@@ -19,6 +19,13 @@
   background-color: #fff;
 }
 
+hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.breadcrumb { padding-bottom: 0; }
+
 #home .cols > .inner {
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -159,7 +166,6 @@
   border-color: #ddd #ddd #ddd transparent;
   *border-left-color: #ffffff;
 }
-
 
 #settings .panel-group .panel {
   border: none;
