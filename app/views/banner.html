@@ -6,22 +6,22 @@
 			  <li><a href="#" class="text-primary" disabled>Facebook Template</a></li>
 			  <li class="text-primary active">Empty Prize</li>
 			</ol>
+			<hr>
 		</div>
 	</div>
-	<hr>
 	<div class="row">
 		<aside class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 			<div id="templates" ng-class="animation.templates" ng-hide="showEditor">
 				<h4 style="margin-left:15px">Default Templates</h4>
 				<div class="tabbable tabs-left">
 					<ul class="margin-top-bottom nav nav-tabs col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<li class="active"><a href="#0-prize" data-toggle="tab">Template Empty Prize</a></li>
-						<li><a href="#1-1prize" data-toggle="tab">Template 1 - 1 Prize</a></li>
-						<li><a href="#1-2prizes" data-toggle="tab">Template 1 - 2 Prizes</a></li>
-						<li><a href="#1-3prizes" data-toggle="tab">Template 1 - 3 Prizes</a></li>
-						<li><a href="#2-1prize" data-toggle="tab">Template 2 - 1 Prize</a></li>
-						<li><a href="#2-2prizes" data-toggle="tab">Template 2 - 2 Prizes</a></li>
-						<li><a href="#2-3prizes" data-toggle="tab">Template 2 - 3 Prizes</a></li>
+						<li class="active"><a href="#0-prize" data-toggle="tab" data-prize="0">Template Empty Prize</a></li>
+						<li><a href="#1-1prize" data-toggle="tab" data-prize="1">Template 1 - 1 Prize</a></li>
+						<li><a href="#1-2prizes" data-toggle="tab" data-prize="2">Template 1 - 2 Prizes</a></li>
+						<li><a href="#1-3prizes" data-toggle="tab" data-prize="3">Template 1 - 3 Prizes</a></li>
+						<li><a href="#2-1prize" data-toggle="tab" data-prize="1">Template 2 - 1 Prize</a></li>
+						<li><a href="#2-2prizes" data-toggle="tab" data-prize="2">Template 2 - 2 Prizes</a></li>
+						<li><a href="#2-3prizes" data-toggle="tab" data-prize="3">Template 2 - 3 Prizes</a></li>
 					</ul>
 				</div>
 			</div>
@@ -33,6 +33,7 @@
 			</button>
 			<div id="settings" class="margin-top-bottom" ng-class="animation.settings" ng-hide="!showEditor">
 				<accordion close-others="settings.oneAtATime">
+					<!-- Background -->
 			        <accordion-group heading="Background" is-open="settings.isFirstOpen" class="panel-primary">
 					   	<div class="form-horizontal">
 						    <div class="form-group">
@@ -41,10 +42,10 @@
 						    <div class="form-group">
 							    <div class="btn-group col-md-12">
 								    <div class="btn-group">
-								        <label class="btn btn-default btn-sm" ng-model="background.type" btn-radio="'Upload'" uncheckable>Upload</label>
-								        <label class="btn btn-default btn-sm" ng-model="background.type" btn-radio="'Feris'" uncheckable>Feris</label>
-								        <label class="btn btn-default btn-sm" ng-model="background.type" btn-radio="'Grass'" uncheckable>Grass</label>
-								        <label class="btn btn-default btn-sm" ng-model="background.type" btn-radio="'Young'" uncheckable>Young</label>
+								        <label class="btn btn-default btn-sm" ng-model="banner.background.type" btn-radio="'Upload'" uncheckable>Upload</label>
+								        <label class="btn btn-default btn-sm" ng-model="banner.background.type" btn-radio="'Feris'" uncheckable>Feris</label>
+								        <label class="btn btn-default btn-sm" ng-model="banner.background.type" btn-radio="'Grass'" uncheckable>Grass</label>
+								        <label class="btn btn-default btn-sm" ng-model="banner.background.type" btn-radio="'Young'" uncheckable>Young</label>
 								    </div>
 							    </div>
 						    </div>
@@ -55,8 +56,8 @@
 						    <div class="form-group">
 							    <div class="btn-group col-md-12">
 								    <div class="btn-group">
-								        <label class="btn btn-default btn-sm" ng-model="background.overlay" btn-radio="'yes'" uncheckable>Yes</label>
-								        <label class="btn btn-default btn-sm" ng-model="background.overlay" btn-radio="'no'" uncheckable>No</label>
+								        <label class="btn btn-default btn-sm" ng-model="banner.background.overlay" btn-radio="'yes'" uncheckable>Yes</label>
+								        <label class="btn btn-default btn-sm" ng-model="banner.background.overlay" btn-radio="'no'" uncheckable>No</label>
 								    </div>
 							    </div>
 						    </div>
@@ -65,10 +66,10 @@
 						      	<label for="inputLogo" class="col-md-4">FB Logo</label>
 						    </div>
 						    <div class="form-group">
-							    <div class="btn-group col-md-12">
+							    <div class="btn-group col-md-12 btn-images">
 							        <button class="btn btn-default btn-sm col-md-4" 
-							        	ng-repeat="img in background.fb.images"
-							        	ng-class="{'active':background.fb.selected == $index}"
+							        	ng-repeat="img in banner.background.fb.images"
+							        	ng-class="{'active':banner.background.fb.selected == $index}"
 							        	ng-click="setFbLogo($index)">
 							        	<img ng-src="{{img}}" width="100%">
 							        </button>
@@ -76,16 +77,21 @@
 						    </div>
 
 						    <div class="form-group">
-						      	<label for="inputLogo" class="col-md-3">FB Size</label>
+						      	<label for="inputLogo" class="col-md-4">FB Size</label>
+						    </div>
+						    <div class="form-group">
 						      	<div class="col-md-5">
 						            <input type="number" class="form-control input-sm" value="120">
 						        </div>
-						        <div class="col-md-4">
+						      	<div class="col-md-1">x</div>
+						        <div class="col-md-5">
 						             <input type="number" class="form-control input-sm" value="120" disabled="disabled">
 						        </div>
 						    </div>
 						</div>
 			        </accordion-group>
+
+			        <!-- Logo -->
 			        <accordion-group heading="Logo" class="panel-primary">
 			            <div class="form-horizontal">
 						    <div class="form-group">
@@ -113,16 +119,42 @@
 						    </div>
 						</div>
 			        </accordion-group>
+
+			        <!-- Badge -->
 			        <accordion-group heading="Bagde" class="panel-primary">
-					    <div class="btn-group">
+					    <div class="btn-group btn-images">
 					        <button class="btn btn-default btn-sm col-md-3" 
-					        	ng-repeat="img in background.badge.images"
-					        	ng-class="{'active':background.badge.selected == $index}"
+					        	ng-repeat="img in banner.badge.images"
+					        	ng-class="{'active':banner.badge.selected == $index}"
 					        	ng-click="setBadge($index)">
 					        	<img ng-src="{{img}}" width="100%">
 					        </button>
 					    </div>
 			        </accordion-group>
+
+			        <!-- Prizes -->
+			        <accordion-group heading="Prizes" class="panel-primary" ng-hide="banner.prize.selected == 0">
+					    <div class="form-horizontal">
+					    	<div class="form-group" ng-show="banner.prize.selected >= 1">
+					    		<label class="col-md-5 control-label">Prize 1</label>
+					    		<div class="col-md-7"><button class="btn btn-primary btn-sm">Select an image</button></div>
+					    	</div>
+					    	<div class="form-group" ng-show="banner.prize.selected >= 2">
+					    		<label class="col-md-5 control-label">Prize 2</label>
+					    		<div class="col-md-7"><button class="btn btn-primary btn-sm">Select an image</button></div>
+					    	</div>
+					    	<div class="form-group" ng-show="banner.prize.selected >= 3">
+					    		<label class="col-md-5 control-label">Prize 3</label>
+					    		<div class="col-md-7"><button class="btn btn-primary btn-sm">Select an image</button></div>
+					    	</div>
+					    	<div class="form-group">
+					    		<label class="col-md-5 control-label">Position ({{banner.prize.position}})</label>
+					    		<div class="col-md-7"><input type="range" min="0" max="10" ng-model="banner.prize.position"></div>
+					    	</div>
+					    </div>
+			        </accordion-group>
+
+			        <!-- Text -->
 			        <accordion-group heading="Text" class="panel-primary">
 			            <div class="form-group">
 						    <label for="textTitle">Title</label>
@@ -137,20 +169,20 @@
 			        </accordion-group>
 			    </accordion>
 				
-				    <div class="btn-group btn-block">
-				      <button type="button" class="btn col-lg-10 btn-sm btn-success"><i class="fa fa-gear"></i> Generate Image</button>
-				      <button type="button" class="btn col-lg-2 btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
-				        <span class="caret"></span>
-				        <span class="sr-only">Toggle Dropdown</span>
-				      </button>
-				      <ul class="dropdown-menu col-lg-12" role="menu">
-				        <li><a href="#">Generate Image & Save</a></li>
-				      </ul>
-				    </div>
+			    <div class="btn-group btn-block">
+			      <button type="button" class="btn col-lg-10 btn-sm btn-success"><i class="fa fa-gear"></i> Generate Image</button>
+			      <button type="button" class="btn col-lg-2 btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
+			        <span class="caret"></span>
+			        <span class="sr-only">Toggle Dropdown</span>
+			      </button>
+			      <ul class="dropdown-menu col-lg-12" role="menu">
+			        <li><a href="#">Generate Image & Save</a></li>
+			      </ul>
+			    </div>
 			</div>
 		</aside>
 		<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
-			<div class="tab-content margin-top-bottom text-center">
+			<div class="tab-content text-center" style="margin-top: 60px;">
 	         	<div class="tab-pane active" id="empty-prize"><img src="http://placehold.it/810x381&text=Template+Empty+Prize"></div>
 	         	<div class="tab-pane" id="1-1prize"><img src="http://placehold.it/810x381&text=Template+1-1+Prize"></div>
 	         	<div class="tab-pane" id="1-2prizes"><img src="http://placehold.it/810x381&text=Template+1-2+Prizes"></div>

@@ -13,7 +13,13 @@ require.config({
     'angular-ui-utils': '../bower_components/angular-ui-utils/ui-utils.min',
 
     'jquery': '../bower_components/jquery/dist/jquery.min',
-    'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min'
+    'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
+
+    'raphael': 'lib/raphael/raphael',
+    'raphael-group': 'lib/raphael/raphael.group',
+    'raphael-filter': 'lib/raphael/fraphael',
+    'raphael-transform': 'lib/raphael/raphael.transform',
+    'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min'
   },
   shim: {
     'angular' : {'exports' : 'angular'},
@@ -29,7 +35,13 @@ require.config({
     'angular-bootstrap': ['angular'],
     'angular-ui-utils': ['angular'],
 
-    'bootstrap': ['jquery']
+    'bootstrap': ['jquery'],
+
+    'raphael': ['jquery'],
+    'raphael-group': ['raphael'],
+    'raphael-filter': ['raphael'],
+    'raphael-transform': ['raphael'],
+    'raphael-svg-import': ['raphael']
   },
   priority: [
     'angular'

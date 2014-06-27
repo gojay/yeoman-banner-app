@@ -186,11 +186,20 @@ hr {
   cursor: pointer;
 }
 #settings label {
-  display: block;
+  text-align: left !important;
 }
 
 .nav-tabs > li > a, .nav-tabs > li > a:hover, .nav-tabs > li > a:focus {
   color: #2C3E50;
 }.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
   color: #18BC9C;
+}
+
+.btn-images.btn-group > .btn {
+  background-color: #FFF;
+  box-shadow: none;
+  border: 0;
+}
+.btn-images.btn-group > .btn.active {
+  border-bottom: 2px solid #18BC9C;
 }
