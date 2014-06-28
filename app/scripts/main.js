@@ -19,6 +19,7 @@ require.config({
     'raphael-group': 'lib/raphael/raphael.group',
     'raphael-filter': 'lib/raphael/fraphael',
     'raphael-transform': 'lib/raphael/raphael.transform',
+    'raphael-json': 'lib/raphael/raphael.json',
     'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min'
   },
   shim: {
@@ -41,6 +42,7 @@ require.config({
     'raphael-group': ['raphael'],
     'raphael-filter': ['raphael'],
     'raphael-transform': ['raphael'],
+    'raphael-json': ['raphael'],
     'raphael-svg-import': ['raphael']
   },
   priority: [
