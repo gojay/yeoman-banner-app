@@ -3,6 +3,7 @@ define(['angular'], function (angular) {
 
   angular.module('bannerAppApp.controllers.MainCtrl', [])
     .controller('MainCtrl', function ($scope, $modal) {
+      // $scope.$navigate = $navigate;
       $scope.menus = {
       	'Facebook' : [{
       		title: 'Banner Creator',
@@ -23,7 +24,10 @@ define(['angular'], function (angular) {
       		link : 'splash' 
       	}],
 
-      	'others' : []
+      	'others' : [{
+                  title: 'Raphael',
+                  link: 'raphael'
+            }]
       };
 
       var icons = [

@@ -11,9 +11,12 @@ require.config({
     'angular-animate': '../bower_components/angular-animate/angular-animate.min',
     'angular-bootstrap': '../bower_components/angular-bootstrap/ui-bootstrap-tpls.min',
     'angular-ui-utils': '../bower_components/angular-ui-utils/ui-utils.min',
+    'angular-spinkit': '../bower_components/angular-spinkit/build/angular-spinkit.min',
+    'angular-snap': '../bower_components/angular-snap/angular-snap',
 
     'jquery': '../bower_components/jquery/dist/jquery.min',
     'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
+    'snap': 'lib/snap.min',
 
     'raphael': 'lib/raphael/raphael',
     'raphael-group': 'lib/raphael/raphael.group',
@@ -35,6 +38,10 @@ require.config({
     'angular-animate': ['angular'],
     'angular-bootstrap': ['angular'],
     'angular-ui-utils': ['angular'],
+    'angular-spinkit': ['angular'],
+    'angular-snap': ['angular', 'snap'],
+
+    'snap' : {'exports' : 'snap'},
 
     'bootstrap': ['jquery'],
 
@@ -63,6 +70,9 @@ require([
   'angular-bootstrap',
   'angular-ui-utils',
   'angular-animate',
+  'angular-spinkit',
+  'snap',
+  'angular-snap',
   'bootstrap'
 ], function(angular, app, ngRoutes, ngCookies, ngSanitize, ngResource) {
   'use strict';
