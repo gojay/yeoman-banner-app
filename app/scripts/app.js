@@ -10,7 +10,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         'bannerAppApp.filters.Comatonewline',
         'bannerAppApp.filters.Splitintolines',
         'bannerAppApp.services.Banner',
-/*angJSDeps*/
+        /*angJSDeps*/
         'ngCookies',
         'ngResource',
         'ngSanitize',
@@ -23,85 +23,126 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         'angularSpinkit',
         'snap'
     ])
-    .config(function($routeProvider, $locationProvider) {
-        $routeProvider
-            .when('/', {
-                templateUrl: 'views/main.html',
-                controller: 'MainCtrl'
-            })
-            .when('/bootstrap', {
-                templateUrl: 'views/bootstrap.html',
-                controller: 'BootstrapCtrl'
-            })
-            .when('/facebook/banner', {
-                templateUrl: 'views/banner.html',
-                controller: 'BannerCtrl'
-            })
-            .when('/facebook/conversation', {
-                templateUrl: 'views/conversation.html',
-                controller: 'ConversationCtrl'
-            })
-            .when('/raphael', {
-              templateUrl: 'views/raphael.html',
-              controller: 'RaphaelCtrl',
-              resolve: {
-                  delay: function($q, $timeout, $rootScope){
-                    console.log('delay');
-                    $rootScope.isLoading = true;
-                    var delay = $q.defer();
-                    $timeout(function(){
-                      $rootScope.isLoading = false;
-                      delay.resolve();
-                    }, 1000);
-                    return delay.promise;
-                  }
-              }
-            })
-            .otherwise({
-                redirectTo: '/'
-            });
+        .directive('bindUnsafeHtml', ['$compile',
+            function($compile) {
+                return function(scope, element, attrs) {
+                    console.log('scope', scope)
+                    scope.$watch(
+                        function(scope) {
+                            // watch the 'bindUnsafeHtml' expression for changes
+                            return scope.$eval(attrs.bindUnsafeHtml);
+                        },
+                        function(value) {
+                            // when the 'bindUnsafeHtml' expression changes
+                            // assign it into the current DOM
+                            element.html(value);
 
-        // $locationProvider
-        //     .html5Mode(false)
-        //     .hashPrefix('!');
-    })
-    .run(['$rootScope', '$window', 'snapRemote', function($rootScope, $window, snapRemote){
+                            // compile the new DOM and link it to the current
+                            // scope.
+                            // NOTE: we only compile .childNodes so that
+                            // we don't get into infinite loop compiling ourselves
+                            $compile(element.contents())(scope);
+                        }
+                    );
+                }
+            }
+        ])
+        .config(function($routeProvider, $locationProvider) {
+            $routeProvider
+                .when('/', {
+                    templateUrl: 'views/main.html',
+                    controller: 'MainCtrl'
+                })
+                .when('/bootstrap', {
+                    templateUrl: 'views/bootstrap.html',
+                    controller: 'BootstrapCtrl'
+                })
+                .when('/facebook/banner', {
+                    templateUrl: 'views/banner.html',
+                    controller: 'BannerCtrl'
+                })
+                .when('/facebook/conversation', {
+                    templateUrl: 'views/conversation.html',
+                    controller: 'ConversationCtrl'
+                })
+                .when('/raphael', {
+                    templateUrl: 'views/raphael.html',
+                    controller: 'RaphaelCtrl',
+                    resolve: {
+                        delay: function($q, $timeout, $rootScope) {
+                            console.log('delay');
+                            $rootScope.isLoading = true;
+                            var delay = $q.defer();
+                            $timeout(function() {
+                                $rootScope.isLoading = false;
+                                delay.resolve();
+                            }, 1000);
+                            return delay.promise;
+                        }
+                    }
+                })
+                .otherwise({
+                    redirectTo: '/'
+                });
 
-      $window.addEventListener('resize', function() {
-        $rootScope.$digest();
-      });
+            // $locationProvider
+            //     .html5Mode(false)
+            //     .hashPrefix('!');
+        })
+        .run(['$rootScope', '$window', '$timeout', 'snapRemote',
+            function($rootScope, $window, $timeout, snapRemote) {
+                // sidemenu
+                $rootScope.menus = {
+                    left: {
+                        model: null,
+                        template: null
+                    },
+                    right: {
+                        model: null,
+                        template: null
+                    }
+                };
 
-      $rootScope.$watch(
-        function() {
-          return window.innerWidth;
-        },
-        function(newVal) {
-          snapRemote.getSnapper().then(function(snapper) {
-            var val = newVal * 80/100;
+                $window.addEventListener('resize', function() {
+                    $rootScope.$digest();
+                });
 
-            snapper.settings({
-              maxPosition: val,
-              minPosition:-val
-            });
-          });
-        }
-      );
+                $rootScope.$watch(
+                    function() {
+                        return window.innerWidth;
+                    },
+                    function(newVal) {
+                        snapRemote.getSnapper().then(function(snapper) {
+                            var val = parseInt(newVal * 80 / 100);
+                            snapper.settings({
+                                maxPosition: val,
+                                minPosition: -val
+                            });
+                            $timeout(function() {
+                                $('.snap-drawer').css({
+                                    'width': val + 'px'
+                                })
+                            }, 400)
+                        });
+                    }
+                );
 
-      // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
-      var oldLocation = '';
-      $rootScope.$on('$routeChangeStart', function(angularEvent, next) {
-        console.log("routeChangeStart");
-        var isDownwards = true;
-        if (next && next.$$route) {
-          var newLocation = next.$$route.originalPath;
-          if (oldLocation !== newLocation && oldLocation.indexOf(newLocation) !== -1) {
-            isDownwards = false;
-          }
-          
-          oldLocation = newLocation;
-        }
-        
-        $rootScope.isDownwards = isDownwards;
-      });
-    }]);
+                // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
+                var oldLocation = '';
+                $rootScope.$on('$routeChangeStart', function(angularEvent, next) {
+                    console.log("routeChangeStart");
+                    var isDownwards = true;
+                    if (next && next.$$route) {
+                        var newLocation = next.$$route.originalPath;
+                        if (oldLocation !== newLocation && oldLocation.indexOf(newLocation) !== -1) {
+                            isDownwards = false;
+                        }
+
+                        oldLocation = newLocation;
+                    }
+
+                    $rootScope.isDownwards = isDownwards;
+                });
+            }
+        ]);
 });

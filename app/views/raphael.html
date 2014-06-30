@@ -1,28 +1,28 @@
 <div class="page-header">
 	<div class="row">
-		<div id="canvas" class="col-lg-9"></div>
+		<div id="canvas" class="col-lg-9" data-snap-ignore="true"></div>
 		<div class="col-lg-3">
-			<pre>Selected : {{ selected }}</pre>
-			<pre>Draw : {{ draw }}</pre>
+			<pre>Selected : {{ banner.selected }}</pre>
+			<pre>Draw : {{ banner.draw }}</pre>
 			<form action="" method="POST" role="form">
 				<div class="form-group">
 					<label class="radio-inline">
 					  <input type="radio" ng-model="draw" id="inlineRadio1" ng-value=null> None
 					</label>
 					<label class="radio-inline">
-					  <input type="radio" ng-model="draw" id="inlineRadio1" value="bbox" ng-disabled="!selected"> Box
+					  <input type="radio" ng-model="draw" id="inlineRadio1" value="bbox" ng-disabled="!banner.selected"> Box
 					</label>
 					<label class="radio-inline">
-					  <input type="radio" ng-model="draw" id="inlineRadio2" value="circle" ng-disabled="!selected"> Circle
+					  <input type="radio" ng-model="draw" id="inlineRadio2" value="circle" ng-disabled="!banner.selected"> Circle
 					</label>
 				</div>
 				<div class="form-group">
 					<label for="title">Title</label>
-					<input type="text" class="form-control" id="title" placeholder="Enter title" ng-model="title">
+					<input type="text" class="form-control" id="title" placeholder="Enter title" ng-model="banner.text.html.title">
 				</div>
 				<div class="form-group">
 					<label for="description">Description</label>
-					<textarea description="" rows="10" class="form-control" ng-model="description"></textarea>
+					<textarea description="" rows="10" class="form-control" ng-model="banner.text.html.description"></textarea>
 				</div>
 			</form>
 		</div>
