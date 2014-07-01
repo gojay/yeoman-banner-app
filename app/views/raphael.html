@@ -1,6 +1,9 @@
 <div class="page-header">
 	<div class="row">
-		<div id="canvas" class="col-lg-9" data-snap-ignore="true"></div>
+		<div class="col-lg-9">
+			<banner-creator id="canvas-1" ng-model="banner" ></banner-creator>
+			<banner-creator id="canvas-2" ng-model="banner" ></banner-creator>
+		</div>
 		<div class="col-lg-3">
 			<pre>Selected : {{ banner.selected }}</pre>
 			<pre>Draw : {{ banner.draw }}</pre>
@@ -27,5 +30,5 @@
 			</form>
 		</div>
 	</div>
-	<div class="row"> </div>
+	<div class="row"></div>
 </div>

@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner'] /*deps*/ , function(angular, MainCtrl, BootstrapCtrl, BannerCtrl, ConversationCtrl, RaphaelCtrl, ComatonewlineFilter) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator'] /*deps*/ , function(angular, MainCtrl, BootstrapCtrl, BannerCtrl, ConversationCtrl, RaphaelCtrl, ComatonewlineFilter) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', ['bannerAppApp.controllers.MainCtrl',
@@ -10,7 +10,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         'bannerAppApp.filters.Comatonewline',
         'bannerAppApp.filters.Splitintolines',
         'bannerAppApp.services.Banner',
-        /*angJSDeps*/
+        'bannerAppApp.directives.Bannercreator',
+/*angJSDeps*/
         'ngCookies',
         'ngResource',
         'ngSanitize',
@@ -26,7 +27,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         .directive('bindUnsafeHtml', ['$compile',
             function($compile) {
                 return function(scope, element, attrs) {
-                    console.log('scope', scope)
                     scope.$watch(
                         function(scope) {
                             // watch the 'bindUnsafeHtml' expression for changes
