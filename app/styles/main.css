@@ -24,6 +24,31 @@ hr {
   margin-bottom: 10px;
 }
 
+input[type=range].vVertical {
+    -webkit-appearance: none;
+    background-color: #7b8a8b;
+    width: 200px;
+    height:10px;
+
+      -webkit-transform:rotate(90deg);       
+    -moz-transform:rotate(90deg);
+    -o-transform:rotate(90deg);
+    -ms-transform:rotate(90deg);
+    transform:rotate(90deg);
+    z-index: 0;
+
+    position: relative;
+    top: 80px;
+    border-radius: 15px;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background-color: #2c3e50;
+    width: 20px;
+    height: 20px;
+    border-radius: 50px;
+}
+
 .breadcrumb { padding-bottom: 0; }
 
 #home .cols > .inner {

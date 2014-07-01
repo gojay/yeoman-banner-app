@@ -1,10 +1,11 @@
 <div class="page-header">
 	<div class="row">
 		<div class="col-lg-9">
-			<banner-creator id="canvas-1" ng-model="banner" ></banner-creator>
-			<banner-creator id="canvas-2" ng-model="banner" ></banner-creator>
+			<banner-creator id="canvas-1" ng-model="banner"></banner-creator>
+			<banner-creator id="canvas-2" ng-model="banner" type="1"></banner-creator>
+			<banner-creator id="canvas-3" ng-model="banner" type="2"></banner-creator>
 		</div>
-		<div class="col-lg-3">
+		<div class="col-lg-3" data-snap-ignore="true">
 			<pre>Selected : {{ banner.selected }}</pre>
 			<pre>Draw : {{ banner.draw }}</pre>
 			<form action="" method="POST" role="form">
@@ -26,6 +27,14 @@
 				<div class="form-group">
 					<label for="description">Description</label>
 					<textarea description="" rows="10" class="form-control" ng-model="banner.text.html.description"></textarea>
+				</div>
+				<div class="form-group">
+					<label for="y">Prize 1 Y</label>
+					<input type="range" min="175" max="310" ng-model="banner.prize[1].image.y">
+				</div>
+				<div class="form-group">
+					<label for="y">Prize 2 Y</label>
+					<input type="range" min="194" max="293" ng-model="banner.prize[2].image.y">
 				</div>
 			</form>
 		</div>

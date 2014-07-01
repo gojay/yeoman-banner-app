@@ -1,8 +1,9 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator'] /*deps*/ , function(angular, MainCtrl, BootstrapCtrl, BannerCtrl, ConversationCtrl, RaphaelCtrl, ComatonewlineFilter) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
-    return angular.module('bannerAppApp', ['bannerAppApp.controllers.MainCtrl',
+    return angular.module('bannerAppApp', [
+        'bannerAppApp.controllers.MainCtrl',
         'bannerAppApp.controllers.BootstrapCtrl',
         'bannerAppApp.controllers.BannerCtrl',
         'bannerAppApp.controllers.ConversationCtrl',
@@ -11,7 +12,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         'bannerAppApp.filters.Splitintolines',
         'bannerAppApp.services.Banner',
         'bannerAppApp.directives.Bannercreator',
-/*angJSDeps*/
+        /*angJSDeps*/
         'ngCookies',
         'ngResource',
         'ngSanitize',
@@ -27,6 +28,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         .directive('bindUnsafeHtml', ['$compile',
             function($compile) {
                 return function(scope, element, attrs) {
+                    console.log('scope', scope)
                     scope.$watch(
                         function(scope) {
                             // watch the 'bindUnsafeHtml' expression for changes
@@ -121,7 +123,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                             $timeout(function() {
                                 $('.snap-drawer').css({
                                     'width': val + 'px'
-                                })
+                                });
                             }, 400)
                         });
                     }
@@ -130,7 +132,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
                 var oldLocation = '';
                 $rootScope.$on('$routeChangeStart', function(angularEvent, next) {
-                    console.log("routeChangeStart");
+                    console.log("routeChangeStart:event", angularEvent);
+                    console.log("routeChangeStart:next", next);
                     var isDownwards = true;
                     if (next && next.$$route) {
                         var newLocation = next.$$route.originalPath;
