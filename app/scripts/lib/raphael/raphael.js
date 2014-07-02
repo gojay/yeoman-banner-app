@@ -7014,6 +7014,7 @@
         var b = document.createElement("body");
         b.innerHTML = html;
         if( className ) b.className = className;
+        
         res.node.appendChild(b);
 
         // fix the height to match the newly created html 

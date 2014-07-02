@@ -14,6 +14,9 @@ require.config({
     'angular-spinkit': '../bower_components/angular-spinkit/build/angular-spinkit.min',
     'angular-snap': '../bower_components/angular-snap/angular-snap',
 
+    'webfontloader': 'lib/font-select/libs/webfontloader',
+    'angular-font-select': 'lib/font-select/angular-fontselect',
+
     'jquery': '../bower_components/jquery/dist/jquery.min',
     'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
     'snap': 'lib/snap.min',
@@ -40,8 +43,11 @@ require.config({
     'angular-ui-utils': ['angular'],
     'angular-spinkit': ['angular'],
     'angular-snap': ['angular', 'snap'],
+    
+    'angular-font-select': ['angular', 'webfontloader'],
 
     'snap' : {'exports' : 'snap'},
+    'webfontloader' : {'exports' : 'webfontloader'},
 
     'bootstrap': ['jquery'],
 
@@ -73,6 +79,7 @@ require([
   'angular-spinkit',
   'snap',
   'angular-snap',
+  'angular-font-select',
   'bootstrap'
 ], function(angular, app, ngRoutes, ngCookies, ngSanitize, ngResource) {
   'use strict';

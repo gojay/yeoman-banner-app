@@ -26,6 +26,19 @@ define(['angular'], function(angular) {
                             draw: [value == 'bbox' ? 'bbox' : null, value == 'circle' ? 'circle' : null]
                         });
                     });
+                    scope.$watchCollection('banner.text.font', function(values) {
+                        if( values.size < 8 )
+                            scope.banner.text.font.size = 8;
+                        if( values.size > 64 )
+                            scope.banner.text.font.size = 64;
+                        if( values.line < 8 )
+                            scope.banner.text.font.line = 8;
+                        if( values.line > 64 )
+                            scope.banner.text.font.line = 64;
+                    });
+
+                    scope.banner.text.font.size = 24;
+                    scope.banner.text.font.line = 32;
 
                     switch (type) {
                         case '2':
@@ -48,13 +61,16 @@ define(['angular'], function(angular) {
                     // add definition styles for foreignObject HTML
                     var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
                     var css = {
-                        0: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-0 h2{text-align:left;color:#FFF;font-family:Rockwell;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;color:#FFF;font-family:Arial;font-size:13px;line-height:16px;margin:0;padding:0 20px}",
-                        1: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-1 h2{text-align:left;color:#FFF;font-family:Rockwell;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;color:#FFF;font-family:Arial;line-height:16px;font-size:13px;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;line-height:18px;text-align:center;color:#FFF;font-family:Rockwell;font-weight:400;font-size:18px;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center;color:#FFF;font-family:Arial;font-size:12px;line-height:16px}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;color:#FFF;font-family:Arial;font-size:13px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
-                        2: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-2 h2{text-align:left;color:#FFF;font-family:Rockwell;font-weight:400;font-size:24px;line-height:29px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;color:#FFF;font-family:Arial;line-height:16px;font-size:12px;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;color:#FFF;font-family:Rockwell;font-weight:400;font-size:22px;line-height:24px;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center;color:#FFF;font-family:Arial;font-size:14px}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;color:#FFF;font-family:Arial;font-size:12px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
+                        0: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-0 h2{text-align:left;color:#FFF;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;color:#FFF;font-size:13px;line-height:16px;margin:0;padding:0 20px}",
+                        1: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-1 h2{text-align:left;color:#FFF;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;color:#FFF;line-height:16px;font-size:13px;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;line-height:18px;text-align:center;color:#FFF;font-weight:400;font-size:18px;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center;color:#FFF;font-size:12px;line-height:16px}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;color:#FFF;font-size:13px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
+                        2: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-2 h2{text-align:left;color:#FFF;font-weight:400;font-size:24px;line-height:29px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;color:#FFF;line-height:16px;font-size:12px;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;color:#FFF;font-weight:400;font-size:22px;line-height:24px;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center;color:#FFF;font-size:14px}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;color:#FFF;font-size:12px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
                     };
+
+                    var _css = css[type];
+
                     var style = document.createElement('style');
                     style.type = 'text/css';
-                    style.styleSheet ? style.styleSheet.cssText = css[type] : style.appendChild(document.createTextNode(css[type]));
+                    style.styleSheet ? style.styleSheet.cssText = _css : style.appendChild(document.createTextNode(_css));
                     defs.appendChild(style);
                     paper.canvas.insertBefore(defs, paper.defs);
 
@@ -117,7 +133,7 @@ define(['angular'], function(angular) {
                     }).click(onClickHandler);
                     placeText.node.id = 'text-place';
                     // text html
-                    var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.html.title|comaToNewLine"></h2><p ng-bind-html="banner.text.html.description"></p>',
+                    var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.html.title|comaToNewLine" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.size}}px; line-height: {{banner.text.font.line}}px"></h2><p ng-bind-html="banner.text.html.description" style="font-family: {{banner.text.font.family}}"></p>',
                         scope.banner.text.attrs.html.x,
                         scope.banner.text.attrs.html.y,
                         scope.banner.text.attrs.html.w,
@@ -141,10 +157,11 @@ define(['angular'], function(angular) {
                                 231, 38 // width, height
                             ).attr({
                                 'fill': 'black',
-                                'fill-opacity': 0.75
+                                'fill-opacity': 0.75,
+                                'opacity': '{{ banner.prize[1].placeholder }}'
                             });
                             var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[1].text.header"></h2><span ng-bind-html="banner.prize[1].text.description"></span>',
+                                '<h2 ng-bind-html="banner.prize[1].text.header" style="font-family:{{banner.prize[1].text.font.family}}; color:{{banner.prize[1].text.font.color}}"></h2><span ng-bind-html="banner.prize[1].text.description" style="font-family:{{banner.prize[1].text.font.family}}; color:{{banner.prize[1].text.font.color}}"></span>',
                                 504, 128,
                                 231, 38,
                                 'foreign-object-prize-1'
@@ -174,7 +191,7 @@ define(['angular'], function(angular) {
                                 'stroke': 'none'
                             });
                             var prizeDescriptionHtml = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[1].image.text"></p>',
+                                '<p ng-bind-html="banner.prize[1].image.text" style="font-family: {{banner.prize[1].text.font.family}}"></p>',
                                 455, '{{ banner.prize[1].image.y }}',
                                 340, 50,
                                 'foreign-object-prize-1 prize-figure'
@@ -191,7 +208,7 @@ define(['angular'], function(angular) {
                                 'fill-opacity': 0.75
                             });
                             var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[2].text.header"></h2><span ng-bind-html="banner.prize[2].text.description"></span>',
+                                '<h2 ng-bind-html="banner.prize[2].text.header" style="font-family: {{banner.prize[2].text.font.family}}"></h2><span ng-bind-html="banner.prize[2].text.description" style="font-family: {{banner.prize[2].text.font.family}}"></span>',
                                 447, 129,
                                 272, 50,
                                 'foreign-object-prize-2'
@@ -221,7 +238,7 @@ define(['angular'], function(angular) {
                                 'stroke': 'none'
                             });
                             var prizeDescriptionHtml = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text"></p>',
+                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family: {{banner.prize[2].text.font.family}}"></p>',
                                 379, '{{ banner.prize[2].image.y }}',
                                 203, 30,
                                 'foreign-object-prize-2 prize-figure'
@@ -251,7 +268,7 @@ define(['angular'], function(angular) {
                                 'stroke': 'none'
                             });
                             var prizeDescriptionHtml = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[2].image.attrs[1].text"></p>',
+                                '<p ng-bind-html="banner.prize[2].image.attrs[1].text" style="font-family: {{banner.prize[2].text.font.family}}"></p>',
                                 595, '{{ banner.prize[2].image.y }}',
                                 203, 30,
                                 'foreign-object-prize-2 prize-figure'

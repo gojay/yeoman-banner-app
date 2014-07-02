@@ -23,8 +23,12 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         'ui.bootstrap',
         'ui.utils',
         'angularSpinkit',
-        'snap'
+        'snap',
+        'jdFontselect'
     ])
+        .constant('jdFontselectConfig', {
+            googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
+        })
         .directive('bindUnsafeHtml', ['$compile',
             function($compile) {
                 return function(scope, element, attrs) {
