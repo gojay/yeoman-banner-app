@@ -9,6 +9,64 @@
 			<!-- <pre>Selected : {{ banner.selected }}</pre>
 			<pre>Draw : {{ banner.draw }}</pre>
 			 -->
+
+			<accordion close-others=true>
+			    <accordion-group heading="Font" is-open="isFirstOpen">
+			      	<div class="form-group">
+						<div class="row">
+							<jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect>
+						</div>
+					</div>
+			    </accordion-group>
+			    <accordion-group heading="Header">
+			    	<div class="form-group">
+						<label for="y">Font Size</label>
+						<div class="row">
+							<div class="col-lg-9">
+								<input type="range" min="8" max="32" ng-model="banner.text.font.header.size"> 
+							</div>
+							<div class="col-lg-3">
+								<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size">
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="y">Line Height</label>
+						<div class="row">
+							<div class="col-lg-9">
+								<input type="range" min="8" max="64" ng-model="banner.text.font.header.line"> 
+							</div>
+							<div class="col-lg-3">
+								<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line">
+							</div>
+						</div>
+					</div>
+			    </accordion-group>
+			    <accordion-group heading="Paragraph">
+					<div class="form-group">
+						<label for="y">Font Size</label>
+						<div class="row">
+							<div class="col-lg-9">
+								<input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"> 
+							</div>
+							<div class="col-lg-3">
+								<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size">
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="y">Line Height</label>
+						<div class="row">
+							<div class="col-lg-9">
+								<input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"> 
+							</div>
+							<div class="col-lg-3">
+								<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line">
+							</div>
+						</div>
+					</div>
+			    </accordion-group>
+			</accordion>
 			<form action="" method="POST" role="form">
 				<div class="form-group">
 					<label class="radio-inline">
@@ -26,20 +84,21 @@
 				<div class="panel panel-primary">
 					<div class="panel-heading">Style</div>
 				  	<div class="panel-body">
+						<legend>Font</legend>
 						<div class="form-group">
-							<label for="font">Font Family</label>
 							<div class="row">
 								<jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect>
 							</div>
 						</div>
+						<legend>Header</legend>
 						<div class="form-group">
 							<label for="y">Font Size</label>
 							<div class="row">
 								<div class="col-lg-9">
-									<input type="range" min="8" max="64" ng-model="banner.text.font.size"> 
+									<input type="range" min="8" max="32" ng-model="banner.text.font.header.size"> 
 								</div>
 								<div class="col-lg-3">
-									<input type="text" class="form-control input-sm" ng-model="banner.text.font.size">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size">
 								</div>
 							</div>
 						</div>
@@ -47,10 +106,33 @@
 							<label for="y">Line Height</label>
 							<div class="row">
 								<div class="col-lg-9">
-									<input type="range" min="8" max="64" ng-model="banner.text.font.line"> 
+									<input type="range" min="8" max="64" ng-model="banner.text.font.header.line"> 
 								</div>
 								<div class="col-lg-3">
-									<input type="text" class="form-control input-sm" ng-model="banner.text.font.line">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line">
+								</div>
+							</div>
+						</div>
+						<legend>Paragraph</legend>
+						<div class="form-group">
+							<label for="y">Font Size</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="y">Line Height</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line">
 								</div>
 							</div>
 						</div>

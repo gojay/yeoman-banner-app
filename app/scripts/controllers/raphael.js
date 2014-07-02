@@ -7,6 +7,8 @@ define(['angular', 'raphael', 'raphael-filter', 'raphael-transform', 'raphael-js
             function($scope, $rootScope, $compile, $timeout, Banner) {
                 window.$scope = $scope;
 
+                $scope.isFirstOpen = true;
+
                 $rootScope.menus.left = {
                     model: ['itemA', 'itemB', 'itemC'],
                     template: '<div class="row"><ul class="list-group"><li class="list-group-item" ng-repeat="item in menus.left.model">{{item}}</li></ul></div>'
@@ -17,6 +19,10 @@ define(['angular', 'raphael', 'raphael-filter', 'raphael-transform', 'raphael-js
                 };
 
                 $scope.banner = Banner.dummy();
+
+                $('.p').popover({
+                    placement: 'top'
+                });
 
             }
         ]);
