@@ -24,7 +24,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         'ui.utils',
         'angularSpinkit',
         'snap',
-        'jdFontselect'
+        'jdFontselect',
+        'slidePushMenu'
     ])
         .constant('jdFontselectConfig', {
             googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'

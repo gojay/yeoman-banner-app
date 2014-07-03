@@ -11,7 +11,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <!-- <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" /> -->
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-flatly/flatly.min.css" />
     <link rel="stylesheet" href="bower_components/angular-snap/angular-snap.css" />
@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="styles/ng-animation.css">
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="stylesheet" type="text/css" href="scripts/lib/font-select/angular-fontselect.css" />
+    <link rel="stylesheet" href="scripts/lib/slide-push/slide.and.push.css" />
 
     <!-- endbuild -->
   </head>
@@ -38,6 +39,9 @@
     </snap-drawers>
     
     <snap-content>
+      <ng-slide-push-menu position="top" button="slide" button-icon-class="glyphicon glyphicon-cog">
+        <h3>Menu</h3>
+      </ng-slide-push-menu>
       <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
           <a class="navbar-brand" snap-toggle><i class="fa fa-bars"></i></a>

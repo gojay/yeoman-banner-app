@@ -19,6 +19,7 @@ define(['angular'], function(angular) {
                     // console.log('bannerCreator:element', element[0]);
 
                     var type = attrs.type || 0;
+                    scope.type = type;
                     var svgHeight = null,
                         className = 'foreign-object-' + type;
 
@@ -41,8 +42,8 @@ define(['angular'], function(angular) {
 
                     scope.banner.text.font.header.size = 24;
                     scope.banner.text.font.header.line = 32;
-                    scope.banner.text.font.paragraph.size = 12;
-                    scope.banner.text.font.paragraph.line = 16;
+                    scope.banner.text.font.description.size = 12;
+                    scope.banner.text.font.description.line = 16;
 
                     switch (type) {
                         case '2':
@@ -70,7 +71,7 @@ define(['angular'], function(angular) {
                         2: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-2 h2{text-align:left;color:#FFF;font-weight:400;font-size:24px;line-height:29px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;color:#FFF;line-height:16px;font-size:12px;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;color:#FFF;font-weight:400;font-size:22px;line-height:24px;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center;color:#FFF;font-size:14px}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;color:#FFF;font-size:12px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
                     };
 
-                    var _css = css[type];
+                    var _css = css[1];
 
                     var style = document.createElement('style');
                     style.type = 'text/css';
@@ -137,15 +138,15 @@ define(['angular'], function(angular) {
 
                     $(placeText.node).attr({
                         'opacity': '{{ banner.text.placeholder.hide ? 0 : 1 }}',
-                        'fill':'{{ banner.text.placeholder.fill }}',
-                        'fill-opacity':'{{ banner.text.placeholder.opacity }}',
-                        'stroke':'{{ banner.text.placeholder.nostroke ? \'none\' : banner.text.placeholder.strokeColor }}',
-                        'stroke-width':'{{ banner.text.placeholder.strokeWidth }}'
+                        'fill': '{{ banner.text.placeholder.fill }}',
+                        'fill-opacity': '{{ banner.text.placeholder.opacity }}',
+                        'stroke': '{{ banner.text.placeholder.nostroke ? \'none\' : banner.text.placeholder.strokeColor }}',
+                        'stroke-width': '{{ banner.text.placeholder.strokeWidth }}'
                     });
                     console.log('placeText', placeText);
 
                     // text html
-                    var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.html.title|comaToNewLine" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.header.size}}px; line-height: {{banner.text.font.header.line}}px; color: {{banner.text.font.color}}"></h2><p ng-bind-html="banner.text.html.description" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.paragraph.size}}px; line-height: {{banner.text.font.paragraph.line}}px; color: {{banner.text.font.color}}"></p>',
+                    var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.html.title|comaToNewLine" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.header.size}}px; line-height: {{banner.text.font.header.line}}px; color: {{banner.text.font.color}}"></h2><p ng-bind-html="banner.text.html.description" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.description.size}}px; line-height: {{banner.text.font.description.line}}px; color: {{banner.text.font.color}}"></p>',
                         scope.banner.text.attrs.html.x,
                         scope.banner.text.attrs.html.y,
                         scope.banner.text.attrs.html.w,
@@ -167,14 +168,17 @@ define(['angular'], function(angular) {
                             var prizeHeaderPlaceholder = paper.rect(
                                 504, 128, // x, y
                                 231, 38 // width, height
-                            ).attr({
-                                'fill': 'black',
-                                'fill-opacity': 0.75,
-                                'opacity': '{{ banner.prize[1].placeholder }}'
-                            }).click(onClickHandler);
+                            ).click(onClickHandler);
+                            $(prizeHeaderPlaceholder.node).attr({
+                                'opacity': '{{banner.prize[1].header.placeholder.hide ? 0 : 1 }}',
+                                'fill': '{{banner.prize[1].header.placeholder.fill}}',
+                                'fill-opacity': '{{banner.prize[1].header.placeholder.opacity}}',
+                                'stroke': '{{banner.prize[1].header.placeholder.nostroke ? \'none\' : banner.prize[1].header.placeholder.strokeColor }}',
+                                'stroke-width': '{{banner.prize[1].header.placeholder.strokeWidth}}'
+                            });
                             prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + type;
                             var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[1].text.header" style="font-family:{{banner.prize[1].text.font.family}}; color:{{banner.prize[1].text.font.color}}"></h2><span ng-bind-html="banner.prize[1].text.description" style="font-family:{{banner.prize[1].text.font.family}}; color:{{banner.prize[1].text.font.color}}"></span>',
+                                '<h2 ng-bind-html="banner.prize[1].header.title.text" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}"></h2><span ng-bind-html="banner.prize[1].header.description.text" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}"></span>',
                                 504, 128,
                                 231, 38,
                                 'foreign-object-prize-1'
@@ -206,11 +210,14 @@ define(['angular'], function(angular) {
                             var prizeDescriptionPlaceholder = paper.rect(
                                 455, '{{ banner.prize[1].image.y }}', // x, y
                                 340, 50 // width, height
-                            ).attr({
-                                'fill': 'black',
-                                'fill-opacity': 0.75,
-                                'stroke': 'none'
-                            }).click(onClickHandler);
+                            ).click(onClickHandler);
+                            $(prizeDescriptionPlaceholder.node).attr({
+                                'opacity': '{{banner.prize[1].image.placeholder.hide ? 0 : 1 }}',
+                                'fill': '{{banner.prize[1].image.placeholder.fill}}',
+                                'fill-opacity': '{{banner.prize[1].image.placeholder.opacity}}',
+                                'stroke': '{{banner.prize[1].image.placeholder.nostroke ? \'none\' : banner.prize[1].image.placeholder.strokeColor }}',
+                                'stroke-width': '{{banner.prize[1].image.placeholder.strokeWidth}}'
+                            });
                             prizeDescriptionPlaceholder.node.id = 'prize-image-description-placeholder-' + type;
                             var prizeDescriptionHtml = paper.foreignObject(
                                 '<p ng-bind-html="banner.prize[1].image.text" style="font-family: {{banner.prize[1].text.font.family}}"></p>',
@@ -239,7 +246,7 @@ define(['angular'], function(angular) {
                             });
                             prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + type;
                             var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[2].text.header" style="font-family: {{banner.prize[2].text.font.family}}"></h2><span ng-bind-html="banner.prize[2].text.description" style="font-family: {{banner.prize[2].text.font.family}}"></span>',
+                                '<h2 ng-bind-html="banner.prize[2].text.header.text" style="font-family: {{banner.prize[2].text.font.family}}"></h2><span ng-bind-html="banner.prize[2].text.description.text" style="font-family: {{banner.prize[2].text.font.family}}"></span>',
                                 447, 129,
                                 272, 50,
                                 'foreign-object-prize-2'
@@ -362,47 +369,68 @@ define(['angular'], function(angular) {
                         var el = e.target,
                             id = el.id;
 
-                        console.log('onClickHandler', id, el.parentNode.className);
 
                         var selected, popoverTitle, popoverEl = null;
-                        if (/fb/.test(id)) {
-                            selected = 'fb';
-                        } else if (/logo/.test(id)) {
-                            selected = 'logo';
+                        if (id) {
+
+                            console.log('onClickHandler:hasID', id);
+
+                            if (/fb/.test(id)) {
+                                selected = 'fb';
+                            } else if (/logo/.test(id)) {
+                                selected = 'logo';
+                            } else if (/prize/.test(id)) {
+                                selected = 'prize-image';
+                            }
                         } else if (el instanceof HTMLElement) {
                             var bodyClass = el.parentNode.className;
+
                             if (/prize/.test(bodyClass)) {
                                 if (/prize-figure/.test(bodyClass)) {
-                                    selected = 'prize-image';
                                     popoverTitle = 'Prize Image';
                                     popoverEl = '#group-prize-image-' + type;
+                                    selected = 'prize-image';
                                 } else {
-                                    selected = 'prize-header';
                                     popoverTitle = 'Prize Header';
                                     popoverEl = '#group-prize-header-' + type;
+                                    selected = 'prize-header';
                                 }
                             } else {
                                 selected = 'text';
                                 popoverTitle = 'Content';
                                 popoverEl = '#group-text-' + type;
+                                scope.customStyle = scope.banner.text;
                             };
-                        } else {
-                            selected = null;
+
+                            console.log('onClickHandler:hasElement', el);
+                            console.log('onClickHandler:className', bodyClass);
+                            console.log('onClickHandler:selected', selected);
+                            console.log('onClickHandler:type', type);
                         }
+
+                        // set banner selected
+                        scope.banner.selected = selected;
+                        // applying scope
+                        scope.$apply();
 
                         /* Popover */
 
-                        // remove first
+                        // remove popover
                         $('.popover').remove();
 
                         // show popover
                         if (popoverEl) {
-                            console.log('popoverEl', popoverEl);
+                            var content = null;
+                            if (selected == 'text') {
+                                content = '<div data-snap-ignore="true"><div class="form-group"><label>Font Family</label><div class="row"><jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect></div></div><div class="form-group"><label>Font Color</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.font.color"></div><div id="settings"><accordion close-others=true><accordion-group heading="Placeholder" class="panel-primary"><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">Hide</label>&nbsp;<input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Fill</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.fill" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="toggle" ng-hide="banner.text.placeholder.hide"><div class="form-group"><label>Fill Opacity</label><div class="row"><div class="col-lg-8"><input type="range" min="0" max="1" step="0.1" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">No Stroke</label><input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.nostroke" ng-disabled="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Stroke</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.strokeColor" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div><div class="form-group"><label>Stroke Width</label><div class="row"><div class="col-lg-8"><input type="range" min="1" max="10" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div></div></accordion-group><accordion-group heading="Title" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.text.font.header.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.text.font.header.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line"></div></div></div></accordion-group><accordion-group heading="Description" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.text.font.description.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.description.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.text.font.description.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.description.line"></div></div></div></accordion-group></accordion></div></div>';
+                            } else if (selected == 'prize-header') {
+                                content = '<div data-snap-ignore="true"><div class="form-group"><label>Font Family</label><div class="row"><jd-fontselect stack="banner.prize[type].header.font.family" class="col-md-12"></jd-fontselect></div></div><div class="form-group"><label>Font Color</label><input type="color" style="margin-left: 5px;" ng-model="banner.prize[type].header.font.color"></div><div id="settings"><accordion close-others=true><accordion-group heading="Placeholder" class="panel-primary"><div class="form-group"><div class="row"><div ng-class="banner.prize[type].header.placeholder.hide ? \'col-md-12\' : \'col-md-6\'"><label for="hide-placeholder">Hide</label>&nbsp;<input type="checkbox" id="hide-placeholder" ng-model="banner.prize[type].header.placeholder.hide"></div><div class="col-md-6" ng-hide="banner.prize[type].header.placeholder.hide"><label>Fill</label><input type="color" style="margin-left: 5px;" ng-model="banner.prize[type].header.placeholder.fill" ng-disabled="banner.prize[type].header.placeholder.hide"></div></div></div><div class="toggle" ng-hide="banner.prize[type].header.placeholder.hide"><div class="form-group"><label>Fill Opacity</label><div class="row"><div class="col-lg-8"><input type="range" min="0" max="1" step="0.1" ng-model="banner.prize[type].header.placeholder.opacity" ng-disabled="banner.prize[type].header.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[type].header.placeholder.opacity" ng-disabled="banner.prize[type].header.placeholder.hide"></div></div></div><div class="form-group"><div class="row"><div ng-class="banner.prize[type].header.placeholder.nostroke ? \'col-md-12\' : \'col-md-6\'"><label for="hide-placeholder">No Stroke</label>&nbsp;<input type="checkbox" id="hide-placeholder" ng-model="banner.prize[type].header.placeholder.nostroke" ng-disabled="banner.prize[type].header.placeholder.hide"></div><div class="col-md-6" ng-hide="banner.prize[type].header.placeholder.nostroke"><label>Stroke</label><input type="color" style="margin-left: 5px;" ng-model="banner.prize[type].header.placeholder.strokeColor" ng-disabled="banner.prize[type].header.placeholder.nostroke || banner.prize[type].header.placeholder.hide"></div></div></div><div class="form-group toggle" ng-hide="banner.prize[type].header.placeholder.nostroke || banner.prize[type].header.placeholder.hide"><label>Stroke Width</label><div class="row"><div class="col-lg-8"><input type="range" min="1" max="10" ng-model="banner.prize[type].header.placeholder.strokeWidth" ng-disabled="banner.prize[type].header.placeholder.nostroke || banner.prize[type].header.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[type].header.placeholder.strokeWidth" ng-disabled="banner.prize[type].header.placeholder.nostroke || banner.prize[type].header.placeholder.hide"></div></div></div></div></accordion-group><accordion-group heading="Title" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.prize[type].header.font.header.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[type].header.font.header.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.prize[type].header.font.header.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[type].header.font.header.line"></div></div></div></accordion-group><accordion-group heading="Description" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.prize[type].header.font.description.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[type].header.font.description.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.prize[type].header.font.description.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[type].header.font.description.line"></div></div></div></accordion-group></accordion></div>';
+                            }
                             $('svg ' + popoverEl).popover({
                                 container: '.page-header',
                                 placement: selected == 'text' ? 'right' : 'bottom',
                                 title: popoverTitle + ' Styles',
-                                content: $compile('<div data-snap-ignore="true"><div class="form-group"><label>Font Family</label><div class="row"><jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect></div></div><div class="form-group"><label>Font Color</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.font.color"></div><div id="settings"><accordion close-others=true><accordion-group heading="Placeholder" class="panel-primary"><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">Hide</label><input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Fill</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.fill" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="toggle" ng-hide="banner.text.placeholder.hide"><div class="form-group"><label>Fill Opacity</label><div class="row"><div class="col-lg-8"><input type="range" min="0" max="1" step="0.1" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">No Stroke</label><input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.nostroke" ng-disabled="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Stroke</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.strokeColor" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div><div class="form-group"><label>Stroke Width</label><div class="row"><div class="col-lg-8"><input type="range" min="1" max="10" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div></div></accordion-group><accordion-group heading="Title" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="32" ng-model="banner.text.font.header.size"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="64" ng-model="banner.text.font.header.line"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line"></div></div></div></accordion-group><accordion-group heading="Description" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line"></div></div></div></accordion-group></accordion></div></div>')(scope),
+                                content: $compile(content)(scope),
                                 html: true
                             });
                         }
@@ -415,14 +443,10 @@ define(['angular'], function(angular) {
                         if (selected) {
                             // show transform for selected element
                             elFts[selected].showHandles();
-                        } else {
-                            scope.banner.draw = null;
                         }
-
-                        // set banner selected
-                        scope.banner.selected = selected;
-                        // applying scope
-                        scope.$apply();
+                        // else {
+                        //     scope.banner.draw = null;
+                        // }
                     };
                     // raphael free transform
                     function onTransform(ft, events) {
@@ -448,6 +472,8 @@ define(['angular'], function(angular) {
                         'logo': ftLogo,
                         'text': ftText,
                     };
+
+                    console.log('scope:type', scope);
 
                     // compile scope to svg
                     $compile(paper.canvas)(scope);
