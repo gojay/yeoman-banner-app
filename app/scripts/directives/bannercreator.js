@@ -5,6 +5,7 @@ define(['angular'], function(angular) {
         .directive('bannerCreator', function($compile) {
             return {
                 template: '<div data-snap-ignore="true"></div>',
+                // templateUrl: 'views/bannercreator.html',
                 restrict: 'E',
                 scope: {
                     banner: '=ngModel'
@@ -124,19 +125,27 @@ define(['angular'], function(angular) {
 
                     /* Text */
 
+                    scope.fill = "none";
+
                     // text placeholder
                     var placeText = paper.rect(
                         scope.banner.text.attrs.place.x,
                         scope.banner.text.attrs.place.y,
                         scope.banner.text.attrs.place.w,
                         scope.banner.text.attrs.place.h
-                    ).attr({
-                        'fill': 'black',
-                        'fill-opacity': 0.75
-                    }).click(onClickHandler);
-                    placeText.node.id = 'text-place-' + type;
+                    ).click(onClickHandler);
+
+                    $(placeText.node).attr({
+                        'opacity': '{{ banner.text.placeholder.hide ? 0 : 1 }}',
+                        'fill':'{{ banner.text.placeholder.fill }}',
+                        'fill-opacity':'{{ banner.text.placeholder.opacity }}',
+                        'stroke':'{{ banner.text.placeholder.nostroke ? \'none\' : banner.text.placeholder.strokeColor }}',
+                        'stroke-width':'{{ banner.text.placeholder.strokeWidth }}'
+                    });
+                    console.log('placeText', placeText);
+
                     // text html
-                    var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.html.title|comaToNewLine" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.header.size}}px; line-height: {{banner.text.font.header.line}}px"></h2><p ng-bind-html="banner.text.html.description" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.paragraph.size}}px; line-height: {{banner.text.font.paragraph.line}}px"></p>',
+                    var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.html.title|comaToNewLine" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.header.size}}px; line-height: {{banner.text.font.header.line}}px; color: {{banner.text.font.color}}"></h2><p ng-bind-html="banner.text.html.description" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.paragraph.size}}px; line-height: {{banner.text.font.paragraph.line}}px; color: {{banner.text.font.color}}"></p>',
                         scope.banner.text.attrs.html.x,
                         scope.banner.text.attrs.html.y,
                         scope.banner.text.attrs.html.w,
@@ -392,8 +401,8 @@ define(['angular'], function(angular) {
                             $('svg ' + popoverEl).popover({
                                 container: '.page-header',
                                 placement: selected == 'text' ? 'right' : 'bottom',
-                                title: popoverTitle + ' Custom Styles',
-                                content: $compile('<div data-snap-ignore="true"><div class="form-group"><label>Font family</label><div class="row"><jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect></div></div><accordion close-others=true><accordion-group heading="Header"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="32" ng-model="banner.text.font.header.size"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="64" ng-model="banner.text.font.header.line"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line"></div></div></div></accordion-group><accordion-group heading="Paragraph"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line"></div></div></div></accordion-group></accordion></div>')(scope),
+                                title: popoverTitle + ' Styles',
+                                content: $compile('<div data-snap-ignore="true"><div class="form-group"><label>Font Family</label><div class="row"><jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect></div></div><div class="form-group"><label>Font Color</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.font.color"></div><div id="settings"><accordion close-others=true><accordion-group heading="Placeholder" class="panel-primary"><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">Hide</label><input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Fill</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.fill" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="toggle" ng-hide="banner.text.placeholder.hide"><div class="form-group"><label>Fill Opacity</label><div class="row"><div class="col-lg-8"><input type="range" min="0" max="1" step="0.1" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">No Stroke</label><input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.nostroke" ng-disabled="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Stroke</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.strokeColor" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div><div class="form-group"><label>Stroke Width</label><div class="row"><div class="col-lg-8"><input type="range" min="1" max="10" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div></div></accordion-group><accordion-group heading="Title" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="32" ng-model="banner.text.font.header.size"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="64" ng-model="banner.text.font.header.line"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line"></div></div></div></accordion-group><accordion-group heading="Description" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-9"><input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"></div><div class="col-lg-3"><input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line"></div></div></div></accordion-group></accordion></div></div>')(scope),
                                 html: true
                             });
                         }

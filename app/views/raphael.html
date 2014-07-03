@@ -10,63 +10,119 @@
 			<pre>Draw : {{ banner.draw }}</pre>
 			 -->
 
-			<accordion close-others=true>
-			    <accordion-group heading="Font" is-open="isFirstOpen">
-			      	<div class="form-group">
-						<div class="row">
-							<jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect>
-						</div>
-					</div>
-			    </accordion-group>
-			    <accordion-group heading="Header">
-			    	<div class="form-group">
-						<label for="y">Font Size</label>
-						<div class="row">
-							<div class="col-lg-9">
-								<input type="range" min="8" max="32" ng-model="banner.text.font.header.size"> 
-							</div>
-							<div class="col-lg-3">
-								<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size">
-							</div>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="y">Line Height</label>
-						<div class="row">
-							<div class="col-lg-9">
-								<input type="range" min="8" max="64" ng-model="banner.text.font.header.line"> 
-							</div>
-							<div class="col-lg-3">
-								<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line">
+	      	<div class="form-group">
+	      		<label>Font Family</label>
+				<div class="row">
+					<jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect>
+				</div>
+			</div>
+			<div class="form-group">
+				<label>Font Color</label>
+				<input type="color" style="margin-left: 5px;" ng-model="banner.text.font.color">
+			</div>
+			<div id="settings">
+				<accordion close-others=true>
+					<accordion-group heading="Placeholder" class="panel-primary">
+						<div class="form-group">
+							<div class="row">
+								<div class="col-md-6">
+									<label for="hide-placeholder">Hide</label>
+									<input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.hide">
+								</div>
+								<div class="col-md-6">
+									<label>Fill</label>
+									<input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.fill" ng-disabled="banner.text.placeholder.hide">
+								</div>
 							</div>
 						</div>
-					</div>
-			    </accordion-group>
-			    <accordion-group heading="Paragraph">
-					<div class="form-group">
-						<label for="y">Font Size</label>
-						<div class="row">
-							<div class="col-lg-9">
-								<input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"> 
+						<div class="toggle" ng-hide="banner.text.placeholder.hide">
+							<div class="form-group">
+								<label>Fill Opacity</label>
+								<div class="row">
+									<div class="col-lg-8">
+										<input type="range" min="0" max="1" step="0.1" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"> 
+									</div>
+									<div class="col-lg-4">
+										<input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide">
+									</div>
+								</div>
 							</div>
-							<div class="col-lg-3">
-								<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size">
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-6">
+										<label for="hide-placeholder">No Stroke</label>
+										<input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.nostroke" ng-disabled="banner.text.placeholder.hide">
+									</div>
+									<div class="col-md-6">
+										<label>Stroke</label>
+										<input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.strokeColor" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>Stroke Width</label>
+								<div class="row">
+									<div class="col-lg-8">
+										<input type="range" min="1" max="10" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"> 
+									</div>
+									<div class="col-lg-4">
+										<input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide">
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-					<div class="form-group">
-						<label for="y">Line Height</label>
-						<div class="row">
-							<div class="col-lg-9">
-								<input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"> 
-							</div>
-							<div class="col-lg-3">
-								<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line">
+					</accordion-group>
+				    <accordion-group heading="Title" class="panel-primary">
+				    	<div class="form-group">
+							<label for="y">Font Size</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="32" ng-model="banner.text.font.header.size"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size">
+								</div>
 							</div>
 						</div>
-					</div>
-			    </accordion-group>
-			</accordion>
+						<div class="form-group">
+							<label for="y">Line Height</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="64" ng-model="banner.text.font.header.line"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line">
+								</div>
+							</div>
+						</div>
+				    </accordion-group>
+				    <accordion-group heading="Description" class="panel-primary">
+						<div class="form-group">
+							<label for="y">Font Size</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="y">Line Height</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line">
+								</div>
+							</div>
+						</div>
+				    </accordion-group>
+				</accordion>
+			</div>
+
 			<form action="" method="POST" role="form">
 				<div class="form-group">
 					<label class="radio-inline">
@@ -166,7 +222,7 @@
 							<label>Hide Placeholder</label>
 						    <input type="checkbox" ng-true-value=0 ng-false-value=1 ng-model="banner.prize[1].placeholder"><br/>
 							<label for="font">Color</label>
-							<input type="color" class="input-sm" style="width: 30px;border: none;padding: 0;" ng-model="banner.prize[1].text.font.color">
+							<input type="color" style="margin-left: 5px;" ng-model="banner.prize[1].text.font.color">
 						</div>
 						<div class="form-group">
 							<label for="y">Prize YAxis</label>
@@ -234,3 +290,118 @@
 	</div>
 	<div class="row"></div>
 </div>
+
+<script id="template.html" type="text/ng-template">
+  	<div class="form-group">
+	      		<label>Font Family</label>
+				<div class="row">
+					<jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect>
+				</div>
+			</div>
+			<div class="form-group">
+				<label>Font Color</label>
+				<input type="color" style="margin-left: 5px;" ng-model="banner.text.font.color">
+			</div>
+			<div id="settings">
+				<accordion close-others=true>
+					<accordion-group heading="Placeholder" class="panel-primary">
+						<div class="form-group">
+							<div class="row">
+								<div class="col-md-6">
+									<label for="hide-placeholder">Hide</label>
+									<input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.hide">
+								</div>
+								<div class="col-md-6">
+									<label>Fill</label>
+									<input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.fill" ng-disabled="banner.text.placeholder.hide">
+								</div>
+							</div>
+						</div>
+						<div class="toggle" ng-hide="banner.text.placeholder.hide">
+							<div class="form-group">
+								<label>Fill Opacity</label>
+								<div class="row">
+									<div class="col-lg-8">
+										<input type="range" min="0" max="1" step="0.1" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"> 
+									</div>
+									<div class="col-lg-4">
+										<input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-6">
+										<label for="hide-placeholder">No Stroke</label>
+										<input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.nostroke" ng-disabled="banner.text.placeholder.hide">
+									</div>
+									<div class="col-md-6">
+										<label>Stroke</label>
+										<input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.strokeColor" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>Stroke Width</label>
+								<div class="row">
+									<div class="col-lg-8">
+										<input type="range" min="1" max="10" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"> 
+									</div>
+									<div class="col-lg-4">
+										<input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide">
+									</div>
+								</div>
+							</div>
+						</div>
+					</accordion-group>
+				    <accordion-group heading="Title" class="panel-primary">
+				    	<div class="form-group">
+							<label for="y">Font Size</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="32" ng-model="banner.text.font.header.size"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="y">Line Height</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="64" ng-model="banner.text.font.header.line"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line">
+								</div>
+							</div>
+						</div>
+				    </accordion-group>
+				    <accordion-group heading="Description" class="panel-primary">
+						<div class="form-group">
+							<label for="y">Font Size</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="y">Line Height</label>
+							<div class="row">
+								<div class="col-lg-9">
+									<input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"> 
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line">
+								</div>
+							</div>
+						</div>
+				    </accordion-group>
+				</accordion>
+			</div>
+</script>
