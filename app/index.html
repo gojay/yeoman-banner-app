@@ -14,12 +14,12 @@
     <!-- <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" /> -->
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-flatly/flatly.min.css" />
-    <link rel="stylesheet" href="bower_components/angular-snap/angular-snap.css" />
+    <!-- <link rel="stylesheet" href="bower_components/angular-snap/angular-snap.css" /> -->
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css({.tmp,app}) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/sticky-footer-navbar.css">
+    <!-- <link rel="stylesheet" href="styles/sticky-footer-navbar.css"> -->
     <link rel="stylesheet" href="styles/ng-animation.css">
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="stylesheet" type="text/css" href="scripts/lib/font-select/angular-fontselect.css" />
@@ -27,45 +27,30 @@
 
     <!-- endbuild -->
   </head>
-  <body ng-app="bannerAppApp">
+  <body ng-app="bannerAppApp" style="padding-top: 70px;">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-
-    <snap-drawers>
-      <snap-drawer class="container" bind-unsafe-html="$root.menus.left.template"></snap-drawer>
-      
-      <div snap-drawer="right" class="container" bind-unsafe-html="$root.menus.right.template"></div>
-    </snap-drawers>
-    
-    <snap-content>
-      <ng-slide-push-menu position="top" button="slide" button-icon-class="glyphicon glyphicon-cog">
-        <h3>Menu</h3>
-      </ng-slide-push-menu>
-      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
-          <a class="navbar-brand" snap-toggle><i class="fa fa-bars"></i></a>
-          <a class="navbar-brand" href="#">Banner Creator</a>
-          <a class="navbar-brand pull-right" snap-toggle="right"><i class="fa fa-chevron-right"></i></a>
-        </div>
-      </nav>
-
-      <!-- Add your site or application content here -->
-      <!-- transition http://angular-transitions.mgechev.com/ -->
-      <double-bounce-spinner class="spinkit" style="width:100%" ng-if="$root.isLoading"></double-bounce-spinner>
-      <div class="container main-wrapper at-view-slide-in-left at-view-slide-out-right" 
-           ng-class="{ 
-           'bg-loading': $root.isLoading,
-           'at-view-slide-in-left at-view-slide-out-right': !$root.isDownwards,
-           'at-view-slide-in-left at-view-slide-out-left' : $root.isDownwards,
-           }" ng-view></div> 
-
-      <div id="footer">
-        <div class="container">
-          <p class="text-muted">Place sticky footer content here.</p>
-        </div>
+    <ng-slide-push-menu id="menu-top" position="top" class="bg-primary">
+        <div bind-unsafe-html="$root.menus.top.template"></div>
+    </ng-slide-push-menu>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <a class="navbar-brand" ng-push-menu="menu-left"><i class="fa fa-bars"></i></a>
+        <a class="navbar-brand" href="#">Banner Creator</a>
+        <a class="navbar-brand pull-right" ng-slide-menu="menu-right"><i class="fa fa-chevron-right"></i></a>
+        <a class="navbar-brand pull-right" ng-push-menu="menu-top"><i class="fa fa-gear"></i></a>
       </div>
-    </snap-content>
+    </nav>
+
+    <!-- transition http://angular-transitions.mgechev.com/ -->
+    <double-bounce-spinner class="spinkit" style="width:100%" ng-if="$root.isLoading"></double-bounce-spinner>
+    <div class="container at-view-slide-in-left at-view-slide-out-right" 
+         ng-class="{ 
+         'bg-loading': $root.isLoading,
+         'at-view-slide-in-left at-view-slide-out-right': !$root.isDownwards,
+         'at-view-slide-in-left at-view-slide-out-left' : $root.isDownwards,
+         }" ng-view></div> 
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
      <script>

@@ -1,14 +1,13 @@
-<div class="page-header">
 	<div class="row">
 		<div class="col-lg-9">
 			<banner-creator id="canvas-1" ng-model="banner"></banner-creator>
-			<banner-creator id="canvas-2" ng-model="banner" type="1"></banner-creator>
-			<!-- <banner-creator id="canvas-3" ng-model="banner" type="2"></banner-creator> -->
+			<banner-creator id="canvas-2" ng-model="banner" tpl="1"></banner-creator>
+			<banner-creator id="canvas-3" ng-model="banner" tpl="2"></banner-creator>
 		</div>
 		<div class="col-lg-3" data-snap-ignore="true">
-			<pre>Selected : {{ banner.selected }}</pre>
+			<!-- <pre>Selected : {{ banner.selected }}</pre>
 			<pre>Draw : {{ banner.draw }}</pre>
-
+			 -->
 	      	<div class="form-group">
 	      		<label>Font Family</label>
 				<div class="row">
@@ -75,10 +74,10 @@
 				    	<div class="form-group">
 							<label for="y">Font Size</label>
 							<div class="row">
-								<div class="col-lg-8">
+								<div class="col-lg-9">
 									<input type="range" min="8" max="32" ng-model="banner.text.font.header.size"> 
 								</div>
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size">
 								</div>
 							</div>
@@ -86,10 +85,10 @@
 						<div class="form-group">
 							<label for="y">Line Height</label>
 							<div class="row">
-								<div class="col-lg-8">
+								<div class="col-lg-9">
 									<input type="range" min="8" max="64" ng-model="banner.text.font.header.line"> 
 								</div>
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line">
 								</div>
 							</div>
@@ -99,22 +98,22 @@
 						<div class="form-group">
 							<label for="y">Font Size</label>
 							<div class="row">
-								<div class="col-lg-8">
-									<input type="range" min="8" max="32" ng-model="banner.text.font.description.size"> 
+								<div class="col-lg-9">
+									<input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"> 
 								</div>
-								<div class="col-lg-4">
-									<input type="text" class="form-control input-sm" ng-model="banner.text.font.description.size">
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size">
 								</div>
 							</div>
 						</div>
 						<div class="form-group">
 							<label for="y">Line Height</label>
 							<div class="row">
-								<div class="col-lg-8">
-									<input type="range" min="8" max="64" ng-model="banner.text.font.description.line"> 
+								<div class="col-lg-9">
+									<input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"> 
 								</div>
-								<div class="col-lg-4">
-									<input type="text" class="form-control input-sm" ng-model="banner.text.font.description.line">
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line">
 								</div>
 							</div>
 						</div>
@@ -173,10 +172,10 @@
 							<label for="y">Font Size</label>
 							<div class="row">
 								<div class="col-lg-9">
-									<input type="range" min="8" max="32" ng-model="banner.text.font.description.size"> 
+									<input type="range" min="8" max="32" ng-model="banner.text.font.paragraph.size"> 
 								</div>
 								<div class="col-lg-3">
-									<input type="text" class="form-control input-sm" ng-model="banner.text.font.description.size">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.size">
 								</div>
 							</div>
 						</div>
@@ -184,10 +183,10 @@
 							<label for="y">Line Height</label>
 							<div class="row">
 								<div class="col-lg-9">
-									<input type="range" min="8" max="64" ng-model="banner.text.font.description.line"> 
+									<input type="range" min="8" max="64" ng-model="banner.text.font.paragraph.line"> 
 								</div>
 								<div class="col-lg-3">
-									<input type="text" class="form-control input-sm" ng-model="banner.text.font.description.line">
+									<input type="text" class="form-control input-sm" ng-model="banner.text.font.paragraph.line">
 								</div>
 							</div>
 						</div>
@@ -235,11 +234,11 @@
 				  	<div class="panel-body">
 						<div class="form-group">
 							<label>Header Title</label>
-							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[1].text.header.text">
+							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[1].text.header">
 						</div>
 						<div class="form-group">
 							<label>Header Description</label>
-							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[1].text.description.text">
+							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[1].text.description">
 						</div>
 						<div class="form-group">
 							<label>Prize Text</label>
@@ -268,11 +267,11 @@
 				  	<div class="panel-body">
 						<div class="form-group">
 							<label>Header Title</label>
-							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[2].text.header.text">
+							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[2].text.header">
 						</div>
 						<div class="form-group">
 							<label>Header Description</label>
-							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[2].text.description.text">
+							<input type="text" class="form-control" placeholder="Enter title" ng-model="banner.prize[2].text.description">
 						</div>
 						<div class="form-group">
 							<label>Prize Text 1</label>
@@ -287,5 +286,4 @@
 			</form>
 		</div>
 	</div>
-	<div class="row"></div>
-</div>
+

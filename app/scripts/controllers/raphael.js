@@ -11,11 +11,11 @@ define(['angular', 'raphael', 'raphael-filter', 'raphael-transform', 'raphael-js
 
                 $rootScope.menus.left = {
                     model: ['itemA', 'itemB', 'itemC'],
-                    template: '<div class="row"><ul class="list-group"><li class="list-group-item" ng-repeat="item in menus.left.model">{{item}}</li></ul></div>'
+                    template: '<div style="padding-top: 60px;"><ul class="list-group"><li class="list-group-item" ng-repeat="item in menus.left.model">{{item}}</li></ul></div>'
                 };
                 $rootScope.menus.right = {
                     model: ['itemA', 'itemB', 'itemC'],
-                    template: '<div class="row"><ul class="list-group"><li class="list-group-item" ng-repeat="item in menus.left.model">{{item}}</li></ul></div>'
+                    template: '<div style="padding-top: 60px;"><ul class="list-group"><li class="list-group-item" ng-repeat="item in menus.left.model">{{item}}</li></ul></div>'
                 };
 
                 $scope.banner = Banner.dummy();

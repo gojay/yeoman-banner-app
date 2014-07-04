@@ -1,6 +1,6 @@
 /* General styles for all menus */
 .spmenu {
-  background: #65cff0;
+  /*background: #149C82;*/
   position: fixed; }
   .spmenu.spmenu-open {
     -moz-box-shadow: -20px 0px 30px black;
@@ -15,22 +15,25 @@
     background: #06c0f2;
     text-align: center;
     border-bottom: 4px double white; }
-  .spmenu h4 {
+  .spmenu h4, .spmenu span {
     color: black; }
-  .spmenu a, .spmenu label {
+  .spmenu legend {
+    color: white;
+  }
+  /*.spmenu a, .spmenu label {
     display: block;
     color: black;
     font-size: 1.1em;
     font-weight: 300; }
     .spmenu a:hover, .spmenu label:hover {
-      background: #65cff0; }
+      background: #149C82; }
     .spmenu a:active, .spmenu label:active {
-      background: #65cff0;
+      background: #149C82;
       color: black; }
     .spmenu a span, .spmenu label span {
       color: black; }
     .spmenu a input, .spmenu label input {
-      margin: 5px 10px 0 0 !important; }
+      margin: 5px 10px 0 0 !important; }*/
 
 /* Button */
 a.spmenu-button {
@@ -50,7 +53,7 @@ a.spmenu-button {
   a.spmenu-button.show {
     display: block; }
   a.spmenu-button.active {
-    background: #65cff0;
+    background: #149C82;
     color: black; }
     a.spmenu-button.active i, a.spmenu-button.active span {
       color: black; }
@@ -78,7 +81,7 @@ a.spmenu-button {
 
 /* Orientation-dependent styles for the content of the menu */
 .spmenu-vertical {
-  width: 320px;
+  width: 1088px;
   height: 100%;
   top: 0;
   z-index: 1000; }
@@ -103,7 +106,7 @@ a.spmenu-button {
 
 .spmenu-horizontal {
   width: 100%;
-  height: 150px;
+  min-height: 150px;
   left: 0;
   z-index: 1000;
   /*overflow: hidden;*/ }
@@ -112,9 +115,9 @@ a.spmenu-button {
     width: 20%;
     float: left; }
   .spmenu-horizontal a, .spmenu-horizontal label {
-    float: left;
+    /*float: left;*/
     /*width: 20%;*/
-    width: 5%;
+    /*width: 5%;*/
     /*padding: 0.8em;*/ }
   .spmenu-horizontal hr {
     margin: 0;
@@ -123,10 +126,10 @@ a.spmenu-button {
 
 /* Vertical menu that slides from the left or right */
 .spmenu-left {
-  left: -320px;
-  border-right: 1px solid #65cff0; }
+  left: -1088px;
+  border-right: 1px solid #149C82; }
   .spmenu-left a.spmenu-button {
-    left: 320px;
+    left: 1088px;
     top: 10px;
     -webkit-border-top-right-radius: 5px;
     -moz-border-top-right-radius: 5px;
@@ -136,10 +139,10 @@ a.spmenu-button {
     border-bottom-right-radius: 5px; }
 
 .spmenu-right {
-  right: -320px;
-  border-left: 1px solid #65cff0; }
+  right: -1088px;
+  border-left: 1px solid #149C82; }
   .spmenu-right a.spmenu-button {
-    right: 320px;
+    right: 1088px;
     top: 10px;
     -webkit-border-top-left-radius: 5px;
     -moz-border-top-left-radius: 5px;
@@ -151,8 +154,9 @@ a.spmenu-button {
 /* Horizontal menu that slides from the top or bottom */
 .spmenu-top {
   /*top: -150px;*/
-  top: -90px;
-  border-bottom: 1px solid #65cff0; }
+  top: -257px;
+  padding: 15px;
+  border-bottom: 1px solid #149C82; }
   .spmenu-top a.spmenu-button {
     /*left: 10px;*/
     left: 0;
@@ -166,7 +170,7 @@ a.spmenu-button {
 
 .spmenu-bottom {
   bottom: -150px;
-  border-top: 1px solid #65cff0; }
+  border-top: 1px solid #149C82; }
   .spmenu-bottom a.spmenu-button {
     left: 10px;
     bottom: 150px;
@@ -184,10 +188,10 @@ a.spmenu-button {
   left: 0; }
 
 .spmenu-push-toright {
-  left: 320px; }
+  left: 1088px; }
 
 .spmenu-push-toleft {
-  left: -320px; }
+  left: -1088px; }
 
 /* Transitions */
 .spmenu, .spmenu-push {

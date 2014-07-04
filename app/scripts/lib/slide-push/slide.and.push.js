@@ -1,7 +1,7 @@
 angular.module("slidePushMenu", []).factory('slidePush', function() {
     var spmenuHorizontalHeight, spmenuVerticalWidth;
-    spmenuVerticalWidth = 320;
-    spmenuHorizontalHeight = 150;
+    spmenuVerticalWidth = 1088;
+    spmenuHorizontalHeight = 317;
     return {
         slide: function(menu, btn) {
             btn.toggleClass("active");

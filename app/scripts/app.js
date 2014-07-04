@@ -100,6 +100,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             function($rootScope, $window, $timeout, snapRemote) {
                 // sidemenu
                 $rootScope.menus = {
+                    top: {
+                        model: null,
+                        template: null
+                    },
                     left: {
                         model: null,
                         template: null
