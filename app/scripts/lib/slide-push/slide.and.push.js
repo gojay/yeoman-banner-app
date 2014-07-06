@@ -1,36 +1,36 @@
 angular.module("slidePushMenu", []).factory('slidePush', function() {
     var spmenuHorizontalHeight, spmenuVerticalWidth;
-    spmenuVerticalWidth = 1088;
-    spmenuHorizontalHeight = 317;
+    spmenuVerticalWidth = 1229;
+    spmenuHorizontalHeight = 330;
     return {
         slide: function(menu, btn) {
             btn.toggleClass("active");
             if (menu.hasClass("spmenu-left")) {
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("left", parseInt(menu.css("left")) - spmenuVerticalWidth);
+                    menu.css("left", -spmenuVerticalWidth);
                 } else {
-                    menu.css("left", parseInt(menu.css("left")) + spmenuVerticalWidth);
+                    menu.css("left", 0);
                 }
             }
             if (menu.hasClass("spmenu-right")) {
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("right", parseInt(menu.css("right")) - spmenuVerticalWidth);
+                    menu.css("right", -spmenuVerticalWidth);
                 } else {
-                    menu.css("right", parseInt(menu.css("right")) + spmenuVerticalWidth);
+                    menu.css("right", 0);
                 }
             }
             if (menu.hasClass("spmenu-top")) {
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("top", parseInt(menu.css("top")) - spmenuHorizontalHeight);
+                    menu.css("top", -spmenuHorizontalHeight);
                 } else {
-                    menu.css("top", parseInt(menu.css("top")) + spmenuHorizontalHeight);
+                    menu.css("top", 60);
                 }
             }
             if (menu.hasClass("spmenu-bottom")) {
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("bottom", parseInt(menu.css("bottom")) - spmenuHorizontalHeight);
+                    menu.css("bottom", -spmenuHorizontalHeight);
                 } else {
-                    menu.css("bottom", parseInt(menu.css("bottom")) + spmenuHorizontalHeight);
+                    menu.css("bottom", 0);
                 }
             }
             return menu.toggleClass("spmenu-open");
@@ -58,59 +58,64 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
             body = angular.element("body");
             btn.toggleClass("active");
             if (menu.hasClass("spmenu-left")) {
-                bodyLeft = parseInt(body.css("left"));
-                bodyLeft = (bodyLeft ? bodyLeft : 0);
+                // bodyLeft = parseInt(body.css("left"));
+                // bodyLeft = (bodyLeft ? bodyLeft : 0);
                 if (menu.hasClass("spmenu-open")) {
-                    body.css("left", bodyLeft - spmenuVerticalWidth);
+                    body.css("left", 0);
                 } else {
-                    body.css("left", bodyLeft + spmenuVerticalWidth);
+                    body.css("left", spmenuVerticalWidth);
                 }
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("left", parseInt(menu.css("left")) - spmenuVerticalWidth);
+                    menu.css("left", -spmenuVerticalWidth);
                 } else {
-                    menu.css("left", parseInt(menu.css("left")) + spmenuVerticalWidth);
+                    menu.css("left", 0);
                 }
+                angular.element('.overlay').toggleClass("show");
             }
             if (menu.hasClass("spmenu-right")) {
-                bodyLeft = parseInt(body.css("left"));
-                bodyLeft = (bodyLeft ? bodyLeft : 0);
+                // bodyLeft = parseInt(body.css("left"));
+                // bodyLeft = (bodyLeft ? bodyLeft : 0);
                 if (menu.hasClass("spmenu-open")) {
-                    body.css("left", bodyLeft + spmenuVerticalWidth);
+                    body.css("left", 0);
                 } else {
-                    body.css("left", bodyLeft - spmenuVerticalWidth);
+                    body.css("left", -spmenuVerticalWidth);
                 }
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("right", parseInt(menu.css("right")) - spmenuVerticalWidth);
+                    menu.css("right", -spmenuVerticalWidth);
                 } else {
-                    menu.css("right", parseInt(menu.css("right")) + spmenuVerticalWidth);
+                    menu.css("right", 0);
                 }
+                angular.element('.overlay').toggleClass("show");
             }
             if (menu.hasClass("spmenu-top")) {
-                bodyTop = parseInt(body.css("top"));
-                bodyTop = (bodyTop ? bodyTop : 0);
+                // bodyTop = parseInt(body.css("top"));
+                // bodyTop = (bodyTop ? bodyTop : 0);
                 if (menu.hasClass("spmenu-open")) {
-                    body.css("top", "auto");
+                    body.css("top", 0);
                 } else {
-                    body.css("top", bodyTop + spmenuHorizontalHeight);
+                    body.css("top", spmenuHorizontalHeight);
                 }
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("top", parseInt(menu.css("top")) - spmenuHorizontalHeight);
+                    menu.css("top", -spmenuHorizontalHeight);
                 } else {
-                    menu.css("top", parseInt(menu.css("top")) + spmenuHorizontalHeight);
+                    menu.css("top", 60);
                 }
+
+                // angular.element('.overlay').toggleClass("top");
+                // angular.element('.overlay').toggleClass("show");
             }
             if (menu.hasClass("spmenu-bottom")) {
-                bodyTop = parseInt(body.css("top"));
-                bodyTop = (bodyTop ? bodyTop : 0);
+                // bodyTop = parseInt(body.css("top"));
+                // bodyTop = (bodyTop ? bodyTop : 0);
                 if (menu.hasClass("spmenu-open")) {
-                    body.css("top", "auto");
+                    body.css("top", 0);
                 } else {
-                    body.css("top", bodyTop - spmenuHorizontalHeight);
+                    body.css("top", -spmenuHorizontalHeight);
                 }
                 if (menu.hasClass("spmenu-open")) {
-                    menu.css("bottom", parseInt(menu.css("bottom")) - spmenuHorizontalHeight);
+                    menu.css("bottom", -spmenuHorizontalHeight);
                 } else {
-                    menu.css("bottom", parseInt(menu.css("bottom")) + spmenuHorizontalHeight);
+                    menu.css("bottom", 0);
                 }
             }
             return menu.toggleClass("spmenu-open");
@@ -142,6 +147,62 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
                 }
                 return menu.removeClass("spmenu-open");
             }
+        },
+        pushById: function(id) {
+            var body = angular.element("body"),
+                menu = angular.element("#" + id);
+
+            if (!menu.length) return;
+
+            if (menu.hasClass("spmenu-left")) {
+                body.css("left", spmenuVerticalWidth);
+                menu.css("left", 0);
+                angular.element('.overlay').addClass("show");
+            }
+            if (menu.hasClass("spmenu-right")) {
+                body.css("left", -spmenuVerticalWidth);
+                menu.css("right", 0);
+                angular.element('.overlay').addClass("show");
+            }
+            if (menu.hasClass("spmenu-top")) {
+                body.css("top", spmenuHorizontalHeight);
+                menu.css("top", 60);
+                // angular.element('.overlay').addClass("top");
+                // angular.element('.overlay').addClass("show");
+            }
+            if (menu.hasClass("spmenu-bottom")) {
+                body.css("top", -spmenuHorizontalHeight);
+                menu.css("bottom", 0);
+            }
+            return menu.addClass("spmenu-open");
+        },
+        pushForceCloseById: function(id) {
+            var body = angular.element("body"),
+                menu = angular.element("#" + id);
+
+            if (!menu.length) return;
+
+            if (menu.hasClass("spmenu-left")) {
+                body.css("left", 0);
+                menu.css("left", -spmenuVerticalWidth);
+                angular.element('.overlay').removeClass("show");
+            }
+            if (menu.hasClass("spmenu-right")) {
+                body.css("left", 0);
+                menu.css("right", -spmenuVerticalWidth);
+                angular.element('.overlay').removeClass("show");
+            }
+            if (menu.hasClass("spmenu-top")) {
+                body.css("top", 0);
+                menu.css("top", -spmenuHorizontalHeight);
+                // angular.element('.overlay').removeClass("top");
+                // angular.element('.overlay').removeClass("show");
+            }
+            if (menu.hasClass("spmenu-bottom")) {
+                body.css("top", 0);
+                menu.css("bottom", -spmenuHorizontalHeight);
+            }
+            return menu.removeClass("spmenu-open");
         }
     };
 }).directive("ngSlideMenu", [
@@ -220,7 +281,7 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
                         });
                     }
                 }
-                elem.append(clone);
+                // elem.append(clone);
                 if (attrs.open) {
                     return btn.click();
                 }
@@ -230,8 +291,8 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
             compile: compile,
             restrict: "E",
             replace: true,
-            template: "<nav><a class=\"spmenu-button\"><i class=\"caret\"></i></a></nav>",
-            transclude: "element"
+            template: "<nav><div ng-transclude></div></nav>",
+            transclude: true
         };
     }
 ]);

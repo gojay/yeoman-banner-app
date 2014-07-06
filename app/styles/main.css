@@ -19,6 +19,23 @@
   background-color: #fff;
 }
 
+.overlay {
+  z-index: 1000;
+  top: 0px;
+  right: auto;
+  position: fixed;
+  transition: all .5s ease;
+  background: transparent;
+}
+.overlay.show {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+.overlay.top {
+  top: 377px;
+}
+
 hr {
   margin-top: 10px;
   margin-bottom: 10px;

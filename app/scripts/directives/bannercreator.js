@@ -2,28 +2,35 @@ define(['angular'], function(angular) {
     'use strict';
 
     angular.module('bannerAppApp.directives.Bannercreator', [])
-        .directive('bannerCreator', function($rootScope, $compile, $timeout) {
+        .directive('bannerCreator', function($rootScope, $compile, $timeout, slidePush) {
             return {
                 template: '<div data-snap-ignore="true"></div>',
-                // templateUrl: 'views/bannercreator.html',
                 restrict: 'E',
                 scope: {
                     banner: '=ngModel'
                 },
                 replace: true,
                 // controller: function(scope, element, attrs, transclude) {},
-                link: function(scope, element, attrs, ctrl) {
-                    element.attr('id', attrs.id).addClass(attrs.class);
-                    // console.log('bannerCreator:model', scope.banner);
+                link: function(scope, element, attrs, ctrl) { // console.log('bannerCreator:model', scope.banner);
                     // console.log('bannerCreator:attrs', attrs);
                     // console.log('bannerCreator:element', element[0]);
-
-                    
-
-                    var tpl = attrs.tpl || 0;
-                    scope.tpl = tpl;
-                    var svgHeight = null,
+                    var ID = attrs.id,
+                        className = attrs.class;
+                    var tpl = attrs.tpl || 0,
+                        svgHeight = null,
                         className = 'foreign-object-' + tpl;
+
+                    element.attr('id', ID).addClass(className);
+                    scope.tpl = tpl;
+
+                    $timeout(function() {
+                        var model = angular.copy(scope.banner.text);
+                        model.section = 'Content';
+                        $rootScope.menus.top = {
+                            model: scope.banner.text,
+                            template: '<div ng-include src="\'views/banner-top-config.html\'"></div>'
+                        };
+                    }, 1000);
 
                     // scope.$watch('banner.draw', function(value) {
                     //     if (!elFts[scope.banner.selected]) return;
@@ -42,11 +49,6 @@ define(['angular'], function(angular) {
                             scope.banner.text.font.line = 64;
                     });
 
-                    scope.banner.text.font.header.size = 24;
-                    scope.banner.text.font.header.line = 32;
-                    scope.banner.text.font.description.size = 12;
-                    scope.banner.text.font.description.line = 16;
-
                     switch (tpl) {
                         case '2':
                             svgHeight = 339;
@@ -60,21 +62,24 @@ define(['angular'], function(angular) {
                             break;
                         default:
                             svgHeight = 380;
+                            scope.banner.text.font.header.size = 24;
+                            scope.banner.text.font.header.line = 32;
+                            scope.banner.text.font.description.size = 12;
+                            scope.banner.text.font.description.line = 16;
                             break;
                     };
 
-                    var paper = Raphael(attrs.id, 810, svgHeight);
+                    var paper = Raphael(ID, 810, svgHeight);
 
                     // add definition styles for foreignObject HTML
                     var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
                     var css = {
-                        0: "svg{background-color:#FFF}body{background-color:transparent;}.foreign-object-0 h2{text-align:left;color:#FFF;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;color:#FFF;font-size:13px;line-height:16px;margin:0;padding:0 20px}",
-                        1: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-1 h2{text-align:left;color:#FFF;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;color:#FFF;line-height:16px;font-size:13px;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;line-height:18px;text-align:center;color:#FFF;font-weight:400;font-size:18px;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center;color:#FFF;font-size:12px;line-height:16px}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;color:#FFF;font-size:13px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
-                        2: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-2 h2{text-align:left;color:#FFF;font-weight:400;font-size:24px;line-height:29px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;color:#FFF;line-height:16px;font-size:12px;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;color:#FFF;font-weight:400;font-size:22px;line-height:24px;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center;color:#FFF;font-size:14px}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;color:#FFF;font-size:12px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
+                        0: "svg{background-color:#FFF}body{background-color:transparent;height:235px}.foreign-object-0 h2{text-align:left;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;font-size:13px;line-height:16px;margin:0;padding:0 20px}",
+                        1: "svg{background-color:#FFF}body{background-color:transparent;height:235px}.foreign-object-1 h2{text-align:left;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;line-height:16px;font-size:13px;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;line-height:18px;text-align:center;font-weight:400;font-size:18px;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center;font-size:12px;line-height:16px}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;font-size:13px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
+                        2: "svg{background-color:#FFF}body{background-color:transparent;height:332px}.foreign-object-2 h2{text-align:left;font-weight:400;font-size:24px;line-height:29px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;line-height:16px;font-size:12px;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;font-weight:400;font-size:22px;line-height:24px;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center;font-size:14px}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;font-size:12px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
                     };
 
                     var _css = css[tpl];
-
                     var style = document.createElement('style');
                     style.type = 'text/css';
                     style.styleSheet ? style.styleSheet.cssText = _css : style.appendChild(document.createTextNode(_css));
@@ -222,7 +227,7 @@ define(['angular'], function(angular) {
                             });
                             prizeDescriptionPlaceholder.node.id = 'prize-image-description-placeholder-' + tpl;
                             var prizeDescriptionHtml = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[1].image.text" style="font-family: {{banner.prize[1].text.font.family}}"></p>',
+                                '<p ng-bind-html="banner.prize[1].image.text" style="font-family: {{banner.prize[1].text.font.family}}; color:{{banner.prize[1].image.font.color}}"></p>',
                                 455, '{{ banner.prize[1].image.y }}',
                                 340, 50,
                                 'foreign-object-prize-1 prize-figure'
@@ -360,6 +365,7 @@ define(['angular'], function(angular) {
 
                     // Transform text
                     var gSetText = paper.set(placeText, textHtml);
+                    defaultOptions.configOnClick = onClickHandlerConfigTransform;
                     var ftText = paper.freeTransform(gSetText, defaultOptions, onTransform).hideHandles();
                     angular.extend(gSetText.freeTransform.attrs, scope.banner.text.transform);
                     gSetText.freeTransform.apply();
@@ -370,9 +376,8 @@ define(['angular'], function(angular) {
                     function onClickHandler(e) {
                         var el = e.target,
                             id = el.id;
-
-
                         var selected, popoverTitle, popoverEl = null;
+
                         if (id) {
 
                             console.log('onClickHandler:hasID', id);
@@ -384,8 +389,10 @@ define(['angular'], function(angular) {
                             } else if (/prize/.test(id)) {
                                 selected = 'prize-image';
                             }
+
                         } else if (el instanceof HTMLElement) {
-                            var bodyClass = el.parentNode.className;
+                            var parentElement = el.parentNode;
+                            var bodyClass = parentElement.className;
 
                             if (/prize/.test(bodyClass)) {
                                 if (/prize-figure/.test(bodyClass)) {
@@ -401,13 +408,15 @@ define(['angular'], function(angular) {
                                 selected = 'text';
                                 popoverTitle = 'Content';
                                 popoverEl = '#group-text-' + tpl;
-                                scope.customStyle = scope.banner.text;
                             };
 
-                            console.log('onClickHandler:hasElement', el);
-                            console.log('onClickHandler:className', bodyClass);
-                            console.log('onClickHandler:selected', selected);
-                            console.log('onClickHandler:tpl', tpl);
+                            if (scope.banner.selected != selected && !scope.banner.onEdit) {
+                                // $("body").animate({
+                                //     scrollTop: $('#' + ID).offset().top - 60
+                                // }, "slow");
+                                // scope.banner.onEdit = true;
+                                // slidePush.pushById('menu-top');
+                            }
                         }
 
                         // set banner selected
@@ -417,24 +426,18 @@ define(['angular'], function(angular) {
 
                         /* Popover */
 
-                        // remove popover
-                        $('.popover').remove();
-
-                        // show popover
                         if (popoverEl) {
-                            var content = null;
+                            var content, model = null;
+
                             if (selected == 'text') {
-                                content = '<div data-snap-ignore="true"><div class="form-group"><label>Font Family</label><div class="row"><jd-fontselect stack="banner.text.font.family" class="col-md-12"></jd-fontselect></div></div><div class="form-group"><label>Font Color</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.font.color"></div><div id="settings"><accordion close-others=true><accordion-group heading="Placeholder" class="panel-primary"><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">Hide</label>&nbsp;<input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Fill</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.fill" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="toggle" ng-hide="banner.text.placeholder.hide"><div class="form-group"><label>Fill Opacity</label><div class="row"><div class="col-lg-8"><input type="range" min="0" max="1" step="0.1" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.opacity" ng-disabled="banner.text.placeholder.hide"></div></div></div><div class="form-group"><div class="row"><div class="col-md-6"><label for="hide-placeholder">No Stroke</label><input type="checkbox" id="hide-placeholder" ng-model="banner.text.placeholder.nostroke" ng-disabled="banner.text.placeholder.hide"></div><div class="col-md-6"><label>Stroke</label><input type="color" style="margin-left: 5px;" ng-model="banner.text.placeholder.strokeColor" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div><div class="form-group"><label>Stroke Width</label><div class="row"><div class="col-lg-8"><input type="range" min="1" max="10" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.placeholder.strokeWidth" ng-disabled="banner.text.placeholder.nostroke || banner.text.placeholder.hide"></div></div></div></div></accordion-group><accordion-group heading="Title" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.text.font.header.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.text.font.header.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.header.line"></div></div></div></accordion-group><accordion-group heading="Description" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.text.font.description.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.description.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.text.font.description.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.text.font.description.line"></div></div></div></accordion-group></accordion></div></div>';
-                            } else if (selected == 'prize-header') {
-                                content = '<div data-snap-ignore="true"><div class="form-group"><label>Font Family</label><div class="row"><jd-fontselect stack="banner.prize[tpl].header.font.family" class="col-md-12"></jd-fontselect></div></div><div class="form-group"><label>Font Color</label><input type="color" style="margin-left: 5px;" ng-model="banner.prize[tpl].header.font.color"></div><div id="settings"><accordion close-others=true><accordion-group heading="Placeholder" class="panel-primary"><div class="form-group"><div class="row"><div ng-class="banner.prize[tpl].header.placeholder.hide ? \'col-md-12\' : \'col-md-6\'"><label for="hide-placeholder">Hide</label>&nbsp;<input type="checkbox" id="hide-placeholder" ng-model="banner.prize[tpl].header.placeholder.hide"></div><div class="col-md-6" ng-hide="banner.prize[tpl].header.placeholder.hide"><label>Fill</label><input type="color" style="margin-left: 5px;" ng-model="banner.prize[tpl].header.placeholder.fill" ng-disabled="banner.prize[tpl].header.placeholder.hide"></div></div></div><div class="toggle" ng-hide="banner.prize[tpl].header.placeholder.hide"><div class="form-group"><label>Fill Opacity</label><div class="row"><div class="col-lg-8"><input type="range" min="0" max="1" step="0.1" ng-model="banner.prize[tpl].header.placeholder.opacity" ng-disabled="banner.prize[tpl].header.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[tpl].header.placeholder.opacity" ng-disabled="banner.prize[tpl].header.placeholder.hide"></div></div></div><div class="form-group"><div class="row"><div ng-class="banner.prize[tpl].header.placeholder.nostroke ? \'col-md-12\' : \'col-md-6\'"><label for="hide-placeholder">No Stroke</label>&nbsp;<input type="checkbox" id="hide-placeholder" ng-model="banner.prize[tpl].header.placeholder.nostroke" ng-disabled="banner.prize[tpl].header.placeholder.hide"></div><div class="col-md-6" ng-hide="banner.prize[tpl].header.placeholder.nostroke"><label>Stroke</label><input type="color" style="margin-left: 5px;" ng-model="banner.prize[tpl].header.placeholder.strokeColor" ng-disabled="banner.prize[tpl].header.placeholder.nostroke || banner.prize[tpl].header.placeholder.hide"></div></div></div><div class="form-group toggle" ng-hide="banner.prize[tpl].header.placeholder.nostroke || banner.prize[tpl].header.placeholder.hide"><label>Stroke Width</label><div class="row"><div class="col-lg-8"><input type="range" min="1" max="10" ng-model="banner.prize[tpl].header.placeholder.strokeWidth" ng-disabled="banner.prize[tpl].header.placeholder.nostroke || banner.prize[tpl].header.placeholder.hide"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[tpl].header.placeholder.strokeWidth" ng-disabled="banner.prize[tpl].header.placeholder.nostroke || banner.prize[tpl].header.placeholder.hide"></div></div></div></div></accordion-group><accordion-group heading="Title" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.prize[tpl].header.font.header.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[tpl].header.font.header.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.prize[tpl].header.font.header.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[tpl].header.font.header.line"></div></div></div></accordion-group><accordion-group heading="Description" class="panel-primary"><div class="form-group"><label for="y">Font Size</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="32" ng-model="banner.prize[tpl].header.font.description.size"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[tpl].header.font.description.size"></div></div></div><div class="form-group"><label for="y">Line Height</label><div class="row"><div class="col-lg-8"><input type="range" min="8" max="64" ng-model="banner.prize[tpl].header.font.description.line"></div><div class="col-lg-4"><input type="text" class="form-control input-sm" ng-model="banner.prize[tpl].header.font.description.line"></div></div></div></accordion-group></accordion></div>';
+                                model = scope.banner.text;
+                            } else {
+                                var type = /header/.test(selected) ? 'header' : 'image';
+                                model = scope.banner.prize[tpl][type];
                             }
-                            $('svg ' + popoverEl).popover({
-                                container: '.container',
-                                placement: selected == 'text' ? 'right' : 'bottom',
-                                title: popoverTitle + ' Styles',
-                                content: $compile(content)(scope),
-                                html: true
-                            });
+
+                            $rootScope.menus.top.model = model;
+                            $rootScope.$apply();
                         }
 
                         // hide transform
@@ -445,10 +448,15 @@ define(['angular'], function(angular) {
                         if (selected) {
                             // show transform for selected element
                             elFts[selected].showHandles();
+                        } else {
+                            // scope.banner.draw = null;
+                            slidePush.pushForceCloseById('menu-top');
+                            $("body").animate({
+                                scrollTop: 0
+                            }, "slow");
+                            scope.banner.onEdit = false;
                         }
-                        // else {
-                        //     scope.banner.draw = null;
-                        // }
+
                     };
                     // raphael free transform
                     function onTransform(ft, events) {
@@ -466,7 +474,15 @@ define(['angular'], function(angular) {
                             }
                             scope.$apply();
                         }
-                    }
+                    };
+                    // add config click handler for raphael free transform
+                    function onClickHandlerConfigTransform() {
+                        $("body").animate({
+                            scrollTop: $('#' + ID).offset().top - 60
+                        }, "slow");
+                        scope.banner.onEdit = true;
+                        slidePush.pushById('menu-top');
+                    };
 
                     var fts = [ftFb, ftLogo, ftText];
                     var elFts = {
@@ -475,17 +491,8 @@ define(['angular'], function(angular) {
                         'text': ftText,
                     };
 
-                    console.log('scope:type', scope);
-
                     // compile scope to svg
                     $compile(paper.canvas)(scope);
-
-                    $timeout(function(){
-                        $rootScope.menus.top = {
-                            model: scope.banner,
-                            template: '<div ng-include src="\'views/banner-top-config.html\'"></div>'
-                        };
-                    }, 1000);
 
                 }
             };
