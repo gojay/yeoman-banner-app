@@ -10,7 +10,6 @@ define(['angular'], function(angular) {
                     banner: '=ngModel'
                 },
                 replace: true,
-                // controller: function(scope, element, attrs, transclude) {},
                 link: function(scope, element, attrs, ctrl) { // console.log('bannerCreator:model', scope.banner);
                     // console.log('bannerCreator:attrs', attrs);
                     // console.log('bannerCreator:element', element[0]);
@@ -62,10 +61,6 @@ define(['angular'], function(angular) {
                             break;
                         default:
                             svgHeight = 380;
-                            scope.banner.text.font.header.size = 24;
-                            scope.banner.text.font.header.line = 32;
-                            scope.banner.text.font.description.size = 12;
-                            scope.banner.text.font.description.line = 16;
                             break;
                     };
 
@@ -133,8 +128,6 @@ define(['angular'], function(angular) {
 
                     /* Text */
 
-                    scope.fill = "none";
-
                     // text placeholder
                     var placeText = paper.rect(
                         scope.banner.text.attrs.place.x,
@@ -143,14 +136,13 @@ define(['angular'], function(angular) {
                         scope.banner.text.attrs.place.h
                     ).click(onClickHandler);
 
-                    $(placeText.node).attr({
+                    angular.element(placeText.node).attr({
                         'opacity': '{{ banner.text.placeholder.hide ? 0 : 1 }}',
                         'fill': '{{ banner.text.placeholder.fill }}',
                         'fill-opacity': '{{ banner.text.placeholder.opacity }}',
                         'stroke': '{{ banner.text.placeholder.nostroke ? \'none\' : banner.text.placeholder.strokeColor }}',
                         'stroke-width': '{{ banner.text.placeholder.strokeWidth }}'
                     });
-                    console.log('placeText', placeText);
 
                     // text html
                     var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.html.title|comaToNewLine" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.header.size}}px; line-height: {{banner.text.font.header.line}}px; color: {{banner.text.font.color}}"></h2><p ng-bind-html="banner.text.html.description" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.description.size}}px; line-height: {{banner.text.font.description.line}}px; color: {{banner.text.font.color}}"></p>',
@@ -166,185 +158,6 @@ define(['angular'], function(angular) {
                     var gText = paper.group();
                     gText.push(placeText).push(textHtml);
                     gText.node.id = 'group-text-' + tpl;
-
-                    /* Prize */
-
-                    switch (tpl) {
-                        case '1':
-                            // prize header
-                            var prizeHeaderPlaceholder = paper.rect(
-                                504, 128, // x, y
-                                231, 38 // width, height
-                            ).click(onClickHandler);
-                            $(prizeHeaderPlaceholder.node).attr({
-                                'opacity': '{{banner.prize[1].header.placeholder.hide ? 0 : 1 }}',
-                                'fill': '{{banner.prize[1].header.placeholder.fill}}',
-                                'fill-opacity': '{{banner.prize[1].header.placeholder.opacity}}',
-                                'stroke': '{{banner.prize[1].header.placeholder.nostroke ? \'none\' : banner.prize[1].header.placeholder.strokeColor }}',
-                                'stroke-width': '{{banner.prize[1].header.placeholder.strokeWidth}}'
-                            });
-                            prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + tpl;
-                            var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[1].header.title.text" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}"></h2><span ng-bind-html="banner.prize[1].header.description.text" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}"></span>',
-                                504, 128,
-                                231, 38,
-                                'foreign-object-prize-1'
-                            ).click(onClickHandler);
-                            prizeHeaderHtml.node.id = 'prize-header-text-' + tpl;
-                            // grouping
-                            var gPrizeHeader = paper.group();
-                            gPrizeHeader.push(prizeHeaderPlaceholder).push(prizeHeaderHtml);
-                            gPrizeHeader.node.id = 'group-prize-header-' + tpl;
-
-                            // prize image
-                            var prizeImagePlaceholder = paper.rect(
-                                450, 170, // x, y
-                                350, 193 // width, height
-                            ).attr({
-                                'fill': 'white',
-                                'stroke': 'black',
-                                'stroke-width': 1,
-                                'stroke-opacity': 0.3
-                            }).click(onClickHandler);
-                            prizeImagePlaceholder.node.id = 'prize-image-placeholder-' + tpl;
-                            var prizeImage = paper.image(
-                                '{{ banner.prize[1].image.src }}',
-                                455, 175,
-                                340, 183
-                            ).click(onClickHandler);
-                            prizeImage.node.id = 'prize-image-src-' + tpl;
-                            // prize description
-                            var prizeDescriptionPlaceholder = paper.rect(
-                                455, '{{ banner.prize[1].image.y }}', // x, y
-                                340, 50 // width, height
-                            ).click(onClickHandler);
-                            $(prizeDescriptionPlaceholder.node).attr({
-                                'opacity': '{{banner.prize[1].image.placeholder.hide ? 0 : 1 }}',
-                                'fill': '{{banner.prize[1].image.placeholder.fill}}',
-                                'fill-opacity': '{{banner.prize[1].image.placeholder.opacity}}',
-                                'stroke': '{{banner.prize[1].image.placeholder.nostroke ? \'none\' : banner.prize[1].image.placeholder.strokeColor }}',
-                                'stroke-width': '{{banner.prize[1].image.placeholder.strokeWidth}}'
-                            });
-                            prizeDescriptionPlaceholder.node.id = 'prize-image-description-placeholder-' + tpl;
-                            var prizeDescriptionHtml = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[1].image.text" style="font-family: {{banner.prize[1].text.font.family}}; color:{{banner.prize[1].image.font.color}}"></p>',
-                                455, '{{ banner.prize[1].image.y }}',
-                                340, 50,
-                                'foreign-object-prize-1 prize-figure'
-                            ).click(onClickHandler);
-                            prizeDescriptionHtml.node.id = 'prize-image-descrition-text' + tpl;
-                            // grouping
-                            var gPrizeImage = paper.group();
-                            gPrizeImage
-                                .push(prizeImagePlaceholder)
-                                .push(prizeImage).push(prizeDescriptionPlaceholder)
-                                .push(prizeDescriptionHtml);
-                            gPrizeImage.node.id = 'group-prize-image-' + tpl;
-                            break;
-
-                        case '2':
-                            // prize header
-                            var prizeHeaderPlaceholder = paper.rect(
-                                447, 129, // x, y
-                                272, 50 // width, height
-                            ).attr({
-                                'fill': 'black',
-                                'fill-opacity': 0.75
-                            });
-                            prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + tpl;
-                            var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[2].text.header.text" style="font-family: {{banner.prize[2].text.font.family}}"></h2><span ng-bind-html="banner.prize[2].text.description.text" style="font-family: {{banner.prize[2].text.font.family}}"></span>',
-                                447, 129,
-                                272, 50,
-                                'foreign-object-prize-2'
-                            );
-                            prizeHeaderHtml.node.id = 'prize-header-text-' + tpl;
-                            // grouping
-                            var gPrizeHeader = paper.group();
-                            gPrizeHeader.push(prizeHeaderPlaceholder).push(prizeHeaderHtml);
-                            gPrizeHeader.node.id = 'group-prize-header-' + tpl;
-
-                            // prize image 1
-                            var prizeImagePlaceholder1 = paper.rect(
-                                374, 189, // x, y
-                                213, 140 // width, height
-                            ).attr({
-                                'fill': 'white',
-                                'stroke': 'black',
-                                'stroke-width': 1,
-                                'stroke-opacity': 0.3
-                            });
-                            prizeImagePlaceholder1.node.id = 'prize-image-placeholder-1-' + tpl;
-                            var prizeImage1 = paper.image(
-                                '{{ banner.prize[2].image.attrs[0].src }}',
-                                379, 194,
-                                203, 130
-                            );
-                            prizeImage1.node.id = 'prize-image-src-1-' + tpl;
-                            // prize description 1
-                            var prizeDescriptionPlaceholder1 = paper.rect(
-                                379, '{{ banner.prize[2].image.y }}', // x, y
-                                203, 30 // width, height
-                            ).attr({
-                                'fill': 'black',
-                                'fill-opacity': 0.75,
-                                'stroke': 'none'
-                            });
-                            prizeDescriptionPlaceholder1.node.id = 'prize-image-description-placeholder-1-' + tpl;
-                            var prizeDescriptionHtml1 = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family: {{banner.prize[2].text.font.family}}"></p>',
-                                379, '{{ banner.prize[2].image.y }}',
-                                203, 30,
-                                'foreign-object-prize-2 prize-figure'
-                            );
-                            prizeDescriptionHtml1.node.id = 'prize-image-description-text-1-' + tpl;
-
-                            // prize image 2
-                            var prizeImagePlaceholder2 = paper.rect(
-                                590, 189, // x, y
-                                213, 140 // width, height
-                            ).attr({
-                                'fill': 'white',
-                                'stroke': 'black',
-                                'stroke-width': 1,
-                                'stroke-opacity': 0.3
-                            });
-                            prizeImagePlaceholder2.node.id = 'prize-image-placeholder-2-' + tpl;
-                            var prizeImage2 = paper.image(
-                                '{{ banner.prize[2].image.attrs[1].src }}',
-                                595, 194,
-                                203, 130
-                            );
-                            prizeImage2.node.id = 'prize-image-src-2-' + tpl;
-                            // prize description 2
-                            var prizeDescriptionPlaceholder2 = paper.rect(
-                                595, '{{ banner.prize[2].image.y }}', // x, y
-                                203, 30 // width, height
-                            ).attr({
-                                'fill': 'black',
-                                'fill-opacity': 0.75,
-                                'stroke': 'none'
-                            });
-                            prizeDescriptionPlaceholder2.node.id = 'prize-image-description-placeholder-2-' + tpl;
-                            var prizeDescriptionHtml2 = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[2].image.attrs[1].text" style="font-family: {{banner.prize[2].text.font.family}}"></p>',
-                                595, '{{ banner.prize[2].image.y }}',
-                                203, 30,
-                                'foreign-object-prize-2 prize-figure'
-                            );
-                            prizeDescriptionHtml2.node.id = 'prize-image-description-text-2-' + tpl;
-                            // grouping
-                            var gPrizeImage = paper.group();
-                            gPrizeImage
-                                .push(prizeImagePlaceholder1)
-                                .push(prizeImage1).push(prizeDescriptionPlaceholder1)
-                                .push(prizeDescriptionHtml1)
-                                .push(prizeImagePlaceholder2)
-                                .push(prizeImage2).push(prizeDescriptionPlaceholder2)
-                                .push(prizeDescriptionHtml2);
-                            gPrizeImage.node.id = 'group-prize-image-' + tpl;
-                            break;
-                    }
 
                     /* Transform */
 
@@ -364,11 +177,254 @@ define(['angular'], function(angular) {
                     gSetLogo.freeTransform.apply();
 
                     // Transform text
+                    var options = angular.copy(defaultOptions);
+                    options.configOnClick = onClickHandlerConfigTransform;
                     var gSetText = paper.set(placeText, textHtml);
-                    defaultOptions.configOnClick = onClickHandlerConfigTransform;
-                    var ftText = paper.freeTransform(gSetText, defaultOptions, onTransform).hideHandles();
+                    var ftText = paper.freeTransform(gSetText, options, onTransform).hideHandles();
                     angular.extend(gSetText.freeTransform.attrs, scope.banner.text.transform);
                     gSetText.freeTransform.apply();
+
+                    /* Prize */
+
+                    var ftPrizeHeader, ftPrizeImage = null;
+                    switch (tpl) {
+                        case '1':
+                            // prize header
+                            var prizeHeaderPlaceholder = paper.rect(
+                                504, 128, // x, y
+                                231, 38 // width, height
+                            ).click(onClickHandler);
+                            angular.element(prizeHeaderPlaceholder.node).attr({
+                                'opacity': '{{banner.prize[1].header.placeholder.hide ? 0 : 1 }}',
+                                'fill': '{{banner.prize[1].header.placeholder.fill}}',
+                                'fill-opacity': '{{banner.prize[1].header.placeholder.opacity}}',
+                                'stroke': '{{banner.prize[1].header.placeholder.nostroke ? \'none\' : banner.prize[1].header.placeholder.strokeColor }}',
+                                'stroke-width': '{{banner.prize[1].header.placeholder.strokeWidth}}'
+                            });
+                            prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + tpl;
+                            var prizeHeaderHtml = paper.foreignObject(
+                                '<h2 ng-bind-html="banner.prize[1].header.title" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}; font-size: {{banner.prize[1].header.font.header.size}}px; line-height: {{banner.prize[1].header.font.header.line}}px"></h2><span ng-bind-html="banner.prize[1].header.description" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}; font-size: {{banner.prize[1].header.font.description.size}}px; line-height: {{banner.prize[1].header.font.description.line}}px"></span>',
+                                504, 128,
+                                231, 38,
+                                'foreign-object-prize-1'
+                            ).click(onClickHandler);
+                            prizeHeaderHtml.node.id = 'prize-header-text-' + tpl;
+                            // grouping
+                            var gPrizeHeader = paper.group();
+                            gPrizeHeader.push(prizeHeaderPlaceholder).push(prizeHeaderHtml);
+                            gPrizeHeader.node.id = 'group-prize-header-' + tpl;
+
+                            // transform configuration
+                            var options = angular.copy(defaultOptions);
+                            options.configOnClick = onClickHandlerConfigTransform;
+                            options.configSize = 'small';
+                            // set transform elements
+                            var gSetPrizeHeader = paper.set(prizeHeaderPlaceholder, prizeHeaderHtml);
+                            ftPrizeHeader = paper.freeTransform(gSetPrizeHeader, options, onTransform).hideHandles();
+                            angular.extend(gSetPrizeHeader.freeTransform.attrs, scope.banner.prize[1].header.transform);
+                            gSetPrizeHeader.freeTransform.apply();
+
+                            // prize image
+                            var prizeImagePlaceholder = paper.rect(
+                                450, 170, // x, y
+                                350, 193 // width, height
+                            ).attr({
+                                'fill': 'white',
+                                'stroke': 'black',
+                                'stroke-width': 1,
+                                'stroke-opacity': 0.3
+                            }).click(onClickHandler);
+                            prizeImagePlaceholder.node.id = 'prize-image-placeholder-' + tpl;
+
+                            var prizeImage = paper.image(
+                                '{{ banner.prize[1].image.src }}',
+                                455, 175,
+                                340, 183
+                            ).click(onClickHandler);
+                            prizeImage.node.id = 'prize-image-src-' + tpl;
+                            // prize description
+                            var prizeImageDescriptionPlaceholder = paper.rect(
+                                455, 310, // x, y
+                                340, 50 // width, height
+                            ).click(onClickHandler);
+                            angular.element(prizeImageDescriptionPlaceholder.node).attr({
+                                'y': '{{ banner.prize[1].image.y }}',
+                                'opacity': '{{banner.prize[1].image.placeholder.hide ? 0 : 1 }}',
+                                'fill': '{{banner.prize[1].image.placeholder.fill}}',
+                                'fill-opacity': '{{banner.prize[1].image.placeholder.opacity}}',
+                                'stroke': '{{banner.prize[1].image.placeholder.nostroke ? \'none\' : banner.prize[1].image.placeholder.strokeColor }}',
+                                'stroke-width': '{{banner.prize[1].image.placeholder.strokeWidth}}'
+                            });
+                            prizeImageDescriptionPlaceholder.node.id = 'prize-image-description-placeholder-' + tpl;
+                            var prizeDescriptionHtml = paper.foreignObject(
+                                '<p ng-bind-html="banner.prize[1].image.text" style="font-family: {{banner.prize[1].image.font.family}}; color:{{banner.prize[1].image.font.color}}; font-size: {{banner.prize[1].image.font.description.size}}px; line-height: {{banner.prize[1].image.font.description.line}}px"></p>',
+                                455, 310,
+                                340, 50,
+                                'foreign-object-prize-1 prize-figure'
+                            ).click(onClickHandler);
+                            angular.element(prizeDescriptionHtml.node).attr({
+                                'y': '{{ banner.prize[1].image.y }}'
+                            });
+                            prizeDescriptionHtml.node.id = 'prize-image-descrition-text' + tpl;
+                            // grouping
+                            var gPrizeImage = paper.group();
+                            gPrizeImage
+                                .push(prizeImagePlaceholder)
+                                .push(prizeImage).push(prizeImageDescriptionPlaceholder)
+                                .push(prizeDescriptionHtml);
+                            gPrizeImage.node.id = 'group-prize-image-' + tpl;
+
+                            // transform configuration
+                            var options = angular.copy(defaultOptions);
+                            options.configOnClick = onClickHandlerConfigTransform;
+                            options.configSize = 'small';
+                            // set transform elements
+                            var gSetPrizeImage = paper.set(prizeImagePlaceholder, prizeImage, prizeImageDescriptionPlaceholder, prizeDescriptionHtml);
+                            ftPrizeImage = paper.freeTransform(gSetPrizeImage, options, onTransform).hideHandles();
+                            angular.extend(gSetPrizeImage.freeTransform.attrs, scope.banner.prize[1].image.transform);
+                            gSetPrizeImage.freeTransform.apply();
+                            break;
+
+                        case '2':
+                            // prize header
+                            var prizeHeaderPlaceholder = paper.rect(
+                                447, 129, // x, y
+                                272, 50 // width, height
+                            ).click(onClickHandler);
+                            angular.element(prizeHeaderPlaceholder.node).attr({
+                                'opacity': '{{banner.prize[2].header.placeholder.hide ? 0 : 1 }}',
+                                'fill': '{{banner.prize[2].header.placeholder.fill}}',
+                                'fill-opacity': '{{banner.prize[2].header.placeholder.opacity}}',
+                                'stroke': '{{banner.prize[2].header.placeholder.nostroke ? \'none\' : banner.prize[2].header.placeholder.strokeColor }}',
+                                'stroke-width': '{{banner.prize[2].header.placeholder.strokeWidth}}'
+                            });
+                            prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + tpl;
+                            var prizeHeaderHtml = paper.foreignObject(
+                                '<h2 ng-bind-html="banner.prize[2].header.title.text" style="font-family:{{banner.prize[2].header.font.family}}; color:{{banner.prize[2].header.font.color}}; font-size: {{banner.prize[2].header.title.size}}px; line-height: {{banner.prize[2].header.title.line}}px"></h2><span ng-bind-html="banner.prize[2].header.description.text" style="font-family:{{banner.prize[2].header.font.family}}; color:{{banner.prize[2].header.font.color}}; font-size: {{banner.prize[2].header.description.size}}px; line-height: {{banner.prize[2].header.description.line}}px"></span>',
+                                447, 129,
+                                272, 50,
+                                'foreign-object-prize-2'
+                            ).click(onClickHandler);
+                            prizeHeaderHtml.node.id = 'prize-header-text-' + tpl;
+                            // grouping
+                            var gPrizeHeader = paper.group();
+                            gPrizeHeader.push(prizeHeaderPlaceholder).push(prizeHeaderHtml);
+                            gPrizeHeader.node.id = 'group-prize-header-' + tpl;
+
+                            // transform configuration
+                            var options = angular.copy(defaultOptions);
+                            options.configOnClick = onClickHandlerConfigTransform;
+                            options.configSize = 'small';
+                            // set transform elements
+                            var gSetPrizeHeader = paper.set(prizeHeaderPlaceholder, prizeHeaderHtml);
+                            ftPrizeHeader = paper.freeTransform(gSetPrizeHeader, options, onTransform).hideHandles();
+                            angular.extend(gSetPrizeHeader.freeTransform.attrs, scope.banner.prize[2].header.transform);
+                            gSetPrizeHeader.freeTransform.apply();
+
+                            // prize image 1
+                            var prizeImagePlaceholder1 = paper.rect(
+                                374, 189, // x, y
+                                213, 140 // width, height
+                            ).attr({
+                                'fill': 'white',
+                                'stroke': 'black',
+                                'stroke-width': 1,
+                                'stroke-opacity': 0.3
+                            }).click(onClickHandler);
+                            prizeImagePlaceholder1.node.id = 'prize-image-placeholder-1-' + tpl;
+                            var prizeImage1 = paper.image(
+                                '{{ banner.prize[2].image.attrs[0].src }}',
+                                379, 194,
+                                203, 130
+                            );
+                            prizeImage1.node.id = 'prize-image-src-1-' + tpl;
+                            // prize description 1
+                            var prizeDescriptionPlaceholder1 = paper.rect(
+                                379, scope.banner.prize[2].image.y, // x, y
+                                203, 30 // width, height
+                            ).click(onClickHandler);
+                            angular.element(prizeDescriptionPlaceholder1.node).attr({
+                                'y': '{{ banner.prize[2].image.y }}',
+                                'opacity': '{{banner.prize[2].image.placeholder.hide ? 0 : 1 }}',
+                                'fill': '{{banner.prize[2].image.placeholder.fill}}',
+                                'fill-opacity': '{{banner.prize[2].image.placeholder.opacity}}',
+                                'stroke': '{{banner.prize[2].image.placeholder.nostroke ? \'none\' : banner.prize[2].image.placeholder.strokeColor }}',
+                                'stroke-width': '{{banner.prize[2].image.placeholder.strokeWidth}}'
+                            });
+                            prizeDescriptionPlaceholder1.node.id = 'prize-image-description-placeholder-1-' + tpl;
+                            var prizeDescriptionHtml1 = paper.foreignObject(
+                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family:{{banner.prize[2].image.font.family}}; color:{{banner.prize[2].image.font.color}}; font-size: {{banner.prize[2].image.font.size}}px; line-height: {{banner.prize[2].image.font.line}}px"></p>',
+                                379, scope.banner.prize[2].image.y,
+                                203, 30,
+                                'foreign-object-prize-2 prize-figure'
+                            ).click(onClickHandler);
+                            prizeDescriptionHtml1.node.id = 'prize-image-description-text-1-' + tpl;
+                            angular.element(prizeDescriptionHtml1.node).attr({
+                                'y': '{{ banner.prize[2].image.y }}'
+                            });
+
+                            // prize image 2
+                            var prizeImagePlaceholder2 = paper.rect(
+                                590, 189, // x, y
+                                213, 140 // width, height
+                            ).attr({
+                                'fill': 'white',
+                                'stroke': 'black',
+                                'stroke-width': 1,
+                                'stroke-opacity': 0.3
+                            }).click(onClickHandler);
+                            prizeImagePlaceholder2.node.id = 'prize-image-placeholder-2-' + tpl;
+                            var prizeImage2 = paper.image(
+                                '{{ banner.prize[2].image.attrs[1].src }}',
+                                595, 194,
+                                203, 130
+                            ).click(onClickHandler);
+                            prizeImage2.node.id = 'prize-image-src-2-' + tpl;
+                            // prize description 2
+                            var prizeDescriptionPlaceholder2 = paper.rect(
+                                595, scope.banner.prize[2].image.y, // x, y
+                                203, 30 // width, height
+                            ).click(onClickHandler);
+                            angular.element(prizeDescriptionPlaceholder2.node).attr({
+                                'y': '{{ banner.prize[2].image.y }}',
+                                'opacity': '{{banner.prize[2].image.placeholder.hide ? 0 : 1 }}',
+                                'fill': '{{banner.prize[2].image.placeholder.fill}}',
+                                'fill-opacity': '{{banner.prize[2].image.placeholder.opacity}}',
+                                'stroke': '{{banner.prize[2].image.placeholder.nostroke ? \'none\' : banner.prize[2].image.placeholder.strokeColor }}',
+                                'stroke-width': '{{banner.prize[2].image.placeholder.strokeWidth}}'
+                            });
+                            prizeDescriptionPlaceholder2.node.id = 'prize-image-description-placeholder-2-' + tpl;
+                            var prizeDescriptionHtml2 = paper.foreignObject(
+                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family:{{banner.prize[2].image.font.family}}; color:{{banner.prize[2].image.font.color}}; font-size: {{banner.prize[2].image.font.size}}px; line-height: {{banner.prize[2].image.font.line}}px"></p>',
+                                595, scope.banner.prize[2].image.y,
+                                203, 30,
+                                'foreign-object-prize-2 prize-figure'
+                            ).click(onClickHandler);
+                            prizeDescriptionHtml2.node.id = 'prize-image-description-text-2-' + tpl;
+                            angular.element(prizeDescriptionHtml2.node).attr({
+                                'y': '{{ banner.prize[2].image.y }}'
+                            });
+                            // grouping
+                            var gPrizeImage = paper.group();
+                            gPrizeImage
+                                .push(prizeImagePlaceholder1)
+                                .push(prizeImage1).push(prizeDescriptionPlaceholder1)
+                                .push(prizeDescriptionHtml1)
+                                .push(prizeImagePlaceholder2)
+                                .push(prizeImage2).push(prizeDescriptionPlaceholder2)
+                                .push(prizeDescriptionHtml2);
+                            gPrizeImage.node.id = 'group-prize-image-' + tpl;
+
+                            // transform configuration
+                            var options = angular.copy(defaultOptions);
+                            options.configOnClick = onClickHandlerConfigTransform;
+                            // set transform elements
+                            var gSetPrizeImage = paper.set(prizeImagePlaceholder1, prizeImage1, prizeDescriptionPlaceholder1, prizeDescriptionHtml1, prizeImagePlaceholder2, prizeImage2, prizeDescriptionPlaceholder2, prizeDescriptionHtml2);
+                            ftPrizeImage = paper.freeTransform(gSetPrizeImage, options, onTransform).hideHandles();
+                            angular.extend(gSetPrizeImage.freeTransform.attrs, scope.banner.prize[2].image.transform);
+                            gSetPrizeImage.freeTransform.apply();
+                            break;
+                    }
 
                     /* Callback */
 
@@ -427,7 +483,7 @@ define(['angular'], function(angular) {
                         /* Popover */
 
                         if (popoverEl) {
-                            var content, model = null;
+                            var model = null;
 
                             if (selected == 'text') {
                                 model = scope.banner.text;
@@ -442,7 +498,7 @@ define(['angular'], function(angular) {
 
                         // hide transform
                         angular.forEach(fts, function(ft) {
-                            ft.hideHandles();
+                            if( ft ) ft.hideHandles();
                         });
 
                         if (selected) {
@@ -450,11 +506,13 @@ define(['angular'], function(angular) {
                             elFts[selected].showHandles();
                         } else {
                             // scope.banner.draw = null;
-                            slidePush.pushForceCloseById('menu-top');
-                            $("body").animate({
-                                scrollTop: 0
-                            }, "slow");
-                            scope.banner.onEdit = false;
+                            if( scope.banner.onEdit ){
+                                slidePush.pushForceCloseById('menu-top');
+                                $("body").animate({
+                                    scrollTop: 0
+                                }, "slow");
+                                scope.banner.onEdit = false;
+                            }
                         }
 
                     };
@@ -477,18 +535,22 @@ define(['angular'], function(angular) {
                     };
                     // add config click handler for raphael free transform
                     function onClickHandlerConfigTransform() {
-                        $("body").animate({
-                            scrollTop: $('#' + ID).offset().top - 60
-                        }, "slow");
-                        scope.banner.onEdit = true;
-                        slidePush.pushById('menu-top');
+                        if (!scope.banner.onEdit) {
+                            $("body").animate({
+                                scrollTop: $('#' + ID).offset().top - 60
+                            }, "slow");
+                            scope.banner.onEdit = true;
+                            slidePush.pushById('menu-top');
+                        }
                     };
 
-                    var fts = [ftFb, ftLogo, ftText];
+                    var fts = [ftFb, ftLogo, ftText, ftPrizeHeader, ftPrizeImage];
                     var elFts = {
                         'fb': ftFb,
                         'logo': ftLogo,
                         'text': ftText,
+                        'prize-header': ftPrizeHeader,
+                        'prize-image' : ftPrizeImage
                     };
 
                     // compile scope to svg

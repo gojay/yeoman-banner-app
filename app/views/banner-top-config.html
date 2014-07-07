@@ -1,8 +1,8 @@
 <div class="container">
     <div class="row">
         <datalist id="colors">
-            <option>#000000</option>
             <option>#ffffff</option>
+            <option>#000000</option>
             <option>#95a5a6</option>
             <option>#1a242f</option>
             <option>#128f76</option>
@@ -23,8 +23,17 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Font Color</label>
-                <input type="color" style="margin-left: 5px;" ng-model="menus.top.model.font.color" list="colors">
+                <div class="row">
+                    <div class="col-md-12">
+                      <label>Font Color</label>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="color" ng-model="menus.top.model.font.color" list="colors" class="ng-pristine ng-valid">
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" class="col-md-6 input-sm ng-pristine ng-valid" ng-model="menus.top.model.font.color" style="color:black">
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-lg-3">
@@ -82,10 +91,10 @@
                 <label for="y">Font Size</label>
                 <div class="row">
                     <div class="col-lg-9">
-                        <input type="range" min="8" max="32" ng-model="menus.top.model.font.header.size">
+                        <input type="range" min="8" max="32" ng-model="menus.top.model.font.header.size" ng-disabled="!menus.top.model.font.header.size">
                     </div>
                     <div class="col-lg-3">
-                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.font.header.size">
+                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.font.header.size" ng-disabled="!menus.top.model.font.header.size">
                     </div>
                 </div>
             </div>
@@ -93,10 +102,10 @@
                 <label for="y">Line Height</label>
                 <div class="row">
                     <div class="col-lg-9">
-                        <input type="range" min="8" max="64" ng-model="menus.top.model.font.header.line">
+                        <input type="range" min="8" max="64" ng-model="menus.top.model.font.header.line" ng-disabled="!menus.top.model.font.header.line">
                     </div>
                     <div class="col-lg-3">
-                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.font.header.line">
+                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.font.header.line" ng-disabled="!menus.top.model.font.header.line">
                     </div>
                 </div>
             </div>
@@ -122,6 +131,17 @@
                     </div>
                     <div class="col-lg-3">
                         <input type="text" class="form-control input-sm" ng-model="menus.top.model.font.description.line">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" ng-hide="!menus.top.model.y">
+                <label for="y">YAxis</label>
+                <div class="row">
+                    <div class="col-lg-9">
+                        <input type="range" min="8" max="310" ng-model="menus.top.model.y">
+                    </div>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.y">
                     </div>
                 </div>
             </div>

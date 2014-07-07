@@ -132,7 +132,8 @@
                 size: 5
             },
             subject: subject,
-            configOnClick: null
+            configOnClick: null,
+            configSize: null
         };
 
         /**
@@ -247,9 +248,10 @@
                 });
 
                 if (ft.opts.configOnClick) {
+                    var min = (ft.opts.configSize || ft.opts.configSize == 'small') ? 11 : 22 ;
                     ft.handles.center.square.attr({
-                        x: ft.attrs.center.x + ft.attrs.translate.x - 22,
-                        y: ft.attrs.center.y + ft.attrs.translate.y - 22
+                        x: ft.attrs.center.x + ft.attrs.translate.x - min,
+                        y: ft.attrs.center.y + ft.attrs.translate.y - min
                     });
                 }
             }
@@ -331,8 +333,10 @@
                     .attr(ft.opts.attrs);
 
                 if (ft.opts.configOnClick) {
+                    var iconSize = (ft.opts.configSize || ft.opts.configSize == 'small') ? '' : 'fa-2x' ;
+                    var width = (ft.opts.configSize || ft.opts.configSize == 'small') ? 24 : 45 ;
                     ft.handles.center.square = paper
-                        .foreignObject('<div style="color:white;cursor:pointer;opacity:0.8;" title="Configuration"><i class="fa fa-gear fa-2x pull-left fa-border" style="background:#2c3e50;"></i></div', ft.attrs.center.x, ft.attrs.center.y, 45, 45)
+                        .foreignObject('<div style="color:white;cursor:pointer;opacity:0.8;" title="Configuration"><i class="fa fa-gear '+ iconSize +' pull-left fa-border" style="background:#2c3e50;"></i></div', ft.attrs.center.x, ft.attrs.center.y, width, width)
                         .attr(ft.opts.attrs)
                         .click(ft.opts.configOnClick);
                 }
