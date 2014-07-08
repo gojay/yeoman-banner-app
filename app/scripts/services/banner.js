@@ -182,6 +182,7 @@ define(['angular'], function(angular) {
                         },
                         2: {
                             header: {
+                                name: 'Prize Header',
                                 font: {
                                     family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                                     color: '#ffffff',
@@ -215,8 +216,8 @@ define(['angular'], function(angular) {
                                 transform: {}
                             },
                             image: {
-                                y: 293,
                                 name: 'Prize Image',
+                                y: 293,
                                 font: {
                                     family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                                     color: '#ffffff',

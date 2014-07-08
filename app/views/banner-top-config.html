@@ -11,9 +11,9 @@
             <option>#f39c12</option>
             <option>#e74c3c</option>
         </datalist>
-        <div class="col-lg-12">
+        <!-- <div class="col-lg-12">
             <h3>{{ menus.top.model.name }}</h3>
-        </div>
+        </div> -->
         <div class="col-lg-3">
             <legend>General</legend>
             <div class="form-group">
@@ -85,7 +85,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-3">
+        <div class="col-lg-3" ng-class="{'col-disabled' : !menus.top.model.font.header.size}">
             <legend>Title</legend>
             <div class="form-group">
                 <label for="y">Font Size</label>
@@ -102,10 +102,10 @@
                 <label for="y">Line Height</label>
                 <div class="row">
                     <div class="col-lg-9">
-                        <input type="range" min="8" max="64" ng-model="menus.top.model.font.header.line" ng-disabled="!menus.top.model.font.header.line">
+                        <input type="range" min="8" max="64" ng-model="menus.top.model.font.header.line" ng-disabled="!menus.top.model.font.header.line ">
                     </div>
                     <div class="col-lg-3">
-                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.font.header.line" ng-disabled="!menus.top.model.font.header.line">
+                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.font.header.line" ng-disabled="!menus.top.model.font.header.line ">
                     </div>
                 </div>
             </div>

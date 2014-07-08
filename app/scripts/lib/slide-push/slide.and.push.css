@@ -40,8 +40,7 @@
   /*overflow: hidden;*/ }
   .spmenu-horizontal h3 {
     color: white;
-    margin-top: 0;
-    font-weight: bold; }
+    margin-top: 0; }
 
 /* Vertical menu that slides from the left or right */
 .spmenu-left {

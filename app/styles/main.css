@@ -19,6 +19,10 @@
   background-color: #fff;
 }
 
+.col-disabled {
+  opacity: .4;
+}
+
 .overlay {
   z-index: 1000;
   top: 0px;

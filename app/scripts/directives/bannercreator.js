@@ -69,9 +69,9 @@ define(['angular'], function(angular) {
                     // add definition styles for foreignObject HTML
                     var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
                     var css = {
-                        0: "svg{background-color:#FFF}body{background-color:transparent;height:235px}.foreign-object-0 h2{text-align:left;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;font-size:13px;line-height:16px;margin:0;padding:0 20px}",
-                        1: "svg{background-color:#FFF}body{background-color:transparent;height:235px}.foreign-object-1 h2{text-align:left;font-weight:400;font-size:27px;line-height:32px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;line-height:16px;font-size:13px;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;line-height:18px;text-align:center;font-weight:400;font-size:18px;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center;font-size:12px;line-height:16px}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;font-size:13px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
-                        2: "svg{background-color:#FFF}body{background-color:transparent;height:332px}.foreign-object-2 h2{text-align:left;font-weight:400;font-size:24px;line-height:29px;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;line-height:16px;font-size:12px;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;font-weight:400;font-size:22px;line-height:24px;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center;font-size:14px}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;font-size:12px;font-weight:normal;line-height:15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
+                        0: "svg{background-color:#FFF}body{background-color:transparent;height:235px}.foreign-object-0 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;margin:0;padding:0 20px}",
+                        1: "svg{background-color:#FFF}body{background-color:transparent;height:235px}.foreign-object-1 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
+                        2: "svg{background-color:#FFF}body{background-color:transparent;height:332px}.foreign-object-2 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
                     };
 
                     var _css = css[tpl];
@@ -300,7 +300,7 @@ define(['angular'], function(angular) {
                             });
                             prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + tpl;
                             var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[2].header.title.text" style="font-family:{{banner.prize[2].header.font.family}}; color:{{banner.prize[2].header.font.color}}; font-size: {{banner.prize[2].header.title.size}}px; line-height: {{banner.prize[2].header.title.line}}px"></h2><span ng-bind-html="banner.prize[2].header.description.text" style="font-family:{{banner.prize[2].header.font.family}}; color:{{banner.prize[2].header.font.color}}; font-size: {{banner.prize[2].header.description.size}}px; line-height: {{banner.prize[2].header.description.line}}px"></span>',
+                                '<h2 ng-bind-html="banner.prize[2].header.title.text" style="font-family:{{banner.prize[2].header.font.family}}; color:{{banner.prize[2].header.font.color}}; font-size: {{banner.prize[2].header.font.header.size}}px; line-height: {{banner.prize[2].header.font.header.line}}px"></h2><span ng-bind-html="banner.prize[2].header.description.text" style="font-family:{{banner.prize[2].header.font.family}}; color:{{banner.prize[2].header.font.color}}; font-size: {{banner.prize[2].header.font.description.size}}px; line-height: {{banner.prize[2].header.font.description.line}}px"></span>',
                                 447, 129,
                                 272, 50,
                                 'foreign-object-prize-2'
@@ -353,7 +353,7 @@ define(['angular'], function(angular) {
                             });
                             prizeDescriptionPlaceholder1.node.id = 'prize-image-description-placeholder-1-' + tpl;
                             var prizeDescriptionHtml1 = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family:{{banner.prize[2].image.font.family}}; color:{{banner.prize[2].image.font.color}}; font-size: {{banner.prize[2].image.font.size}}px; line-height: {{banner.prize[2].image.font.line}}px"></p>',
+                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family:{{banner.prize[2].image.font.family}}; color:{{banner.prize[2].image.font.color}}; font-size: {{banner.prize[2].image.font.description.size}}px; line-height: {{banner.prize[2].image.font.description.line}}px"></p>',
                                 379, scope.banner.prize[2].image.y,
                                 203, 30,
                                 'foreign-object-prize-2 prize-figure'
@@ -395,7 +395,7 @@ define(['angular'], function(angular) {
                             });
                             prizeDescriptionPlaceholder2.node.id = 'prize-image-description-placeholder-2-' + tpl;
                             var prizeDescriptionHtml2 = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family:{{banner.prize[2].image.font.family}}; color:{{banner.prize[2].image.font.color}}; font-size: {{banner.prize[2].image.font.size}}px; line-height: {{banner.prize[2].image.font.line}}px"></p>',
+                                '<p ng-bind-html="banner.prize[2].image.attrs[0].text" style="font-family:{{banner.prize[2].image.font.family}}; color:{{banner.prize[2].image.font.color}}; font-size: {{banner.prize[2].image.font.description.size}}px; line-height: {{banner.prize[2].image.font.description.line}}px"></p>',
                                 595, scope.banner.prize[2].image.y,
                                 203, 30,
                                 'foreign-object-prize-2 prize-figure'
