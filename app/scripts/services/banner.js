@@ -84,6 +84,12 @@ define(['angular'], function(angular) {
                     },
                     text: {
                         name: 'Content',
+                        attrs: {
+                            x: 20,
+                            y: 128,
+                            w: 404,
+                            h: 235
+                        },
                         font: {
                             family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                             color: '#ffffff',
@@ -104,40 +110,32 @@ define(['angular'], function(angular) {
                             strokeColor: 'black',
                             strokeWidth: 1
                         },
-                        attrs: {
-                            place: {
-                                x: 20,
-                                y: 128,
-                                w: 404,
-                                h: 235
-                            },
-                            html: {
-                                x: 20,
-                                y: 128,
-                                w: 404,
-                                h: 235
-                            }
-                        },
-                        transform: {},
-                        html: {
+                        content: {
                             title: 'Contest Name, Contest',
                             description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum.',
-                        }
+                        },
+                        transform: {}
                     },
                     prize: {
                         1: {
                             header: {
                                 name: 'Prize Header',
+                                attrs: {
+                                    x: 504,
+                                    y: 128,
+                                    w: 231,
+                                    h: 38
+                                },
                                 font: {
                                     family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                                     color: '#ffffff',
                                     header: {
-                                        size: 18,
+                                        size: 17,
                                         line: 20
                                     },
                                     description: {
-                                        size: 12,
-                                        line: 16
+                                        size: 11,
+                                        line: 13
                                     }
                                 },
                                 placeholder: {
@@ -148,12 +146,20 @@ define(['angular'], function(angular) {
                                     strokeColor: 'black',
                                     strokeWidth: 1
                                 },
-                                title: 'This Month\'s Prizes',
-                                description: 'Like our page to win!',
+                                content: {
+                                    title: 'This Month\'s Prizes',
+                                    description: 'Like our page to win!'
+                                },
                                 transform: {}
                             },
                             image: {
                                 name: 'Prize Image',
+                                attrs: {
+                                    x: 455,
+                                    y: 175,
+                                    w: 340,
+                                    h: 183
+                                },
                                 font: {
                                     family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                                     color: '#ffffff',
@@ -167,6 +173,7 @@ define(['angular'], function(angular) {
                                     }
                                 },
                                 placeholder: {
+                                    y: 310,
                                     hide: false,
                                     fill: "black",
                                     opacity: 0.7,
@@ -174,24 +181,31 @@ define(['angular'], function(angular) {
                                     strokeColor: 'black',
                                     strokeWidth: 1
                                 },
-                                y: 310,
-                                text: 'Enter description prize 1',
-                                src: 'http://placehold.it/340x183',
+                                data: [{
+                                    text: 'Enter description prize 1',
+                                    src: 'http://placehold.it/340x183'
+                                }],
                                 transform: {}
                             }
                         },
                         2: {
                             header: {
                                 name: 'Prize Header',
+                                attrs: {
+                                    x: 447,
+                                    y: 129,
+                                    w: 272,
+                                    h: 50
+                                },
                                 font: {
                                     family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                                     color: '#ffffff',
                                     header: {
-                                        size: 22,
+                                        size: 20,
                                         line: 26
                                     },
                                     description: {
-                                        size: 14,
+                                        size: 12,
                                         line: 18
                                     }
                                 },
@@ -203,21 +217,20 @@ define(['angular'], function(angular) {
                                     strokeColor: 'black',
                                     strokeWidth: 1
                                 },
-                                title: {
-                                    size: 22,
-                                    line: 26,
-                                    text: 'This Month\'s Prizes'
-                                },
-                                description: {
-                                    size: 14,
-                                    line: 18,
-                                    text: 'Like our page to win!'
+                                content: {
+                                    title: 'This Month\'s Prizes',
+                                    description: 'Like our page to win!'
                                 },
                                 transform: {}
                             },
                             image: {
                                 name: 'Prize Image',
-                                y: 293,
+                                attrs: {
+                                    x: 379,
+                                    y: 194,
+                                    w: 203,
+                                    h: 130
+                                },
                                 font: {
                                     family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                                     color: '#ffffff',
@@ -231,6 +244,7 @@ define(['angular'], function(angular) {
                                     }
                                 },
                                 placeholder: {
+                                    y: 293,
                                     hide: false,
                                     fill: "black",
                                     opacity: 0.7,
@@ -238,7 +252,7 @@ define(['angular'], function(angular) {
                                     strokeColor: 'black',
                                     strokeWidth: 1
                                 },
-                                attrs: [{
+                                data: [{
                                     text: 'Enter description prize 1',
                                     src: 'http://placehold.it/203x130'
                                 }, {
