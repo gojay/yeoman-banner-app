@@ -10,7 +10,6 @@ define(['angular'], function(angular) {
                     banner: '=ngModel'
                 },
                 replace: true,
-                /*
                 controller: ['$scope', '$attrs', '$rootScope', '$timeout',
                     function(scope, attrs, $rootScope, $timeout) {
                         scope.$watchCollection('banner.text.font', function(values) {
@@ -52,107 +51,137 @@ define(['angular'], function(angular) {
                         };
 
                         var paper = this.paper = Raphael(ID, 810, svgHeight);
+                        this.tpl = tpl;
+                        this.className = className;
+
+                        // add definition styles for foreignObject HTML
+                        var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                        var css = {
+                            0: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-0 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;margin:0;padding:0 20px}",
+                            1: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-1 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
+                            2: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-2 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
+                        };
+
+                        var _css = css[tpl];
+                        var style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.styleSheet ? style.styleSheet.cssText = _css : style.appendChild(document.createTextNode(_css));
+                        defs.appendChild(style);
+                        paper.canvas.insertBefore(defs, paper.defs);
 
                         this.createImage = function( params ) {
                             // placeholder
+                            if( params.placeholder ){
+                                var attrs = (params.attrs) ? params.attrs : { fill: 'white' };
+                                var placeholder = paper.rect(
+                                    params.model.attrs.x - 5,
+                                    params.model.attrs.y - 5,
+                                    params.model.attrs.w + 10,
+                                    params.model.attrs.h + 10
+                                ).attr(attrs).shadow(0, 1, 4, 0.6);
+                                // if( params.onClick ){
+                                //     placeholder.click(params.onClick);
+                                // }
 
+                                placeholder.node.id = params.id + '-placeholder-' + tpl;
+                            }
                             // image
+                            var image = paper.image(
+                                params.value,
+                                params.model.attrs.x, params.model.attrs.y, // x,y
+                                params.model.attrs.w, params.model.attrs.h // width, height
+                            );
+                            image.node.id = params.id + '-image-' + tpl;
+                            if( params.onClick ){
+                                image.click(params.onClick);
+                            }
+
+                            return image;
                         };
                         this.createText = function( params ) {
                             // placeholder
+                            var placeholder = null;
+                            if( params.placeholder ){
+                                placeholder = paper.rect(
+                                    params.model.attrs.x,
+                                    ( /image/.test(params.title) ) ? params.model.placeholder.y : params.model.attrs.y,
+                                    params.model.attrs.w,
+                                    params.height ? params.height : params.model.attrs.h
+                                );
+                                if( params.onClick ){
+                                    placeholder.click(params.onClick);
+                                }
 
+                                angular.element(placeholder.node).attr({
+                                    'opacity'       : '{{ banner.'+ params.title +'.placeholder.hide ? 0 : 1 }}',
+                                    'fill'          : '{{ banner.'+ params.title +'.placeholder.fill }}',
+                                    'fill-opacity'  : '{{ banner.'+ params.title +'.placeholder.opacity }}',
+                                    'stroke'        : '{{ banner.'+ params.title +'.placeholder.nostroke ? \'none\' : banner.'+ params.title +'.placeholder.strokeColor }}',
+                                    'stroke-width'  : '{{ banner.'+ params.title +'.placeholder.strokeWidth }}'
+                                });
+                            }
                             // html
+
+                            // text html
+                            if( /image/.test(params.title) ) {
+                                var html = '<p ng-bind-html="'+ params.value +'" style="font-family:{{banner.'+ params.title +'.font.family}}; color:{{banner.'+ params.title +'.font.color}}; font-size: {{banner.'+ params.title +'.font.description.size}}px; line-height: {{banner.'+ params.title +'.font.description.line}}px"></p>'
+                            } else {
+                                var html = '<h2 ng-bind-html="banner.'+ params.title +'.content.title|comaToNewLine" style="font-family: {{banner.'+ params.title +'.font.family}}; font-size: {{banner.'+ params.title +'.font.header.size}}px; line-height: {{banner.'+ params.title +'.font.header.line}}px; color: {{banner.'+ params.title +'.font.color}}"></h2>';
+                                if( params.title == 'text' ){
+                                    html += '<p ng-bind-html="banner.'+ params.title +'.content.description" style="font-family: {{banner.'+ params.title +'.font.family}}; font-size: {{banner.'+ params.title +'.font.description.size}}px; line-height: {{banner.'+ params.title +'.font.description.line}}px; color: {{banner.'+ params.title +'.font.color}}"></p>';
+                                } else {
+                                    html += '<span ng-bind-html="banner.'+ params.title +'.content.description" style="font-family: {{banner.'+ params.title +'.font.family}}; font-size: {{banner.'+ params.title +'.font.description.size}}px; line-height: {{banner.'+ params.title +'.font.description.line}}px; color: {{banner.'+ params.title +'.font.color}}"></span>';
+                                }
+                            }
+
+                            var text = paper.foreignObject(
+                                html,
+                                params.model.attrs.x,
+                                ( /image/.test(params.title) ) ? params.model.placeholder.y : params.model.attrs.y,
+                                params.model.attrs.w,
+                                params.height ? params.height : params.model.attrs.h,
+                                ( params.className ) ? params.className : className
+                            );
+                            if( params.onClick ){
+                                text.click(params.onClick);
+                            }
+
+                            return {
+                                placeholder: placeholder,
+                                text: text
+                            }
                         };
                     }
                 ],
-                */
                 link: function(scope, element, attrs, ctrl) {
                     // console.log('bannerCreator:model', scope.banner);
                     // console.log('bannerCreator:attrs', attrs);
                     // console.log('bannerCreator:element', element[0]);
-                    var ID = attrs.id,
-                        className = attrs.class;
-                    var tpl = attrs.tpl || 0,
-                        svgHeight = null,
-                        className = 'foreign-object-' + tpl;
 
-                    element.attr('id', ID).addClass(className);
-                    scope.tpl = tpl;
-
-                    $timeout(function() {
-                        var model = angular.copy(scope.banner.text);
-                        model.section = 'Content';
-                        $rootScope.menus.top = {
-                            model: scope.banner.text,
-                            template: '<div ng-include src="\'views/banner-top-config.html\'"></div>'
-                        };
-                    }, 1000);
-
-                    // scope.$watch('banner.draw', function(value) {
-                    //     if (!elFts[scope.banner.selected]) return;
-                    //     elFts[scope.banner.selected].setOpts({
-                    //         draw: [value == 'bbox' ? 'bbox' : null, value == 'circle' ? 'circle' : null]
-                    //     });
-                    // });
-                    scope.$watchCollection('banner.text.font', function(values) {
-                        if (values.size < 8)
-                            scope.banner.text.font.size = 8;
-                        if (values.size > 64)
-                            scope.banner.text.font.size = 64;
-                        if (values.line < 8)
-                            scope.banner.text.font.line = 8;
-                        if (values.line > 64)
-                            scope.banner.text.font.line = 64;
-                    });
-
-                    switch (tpl) {
-                        case '2':
-                            svgHeight = 339;
-                            var wH = {
-                                w: 332,
-                                h: 200
-                            };
-                            scope.banner.background.image = "http://placehold.it/810x339";
-                            angular.extend(scope.banner.text.attrs, wH);
-                            angular.extend(scope.banner.text.attrs, wH);
-                            break;
-                        default:
-                            svgHeight = 380;
-                            break;
-                    };
-
-                    var paper = Raphael(ID, 810, svgHeight);
-
-                    // add definition styles for foreignObject HTML
-                    var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-                    var css = {
-                        0: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-0 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;margin:0;padding:0 20px}",
-                        1: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-1 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
-                        2: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-2 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
-                    };
-
-                    var _css = css[tpl];
-                    var style = document.createElement('style');
-                    style.type = 'text/css';
-                    style.styleSheet ? style.styleSheet.cssText = _css : style.appendChild(document.createTextNode(_css));
-                    defs.appendChild(style);
-                    paper.canvas.insertBefore(defs, paper.defs);
+                    var paper = ctrl.paper,
+                        tpl   = ctrl.tpl,
+                        className = ctrl.className;
 
                     /* Background */
 
-                    // bg image
-                    var background = paper.image(
-                        '{{ banner.background.image }}',
-                        scope.banner.background.attrs.x, scope.banner.background.attrs.y, // x,y
-                        scope.banner.background.attrs.w, scope.banner.background.attrs.h // width, height
-                    ).click(onClickHandler);
-                    // facebook
-                    var fb = paper.image(
-                        '{{ banner.fb.image }}',
-                        scope.banner.fb.attrs.x, scope.banner.fb.attrs.y,
-                        scope.banner.fb.attrs.w, scope.banner.fb.attrs.h
-                    ).click(onClickHandler);
-                    fb.node.id = 'fb-' + tpl;
+                    var background = ctrl.createImage({
+                        placeholder: false,
+                        id: 'background',
+                        value  : '{{ banner.background.image }}',
+                        model  : scope.banner.background,
+                        onClick: onClickHandler
+                    });
+
+                    /* fb */
+
+                    var fb = ctrl.createImage({
+                        placeholder: false,
+                        id: 'fb',
+                        value  : '{{ banner.fb.image }}',
+                        model  : scope.banner.fb,
+                        onClick: onClickHandler
+                    });
+
                     // grouping background & fb
                     var gBg = paper.group();
                     gBg.push(background).push(fb);
@@ -160,57 +189,25 @@ define(['angular'], function(angular) {
 
                     /* Logo */
 
-                    // logo placeholder
-                    var placeholder = paper.rect(
-                        scope.banner.logo.attrs.x - 5,
-                        scope.banner.logo.attrs.y - 5,
-                        scope.banner.logo.attrs.w + 10,
-                        scope.banner.logo.attrs.h + 10
-                    ).attr({
-                        fill: 'white'
-                    }).shadow(0, 1, 4, 0.6).click(onClickHandler);
-                    placeholder.node.id = 'logo-placeholder-' + tpl;
-                    // logo image
-                    var logo = paper.image(
-                        '{{ banner.logo.image }}',
-                        scope.banner.logo.attrs.x, scope.banner.logo.attrs.y,
-                        scope.banner.logo.attrs.w, scope.banner.logo.attrs.h
-                    ).click(onClickHandler);
-                    logo.node.id = 'logo-image-' + tpl;
-
-                    // grouping logo placeholder & image
-                    var gLogo = paper.group();
-                    gLogo.push(placeholder).push(logo);
-                    gLogo.node.id = 'group-logo-' + tpl;
+                    var logo = ctrl.createImage({
+                        placeholder: true,
+                        id: 'logo',
+                        value  : '{{ banner.logo.image }}',
+                        model  : scope.banner.logo,
+                        onClick: onClickHandler
+                    });
 
                     /* Text */
 
-                    // text placeholder
-                    var placeText = paper.rect(
-                        scope.banner.text.attrs.x,
-                        scope.banner.text.attrs.y,
-                        scope.banner.text.attrs.w,
-                        scope.banner.text.attrs.h
-                    ).click(onClickHandler);
-
-                    angular.element(placeText.node).attr({
-                        'opacity': '{{ banner.text.placeholder.hide ? 0 : 1 }}',
-                        'fill': '{{ banner.text.placeholder.fill }}',
-                        'fill-opacity': '{{ banner.text.placeholder.opacity }}',
-                        'stroke': '{{ banner.text.placeholder.nostroke ? \'none\' : banner.text.placeholder.strokeColor }}',
-                        'stroke-width': '{{ banner.text.placeholder.strokeWidth }}'
+                    var textElement = ctrl.createText({
+                        placeholder: true,
+                        model: scope.banner.text,
+                        title: 'text',
+                        onClick: onClickHandler
                     });
+                    var placeText = textElement.placeholder;
+                    var textHtml  = textElement.text;
 
-                    // text html
-                    var textHtml = paper.foreignObject('<h2 ng-bind-html="banner.text.content.title|comaToNewLine" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.header.size}}px; line-height: {{banner.text.font.header.line}}px; color: {{banner.text.font.color}}"></h2><p ng-bind-html="banner.text.content.description" style="font-family: {{banner.text.font.family}}; font-size: {{banner.text.font.description.size}}px; line-height: {{banner.text.font.description.line}}px; color: {{banner.text.font.color}}"></p>',
-                        scope.banner.text.attrs.x,
-                        scope.banner.text.attrs.y,
-                        scope.banner.text.attrs.w,
-                        scope.banner.text.attrs.h,
-                        className
-                    );
-                    textHtml.node.id = 'text-html-' + tpl;
-                    textHtml.click(onClickHandler);
                     // grouping place & text
                     var gText = paper.group();
                     gText.push(placeText).push(textHtml);
@@ -228,7 +225,7 @@ define(['angular'], function(angular) {
                     fb.freeTransform.apply();
 
                     // Transform logo
-                    var gSetLogo = paper.set(placeholder, logo);
+                    var gSetLogo = paper.set(logo);
                     var ftLogo = paper.freeTransform(gSetLogo, defaultOptions, onTransform).hideHandles();
                     angular.extend(gSetLogo.freeTransform.attrs, scope.banner.logo.transform);
                     gSetLogo.freeTransform.apply();
@@ -246,39 +243,25 @@ define(['angular'], function(angular) {
                     var ftPrizeHeader, ftPrizeImage = null;
                     switch (tpl) {
                         case '1':
-                            // prize header
-                            var prizeHeaderPlaceholder = paper.rect(
-                                scope.banner.prize[1].header.attrs.x,
-                                scope.banner.prize[1].header.attrs.y,
-                                scope.banner.prize[1].header.attrs.w,
-                                scope.banner.prize[1].header.attrs.h
-                            ).click(onClickHandler);
-                            angular.element(prizeHeaderPlaceholder.node).attr({
-                                'opacity': '{{banner.prize[1].header.placeholder.hide ? 0 : 1 }}',
-                                'fill': '{{banner.prize[1].header.placeholder.fill}}',
-                                'fill-opacity': '{{banner.prize[1].header.placeholder.opacity}}',
-                                'stroke': '{{banner.prize[1].header.placeholder.nostroke ? \'none\' : banner.prize[1].header.placeholder.strokeColor }}',
-                                'stroke-width': '{{banner.prize[1].header.placeholder.strokeWidth}}'
-                            });
-                            prizeHeaderPlaceholder.node.id = 'prize-header-placeholder-' + tpl;
-                            var prizeHeaderHtml = paper.foreignObject(
-                                '<h2 ng-bind-html="banner.prize[1].header.content.title" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}; font-size: {{banner.prize[1].header.font.header.size}}px; line-height: {{banner.prize[1].header.font.header.line}}px"></h2><span ng-bind-html="banner.prize[1].header.content.description" style="font-family:{{banner.prize[1].header.font.family}}; color:{{banner.prize[1].header.font.color}}; font-size: {{banner.prize[1].header.font.description.size}}px; line-height: {{banner.prize[1].header.font.description.line}}px"></span>',
-                                scope.banner.prize[1].header.attrs.x,
-                                scope.banner.prize[1].header.attrs.y,
-                                scope.banner.prize[1].header.attrs.w,
-                                scope.banner.prize[1].header.attrs.h,
-                                'foreign-object-prize-1'
-                            ).click(onClickHandler);
-                            prizeHeaderHtml.node.id = 'prize-header-text-' + tpl;
-                            // grouping
-                            var gPrizeHeader = paper.group();
-                            gPrizeHeader.push(prizeHeaderPlaceholder).push(prizeHeaderHtml);
-                            gPrizeHeader.node.id = 'group-prize-header-' + tpl;
 
                             // transform configuration
                             var options = angular.copy(defaultOptions);
                             options.configOnClick = onClickHandlerConfigTransform;
                             options.configSize = 'small';
+                            
+                            var prize1 = ctrl.createText({
+                                placeholder: true,
+                                model: scope.banner.prize[1].header,
+                                title: 'prize[1].header',
+                                className: 'foreign-object-prize-1',
+                                onClick: onClickHandler
+                            });
+                            var prizeHeaderPlaceholder = prize1.placeholder;
+                            var prizeHeaderHtml = prize1.text;
+                            // grouping
+                            var gPrizeHeader = paper.group();
+                            gPrizeHeader.push(prizeHeaderPlaceholder).push(prizeHeaderHtml);
+                            gPrizeHeader.node.id = 'group-prize-header-' + tpl;
                             // set transform elements
                             var gSetPrizeHeader = paper.set(prizeHeaderPlaceholder, prizeHeaderHtml);
                             ftPrizeHeader = paper.freeTransform(gSetPrizeHeader, options, onTransform).hideHandles();
@@ -286,69 +269,33 @@ define(['angular'], function(angular) {
                             gSetPrizeHeader.freeTransform.apply();
 
                             // prize image
-                            var prizeImagePlaceholder = paper.rect(
-                                scope.banner.prize[1].image.attrs.x - 5,
-                                scope.banner.prize[1].image.attrs.y - 5,
-                                scope.banner.prize[1].image.attrs.w + 10,
-                                scope.banner.prize[1].image.attrs.h + 10
-                            ).attr({
-                                'fill': 'white',
-                                'stroke': 'black',
-                                'stroke-width': 1,
-                                'stroke-opacity': 0.3
-                            }).click(onClickHandler);
-                            prizeImagePlaceholder.node.id = 'prize-image-placeholder-' + tpl;
-
-                            var prizeImage = paper.image(
-                                '{{ banner.prize[1].image.data[0].src }}',
-                                scope.banner.prize[1].image.attrs.x,
-                                scope.banner.prize[1].image.attrs.y,
-                                scope.banner.prize[1].image.attrs.w,
-                                scope.banner.prize[1].image.attrs.h
-                            ).click(onClickHandler);
-                            prizeImage.node.id = 'prize-image-src-' + tpl;
+                            var prizeImage = ctrl.createImage({
+                                placeholder: true,
+                                value  : '{{ banner.prize[1].image.data[0].src }}',
+                                model  : scope.banner.prize[1].image,
+                                id     : 'prize',
+                                onClick: onClickHandler
+                            });
                             // prize description
-                            var prizeImageDescriptionPlaceholder = paper.rect(
-                                scope.banner.prize[1].image.attrs.x,
-                                scope.banner.prize[1].image.placeholder.y,
-                                scope.banner.prize[1].image.attrs.w,
-                                50
-                            ).click(onClickHandler);
-                            angular.element(prizeImageDescriptionPlaceholder.node).attr({
-                                'y': '{{ banner.prize[1].image.placeholder.y }}',
-                                'opacity': '{{banner.prize[1].image.placeholder.hide ? 0 : 1 }}',
-                                'fill': '{{banner.prize[1].image.placeholder.fill}}',
-                                'fill-opacity': '{{banner.prize[1].image.placeholder.opacity}}',
-                                'stroke': '{{banner.prize[1].image.placeholder.nostroke ? \'none\' : banner.prize[1].image.placeholder.strokeColor }}',
-                                'stroke-width': '{{banner.prize[1].image.placeholder.strokeWidth}}'
+                            var prizeDesc1 = ctrl.createText({
+                                placeholder: true,
+                                model  : scope.banner.prize[1].image,
+                                title  : 'prize[1].image',
+                                className: 'foreign-object-prize-1 prize-figure',
+                                height : 50,
+                                value  : 'banner.prize[1].image.data[0].text',
+                                onClick: onClickHandler
                             });
-                            prizeImageDescriptionPlaceholder.node.id = 'prize-image-description-placeholder-' + tpl;
-                            var prizeDescriptionHtml = paper.foreignObject(
-                                '<p ng-bind-html="banner.prize[1].image.data[0].text" style="font-family: {{banner.prize[1].image.font.family}}; color:{{banner.prize[1].image.font.color}}; font-size: {{banner.prize[1].image.font.description.size}}px; line-height: {{banner.prize[1].image.font.description.line}}px"></p>',
-                                scope.banner.prize[1].image.attrs.x,
-                                scope.banner.prize[1].image.placeholder.y,
-                                scope.banner.prize[1].image.attrs.w,
-                                50,
-                                'foreign-object-prize-1 prize-figure'
-                            ).click(onClickHandler);
-                            angular.element(prizeDescriptionHtml.node).attr({
-                                'y': '{{ banner.prize[1].image.placeholder.y }}'
-                            });
-                            prizeDescriptionHtml.node.id = 'prize-image-descrition-text' + tpl;
+                            var prizeImageDescriptionPlaceholder = prizeDesc1.placeholder;
+                            var prizeDescriptionHtml = prizeDesc1.text;                         
                             // grouping
                             var gPrizeImage = paper.group();
                             gPrizeImage
-                                .push(prizeImagePlaceholder)
                                 .push(prizeImage).push(prizeImageDescriptionPlaceholder)
                                 .push(prizeDescriptionHtml);
                             gPrizeImage.node.id = 'group-prize-image-' + tpl;
-
-                            // transform configuration
-                            var options = angular.copy(defaultOptions);
-                            options.configOnClick = onClickHandlerConfigTransform;
-                            options.configSize = 'small';
                             // set transform elements
-                            var gSetPrizeImage = paper.set(prizeImagePlaceholder, prizeImage, prizeImageDescriptionPlaceholder, prizeDescriptionHtml);
+                            var gSetPrizeImage = paper.set(prizeImage, prizeImageDescriptionPlaceholder, prizeDescriptionHtml);
                             ftPrizeImage = paper.freeTransform(gSetPrizeImage, options, onTransform).hideHandles();
                             angular.extend(gSetPrizeImage.freeTransform.attrs, scope.banner.prize[1].image.transform);
                             gSetPrizeImage.freeTransform.apply();

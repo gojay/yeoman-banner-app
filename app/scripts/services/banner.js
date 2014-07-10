@@ -173,7 +173,7 @@ define(['angular'], function(angular) {
                                     }
                                 },
                                 placeholder: {
-                                    y: 310,
+                                    y: 307,
                                     hide: false,
                                     fill: "black",
                                     opacity: 0.7,
