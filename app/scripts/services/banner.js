@@ -173,7 +173,11 @@ define(['angular'], function(angular) {
                                     }
                                 },
                                 placeholder: {
-                                    y: 307,
+                                    y: {
+                                        min: 176,
+                                        max: 307,
+                                        value: 307
+                                    },
                                     hide: false,
                                     fill: "black",
                                     opacity: 0.7,
@@ -245,7 +249,11 @@ define(['angular'], function(angular) {
                                     }
                                 },
                                 placeholder: {
-                                    y: 293,
+                                    y: {
+                                        min: 193,
+                                        max: 293,
+                                        value: 293
+                                    },
                                     hide: false,
                                     fill: "black",
                                     opacity: 0.7,
@@ -261,6 +269,90 @@ define(['angular'], function(angular) {
                                     gap: 216,
                                     text: 'Enter description prize 2',
                                     src: 'http://placehold.it/203x130'
+                                }],
+                                transform: {}
+                            }
+                        },
+                        3: {
+                            header: {
+                                name: 'Prize Header',
+                                attrs: {
+                                    x: 20,
+                                    y: 340,
+                                    w: 770,
+                                    h: 55
+                                },
+                                font: {
+                                    family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
+                                    color: 'black',
+                                    header: {
+                                        size: 30,
+                                        line: 30
+                                    },
+                                    description: {
+                                        size: 18,
+                                        line: 18
+                                    }
+                                },
+                                placeholder: {
+                                    hide: true,
+                                    fill: "black",
+                                    opacity: 0.7,
+                                    nostroke: false,
+                                    strokeColor: 'black',
+                                    strokeWidth: 1
+                                },
+                                content: {
+                                    title: 'This Month\'s Prizes',
+                                    description: 'Like our page to win!'
+                                },
+                                transform: {}
+                            },
+                            image: {
+                                name: 'Prize Image',
+                                attrs: {
+                                    x: 10,
+                                    y: 240 + 165,
+                                    w: 250,
+                                    h: 250
+                                },
+                                font: {
+                                    family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
+                                    color: '#ffffff',
+                                    header: {
+                                        size: null,
+                                        line: null
+                                    },
+                                    description: {
+                                        size: 14,
+                                        line: 15
+                                    }
+                                },
+                                placeholder: {
+                                    y: {
+                                        min: 405,
+                                        max: 588,
+                                        value: 588
+                                    },
+                                    hide: false,
+                                    fill: "black",
+                                    opacity: 0.7,
+                                    nostroke: true,
+                                    strokeColor: 'black',
+                                    strokeWidth: 1
+                                },
+                                data: [{
+                                    gap: 0,
+                                    text: 'Enter description prize 1',
+                                    src: 'http://placehold.it/250x250'
+                                }, {
+                                    gap: 265,
+                                    text: 'Enter description prize 2',
+                                    src: 'http://placehold.it/250x250'
+                                }, {
+                                    gap: 530,
+                                    text: 'Enter description prize 3',
+                                    src: 'http://placehold.it/250x250'
                                 }],
                                 transform: {}
                             }

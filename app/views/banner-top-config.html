@@ -134,14 +134,14 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group" ng-hide="!menus.top.model.y">
+            <div class="form-group" ng-hide="!menus.top.model.placeholder.y">
                 <label for="y">YAxis</label>
                 <div class="row">
                     <div class="col-lg-9">
-                        <input type="range" min="8" max="310" ng-model="menus.top.model.y">
+                        <input type="range" min="{{menus.top.model.placeholder.y.min}}" max="{{menus.top.model.placeholder.y.max}}" ng-model="menus.top.model.placeholder.y.value">
                     </div>
                     <div class="col-lg-3">
-                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.y">
+                        <input type="text" class="form-control input-sm" ng-model="menus.top.model.placeholder.y.value">
                     </div>
                 </div>
             </div>
