@@ -7,19 +7,89 @@ define(['angular'], function(angular) {
             // AngularJS will instantiate a singleton by calling "new" on this function
             this.dummy = function() {
                 return {
-                    background: {
-                        attrs: {
-                            x: 0,
-                            y: 0,
-                            w: 810,
-                            h: 380
+                    dimension: [
+                        // 0
+                        {
+                            attrs: {
+                                x: 0,
+                                y: 0,
+                                w: 810,
+                                h: 380
+                            }
                         },
-                        image: "http://placehold.it/810x380"
-                    },
+                        // 1
+                        {
+                            attrs: {
+                                x: 0,
+                                y: 0,
+                                w: 810,
+                                h: 380
+                            }
+                        },
+                        // 2
+                        {
+                            attrs: {
+                                x: 0,
+                                y: 0,
+                                w: 810,
+                                h: 340
+                            }
+                        },
+                        // 3
+                        {
+                            attrs: {
+                                x: 20,
+                                y: 10,
+                                w: 770,
+                                h: 670
+                            }
+                        }
+                    ],
+                    background: [
+                        {
+                            attrs: {
+                                x: 0,
+                                y: 0,
+                                w: 810,
+                                h: 380
+                            },
+                            image: "http://placehold.it/810x380"
+                        },
+                        // 1
+                        {
+                            attrs: {
+                                x: 0,
+                                y: 0,
+                                w: 810,
+                                h: 380
+                            },
+                            image: "http://placehold.it/810x380"
+                        },
+                        // 2
+                        {
+                            attrs: {
+                                x: 0,
+                                y: 0,
+                                w: 810,
+                                h: 340
+                            },
+                            image: "http://placehold.it/810x340"
+                        },
+                        // 3
+                        {
+                            attrs: {
+                                x: 20,
+                                y: 10,
+                                w: 770,
+                                h: 315
+                            },
+                            image: "http://placehold.it/770x315"
+                        }
+                    ],
                     fb: {
                         attrs: {
                             x: 603,
-                            y: 5,
+                            y: 10,
                             w: 207,
                             h: 54
                         },
@@ -51,8 +121,8 @@ define(['angular'], function(angular) {
                     },
                     logo: {
                         attrs: {
-                            x: 25,
-                            y: 10,
+                            x: 15,
+                            y: 15,
                             w: 160,
                             h: 100
                         },
@@ -80,16 +150,31 @@ define(['angular'], function(angular) {
                             "ratio": 1
                             */
                         },
-                        image: 'http://placehold.it/160x100'
+                        image: ['http://placehold.it/160x100','http://placehold.it/160x100','http://placehold.it/160x100','http://placehold.it/122x80']
                     },
                     text: {
                         name: 'Content',
-                        attrs: {
-                            x: 20,
-                            y: 128,
+                        attrs: [{
+                            x: 10,
+                            y: 135,
                             w: 404,
                             h: 235
-                        },
+                        },{ // 1
+                            x: 10,
+                            y: 135,
+                            w: 404,
+                            h: 235
+                        },{ // 2
+                            x: 10,
+                            y: 340-200-10,
+                            w: 332,
+                            h: 200
+                        },{ // 3
+                            x: 40,
+                            y: 165 + 10,
+                            w: 730,
+                            h: 130
+                        }],
                         font: {
                             family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                             color: '#ffffff',
@@ -122,7 +207,7 @@ define(['angular'], function(angular) {
                                 name: 'Prize Header',
                                 attrs: {
                                     x: 504,
-                                    y: 128,
+                                    y: 135,
                                     w: 231,
                                     h: 38
                                 },
@@ -156,7 +241,7 @@ define(['angular'], function(angular) {
                                 name: 'Prize Image',
                                 attrs: {
                                     x: 455,
-                                    y: 175,
+                                    y: 182,
                                     w: 340,
                                     h: 183
                                 },
@@ -175,8 +260,8 @@ define(['angular'], function(angular) {
                                 placeholder: {
                                     y: {
                                         min: 176,
-                                        max: 307,
-                                        value: 307
+                                        max: 313,
+                                        value: 313
                                     },
                                     hide: false,
                                     fill: "black",
@@ -198,7 +283,7 @@ define(['angular'], function(angular) {
                                 name: 'Prize Header',
                                 attrs: {
                                     x: 447,
-                                    y: 129,
+                                    y: 130,
                                     w: 272,
                                     h: 50
                                 },
@@ -231,8 +316,8 @@ define(['angular'], function(angular) {
                             image: {
                                 name: 'Prize Image',
                                 attrs: {
-                                    x: 379,
-                                    y: 194,
+                                    x: 364,
+                                    y: 195,
                                     w: 203,
                                     h: 130
                                 },
@@ -358,7 +443,8 @@ define(['angular'], function(angular) {
                             }
                         }
                     },
-                    selected: null,
+                    selected: 0,
+                    selectedEl: null,
                     onEdit: false,
                     draw: null
                 }

@@ -38,54 +38,44 @@ define(['angular'], function(angular) {
 
                         switch (tpl) {
                             case '2':
-                                svgHeight = 339;
                                 var wH = {
                                     w: 332,
-                                    h: 200
+                                    h: 200,
+                                    y: 340-200-10
                                 };
-                                scope.banner.background.image = "http://placehold.it/810x339";
-                                angular.extend(scope.banner.text.attrs, wH);
-                                angular.extend(scope.banner.text.attrs, wH);
+                                // angular.extend(scope.banner.text.attrs, wH);
                                 break;
                             case '3':
-                                svgHeight = 670;
-                                angular.extend(scope.banner.background.attrs, {
-                                    x: 20,
-                                    y: 10,
-                                    w: 770,
-                                    h: 315
-                                });
-                                scope.banner.background.image = "http://placehold.it/770x315";
                                 angular.extend(scope.banner.logo.attrs, {
                                     x: 40,
-                                    y: scope.banner.logo.attrs.y + 10,
+                                    y: scope.banner.logo.attrs.y + 20,
                                     w: 122,
                                     h: 80
                                 });
-                                scope.banner.background.logo = "http://placehold.it/122x80";
+                                // scope.banner.logo.image = "http://placehold.it/122x80";
                                 scope.banner.fb.attrs.x = 583;
-                                scope.banner.fb.attrs.y += 10;
+                                scope.banner.fb.attrs.y += 20;
                                 var textAttrs = {
                                     x: 40,
                                     y: 165 + 10,
                                     w: 730,
                                     h: 130
                                 };
-                                angular.extend(scope.banner.text.attrs, textAttrs);
-                                angular.extend(scope.banner.text.attrs, textAttrs);
+                                // angular.extend(scope.banner.text.attrs, textAttrs);
                                 break;
                             default:
-                                svgHeight = 380;
                                 break;
                         };
 
-                        var paper = this.paper = Raphael(ID, 810, svgHeight);
+                        var paper = this.paper = Raphael(ID, 810, scope.banner.dimension[tpl].attrs.h);
+                        angular.element(paper.canvas).attr('height','{{ banner.dimension['+ tpl +'].attrs.h }}');
+
                         this.tpl = tpl;
 
                         if (tpl == '3') {
                             paper.rect(0, 0, 810, svgHeight).attr({
                                 fill: 'white',
-                                // stroke: 'none'
+                                stroke: 'none'
                             });
                             paper.image(
                                 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAwEAAAASCAIAAACM10XqAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjkyNUI4NzNDQzJCRjExRTI5RTVBQTBFN0FBRUZEMzAwIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjkyNUI4NzNEQzJCRjExRTI5RTVBQTBFN0FBRUZEMzAwIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6OTI1Qjg3M0FDMkJGMTFFMjlFNUFBMEU3QUFFRkQzMDAiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OTI1Qjg3M0JDMkJGMTFFMjlFNUFBMEU3QUFFRkQzMDAiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6xYgy1AAAFIUlEQVR42uyca2/zKhCEk/b//+X2WEIvQiw7O8vFSXNmPkSuDesFX3gykD5/f38fUF0Br3xqf7vTFqh77AbYX7bbT7ABiuGSNg3vk0zJa0K7s8rrgZUzgjS6k9ajz+fTi3kdyl44fP+Et2L5tCkxAjfStMjq2efu5dqVTxin3ELr2hXntjTIknPtGtaqO3FM5qgtE+ZpK9rt8rYpT3c9em1/fX117xzQwBLBNrmraM/O1OoK11Ttqb2AXqo2MmgXuJpdEK+9IKWwT8AVBAXwofAuIsvH9yF+JZFj1QTo4AJ4jA/5JiSDYUkPIDwUwHWHJ/r5+QEpdRugUcPCw+0OaLy+8iK3R6+b6cq/0kabZG1X10VteYaBrvLX220YDcNcreslM4wzbA5+Ivjg78ZAR9lugjtPQ8MiA92PYosMVG5+pla950uVghQg+DByfdxCoGmfSrJKHZKvWt/f3y0A1Zj1SSwxn/8UMpBlAg8vbGEbs9voGMjjpyFYlM+rOeB0w3Z5qMSUBCmFvIgpZ4KW1vFoPwMdfdnx7hH/Z5aW1nkLOEZ2GzMQ4+t4TIMZCECbd0bLQB6ckQiLvbS6UUire1lj2892LwncwwvUft0E9IMTC9VG88YYHNDLM+yBzqvbwmenXSvb2NS3RgYvum6ZIBLbCe1RfJVDiGHGGBDEehWpUQpQkTdI1/6spOV5D8C34G0GZkS3kYdwYNEqPJEXB5MHiBl6J8DHYtwmvhjp26Usn7ln89BXl+edlvvKuaa/NzNzbSRspXgLF2YAC/NZdkJwjrowVz2IecmQk5h2Dat0qQ4NKhCt4A5Aja5utcEsaXk22FEfCBtX25/r0ADjuRMATXuUHI+ZcXq7kUPu9JqzxdYC8zKp+Ygyr2S7C7gLXYFSHcMKaQ8wA3A3NQZcHAZiJnAqBRYp1yQ1f4Q7kPdU+KMJc2XBRr15Fvv5bssO3sfAn5v1Y7wB8lCKMHic8uwoD0fIxUbTnpzHQKTJFCImuTOM0DFWOIN2moFCowhHHg7Yex+0xVVWcw75dHCvW/jcLEacY6Bw1QhmiC0zF0yclEuBw9rpPAwTYO1LSDAPM5e3vcdIYN1FJ9mFNX8UaD6Qgf4ES2VLrq8rX6SoOZjgl/XgP1PJl5cdCZE8da3AnDf/ODSlDtk8w1F2wuwcTuUMz4gnfcI2tvObwyB2fzv2WMcoHAC8ZmZLWt8l9d7fa+ODtatZy2GRSCZ28g4HH23aVmFwJMSOXWtWUrcKX8x7OXwSwYiB9qNSOHrdw2Eb5/6YwvwkIDBISLJ55NfaZwPyDMR7GMyPyMJZv4nrvshAG62pCT7LnmhueNjltdw2Sk2DkedtPJI/yQGjOz/MbynJWxRMrV0ZbseXLEwchY//A9mIgT7Qi7qBq6a9qL0kN7dSfh2SJjytxSbs6ueNDH0C1NYZKAtD4JvxIe7xeCI01aYzyYIF4CFL0t7OvVYH41WsrJmdW8uSvegnkEKYIgaSbmWpQ0S1XmsaJlaclWkC2ztnuuVyv0lKu9YDnSOkl9daHJvnzJXw0Lr11f7g7tC/M3gfl0XsIgaSRFf3nejoLw0Xmem2rn63/yR0NLdDbPFHY56e+7uhK14CDSIVSQwkfSBavSSxl7fungT+3IvinnHutaPph/1PbfGKJAaSJMGZ2qgxWG2UJDGQJAnU9IQKLyRJEgNJkiRJkiSJgSRJkiRJksRAkiRJkiRJYiBJkiRJkiQxkCRJkiRJUq//BBgAljy5Rhqp808AAAAASUVORK5CYII=',
@@ -110,6 +100,7 @@ define(['angular'], function(angular) {
                         this.createImage = function(params) {
                             var placeholder = null;
                             var x = (params.distance) ? params.model.attrs.x + params.distance.x : params.model.attrs.x;
+                            var x = params.margin ? (params.model.attrs.x - 5) + (params.model.attrs.w + 10 + 2) + params.margin + 5 : x;
                             // placeholder
                             if (params.placeholder) {
                                 var attrs = (params.attrs) ? params.attrs : {
@@ -147,7 +138,10 @@ define(['angular'], function(angular) {
                         this.createText = function(params) {
                             // placeholder
                             var placeholder = null;
+
                             var x = params.distance ? params.model.attrs.x + params.distance.x : params.model.attrs.x;
+                            var x = params.margin   ? (params.model.attrs.x + 10) + (params.model.attrs.w + 2) + params.margin : x;
+
                             if (params.placeholder) {
                                 placeholder = paper.rect(
                                     x, (params.model.placeholder.y) ? params.model.placeholder.y.value : params.model.attrs.y,
@@ -165,12 +159,20 @@ define(['angular'], function(angular) {
                                     'stroke': '{{ banner.' + params.title + '.placeholder.nostroke ? \'none\' : banner.' + params.title + '.placeholder.strokeColor }}',
                                     'stroke-width': '{{ banner.' + params.title + '.placeholder.strokeWidth }}'
                                 };
+                                if( params.title == 'text' ){
+                                    var textAttrs = 'text.attrs['+ tpl +']';   
+                                    attrs['x'] = '{{ banner.'+ textAttrs +'.x }}';
+                                    attrs['y'] = '{{ banner.'+ textAttrs +'.y }}';
+                                    attrs['width']  = '{{ banner.'+ textAttrs +'.w }}';
+                                    attrs['height'] = '{{ banner.'+ textAttrs +'.h }}';
+                                }
                                 if (params.model.placeholder.y) {
                                     attrs['y'] = '{{ banner.' + params.title + '.placeholder.y.value }}';
                                 }
 
                                 angular.element(placeholder.node).attr(attrs);
                             }
+
                             // text html
                             if (/image/.test(params.title)) {
                                 var html = '<p ng-bind-html="' + params.value + '" style="font-family:{{banner.' + params.title + '.font.family}}; color:{{banner.' + params.title + '.font.color}}; font-size: {{banner.' + params.title + '.font.description.size}}px; line-height: {{banner.' + params.title + '.font.description.line}}px"></p>'
@@ -189,6 +191,16 @@ define(['angular'], function(angular) {
                                 params.model.attrs.w,
                                 params.height ? params.height : params.model.attrs.h, (params.className) ? params.className : className
                             );
+                            if( params.title == 'text' ){
+                                var textAttrs = 'text.attrs['+ tpl +']';
+                                angular.element(text.node).attr({
+                                    'x':'{{ banner.'+ textAttrs +'.x }}',
+                                    'y':'{{ banner.'+ textAttrs +'.y }}',
+                                    'width':'{{ banner.'+ textAttrs +'.w }}',
+                                    'height':'{{ banner.'+ textAttrs +'.h }}'
+                                });
+                            }
+
                             if (params.model.placeholder.y) {
                                 angular.element(text.node).attr('y', '{{ banner.' + params.title + '.placeholder.y.value }}');
                             }
@@ -207,7 +219,7 @@ define(['angular'], function(angular) {
                                 groups.push(element);
                             });
                             if (id) groups.node.id = id;
-                        }
+                        };
                     }
                 ],
                 link: function(scope, element, attrs, ctrl) {
@@ -230,8 +242,8 @@ define(['angular'], function(angular) {
                     var background = ctrl.createImage({
                         placeholder: false,
                         id: 'background',
-                        value: '{{ banner.background.image }}',
-                        model: scope.banner.background,
+                        value: '{{ banner.background['+tpl+'].image }}',
+                        model: scope.banner.background[tpl],
                         onClick: onClickHandler
                     });
 
@@ -255,7 +267,7 @@ define(['angular'], function(angular) {
                     var logo = ctrl.createImage({
                         placeholder: true,
                         id: 'logo',
-                        value: '{{ banner.logo.image }}',
+                        value: '{{ banner.logo.image['+ tpl +'] }}',
                         model: scope.banner.logo,
                         onClick: onClickHandler
                     });
@@ -271,18 +283,35 @@ define(['angular'], function(angular) {
                     /* Content element */
 
                     var content = ctrl.createText({
-                        placeholder: true,
-                        model: scope.banner.text,
-                        title: 'text',
-                        onClick: onClickHandler
+                        placeholder : true,
+                        model       : scope.banner.text,
+                        title       : 'text',
+                        onClick     : onClickHandler
                     });
                     // grouping place & text
                     ctrl.addToGroup([content.placeholder, content.text], 'group-image-' + tpl);
                     // transform text
                     var gSetText = paper.set(content.placeholder, content.text);
                     var ftText = paper.freeTransform(gSetText, options, onTransform).hideHandles();
-                    angular.extend(gSetText.freeTransform.attrs, scope.banner.text.transform);
+                    // angular.extend(gSetText.freeTransform.attrs, scope.banner.text.transform);
+                    // gSetText.freeTransform.attrs.translate.y = 235;
                     gSetText.freeTransform.apply();
+
+                    scope.banner.overlay = function( isOverlay ){
+                        var dimension, content = null;
+                        if( isOverlay ){
+                            dimension = 380;
+                            content   = 0;
+                        } else {
+                            var h     = scope.banner.text.attrs[0].h;
+                            dimension = scope.banner.dimension[0].attrs.h +  h + 20;
+                            content   = h + 20;
+                        }
+
+                        scope.banner.dimension[0].attrs.h = dimension;
+                        gSetText.freeTransform.attrs.translate.y = content;
+                        scope.$apply(); gSetText.freeTransform.apply();
+                    };
 
                     /* Prizes element */
 
@@ -374,16 +403,14 @@ define(['angular'], function(angular) {
                             gSetPrizeHeader.freeTransform.apply();
 
                             var gSetPrizeImage = paper.set();
-                            angular.forEach([0, 216], function(value, index) {
+                            angular.forEach([0, 10], function(value, index) {
                                 // image
                                 var prizeImage = ctrl.createImage({
                                     placeholder: true,
                                     value: '{{ banner.prize[2].image.data[' + index + '].src }}',
                                     model: scope.banner.prize[2].image,
                                     id: 'prize',
-                                    distance: {
-                                        x: value
-                                    },
+                                    margin: value,
                                     onClick: onClickHandler
                                 });
                                 // prize description
@@ -394,9 +421,7 @@ define(['angular'], function(angular) {
                                     className: 'foreign-object-prize-2 prize-figure',
                                     value: 'banner.prize[2].image.data[' + index + '].text',
                                     height: 30,
-                                    distance: {
-                                        x: value
-                                    },
+                                    margin: value,
                                     onClick: onClickHandler
                                 });
                                 // grouping
@@ -522,7 +547,7 @@ define(['angular'], function(angular) {
                                 popoverEl = '#group-text-' + tpl;
                             };
 
-                            if (scope.banner.selected != selected && !scope.banner.onEdit) {
+                            if (scope.banner.selectedEl != selected && !scope.banner.onEdit) {
                                 // $("body").animate({
                                 //     scrollTop: $('#' + ID).offset().top - 60
                                 // }, "slow");
@@ -532,7 +557,7 @@ define(['angular'], function(angular) {
                         }
 
                         // set banner selected
-                        scope.banner.selected = selected;
+                        scope.banner.selectedEl = selected;
                         // applying scope
                         scope.$apply();
 

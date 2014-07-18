@@ -12,7 +12,7 @@ require.config({
         'angular-bootstrap': '../bower_components/angular-bootstrap/ui-bootstrap-tpls.min',
         'angular-ui-utils': '../bower_components/angular-ui-utils/ui-utils.min',
         'angular-spinkit': '../bower_components/angular-spinkit/build/angular-spinkit.min',
-        'angular-snap': '../bower_components/angular-snap/angular-snap',
+        // 'angular-snap': '../bower_components/angular-snap/angular-snap',
 
         'angular-slide-push': 'lib/slide-push/slide.and.push',
 
@@ -21,7 +21,7 @@ require.config({
 
         'jquery': '../bower_components/jquery/dist/jquery.min',
         'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
-        'snap': 'lib/snap.min',
+        // 'snap': 'lib/snap.min',
 
         'raphael': 'lib/raphael/raphael',
         'raphael-group': 'lib/raphael/raphael.group',
@@ -46,14 +46,14 @@ require.config({
         'angular-bootstrap': ['angular'],
         'angular-ui-utils': ['angular'],
         'angular-spinkit': ['angular'],
-        'angular-snap': ['angular', 'snap'],
+        // 'angular-snap': ['angular', 'snap'],
 
         'angular-font-select': ['angular', 'webfontloader'],
         'angular-slide-push': ['angular'],
 
-        'snap': {
-            'exports': 'snap'
-        },
+        // 'snap': {
+        //     'exports': 'snap'
+        // },
         'webfontloader': {
             'exports': 'webfontloader'
         },
@@ -87,8 +87,8 @@ require([
     'angular-ui-utils',
     'angular-animate',
     'angular-spinkit',
-    'snap',
-    'angular-snap',
+    // 'snap',
+    // 'angular-snap',
     'angular-font-select',
     'angular-slide-push',
     'bootstrap'

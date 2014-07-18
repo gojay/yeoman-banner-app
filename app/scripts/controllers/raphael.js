@@ -20,10 +20,6 @@ define(['angular', 'raphael', 'raphael-filter', 'raphael-transform', 'raphael-js
 
                 $scope.banner = Banner.dummy();
 
-                $('.p').popover({
-                    placement: 'top'
-                });
-
             }
         ]);
 });

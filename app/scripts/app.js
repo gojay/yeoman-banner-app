@@ -23,7 +23,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         'ui.bootstrap',
         'ui.utils',
         'angularSpinkit',
-        'snap',
+        // 'snap',
         'jdFontselect',
         'slidePushMenu'
     ])
@@ -96,8 +96,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             //     .html5Mode(false)
             //     .hashPrefix('!');
         })
-        .run(['$rootScope', '$window', '$timeout', 'snapRemote',
-            function($rootScope, $window, $timeout, snapRemote) {
+        .run(['$rootScope', '$window', '$timeout', /*'snapRemote',*/
+            function($rootScope, $window, $timeout/*, snapRemote*/) {
                 // sidemenu
                 $rootScope.menus = {
                     top: {
@@ -123,6 +123,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         return window.innerWidth;
                     },
                     function(newVal) {
+                        /*
                         snapRemote.getSnapper().then(function(snapper) {
                             var val = parseInt(newVal * 80 / 100);
                             snapper.settings({
@@ -135,6 +136,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                                 });
                             }, 400)
                         });
+                        */
                     }
                 );
 
