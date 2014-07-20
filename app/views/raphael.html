@@ -13,15 +13,42 @@
 			<form action="" method="POST" role="form">
 				<div class="form-group">
 					<label class="radio-inline">
-					  <input type="radio" ng-model="draw" id="inlineRadio1" ng-value=null> None
+					  <input type="radio" ng-model="draw"> None
 					</label>
 					<label class="radio-inline">
-					  <input type="radio" ng-model="draw" id="inlineRadio1" value="bbox" ng-disabled="!banner.selected"> Box
+					  <input type="radio" ng-model="draw" value="bbox" ng-disabled="!banner.selected"> Box
 					</label>
 					<label class="radio-inline">
-					  <input type="radio" ng-model="draw" id="inlineRadio2" value="circle" ng-disabled="!banner.selected"> Circle
+					  <input type="radio" ng-model="draw" value="circle" ng-disabled="!banner.selected"> Circle
 					</label>
 				</div>
+				<div class="form-group">
+					<label class="radio-inline">
+					  <input type="radio" ng-model="banner.selected" value="0" ng-click="banner.selected = 0"> 0
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" ng-model="banner.selected" value="1" ng-click="banner.selected = 1"> 1
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" ng-model="banner.selected" value="2" ng-click="banner.selected = 2"> 2
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" ng-model="banner.selected" value="3" ng-click="banner.selected = 3"> 3
+					</label>
+				</div>
+
+				<div class="form-group">
+					<label for="title">Overlay</label>
+					<div class="btn-group">
+					  <button type="button" class="btn btn-sm btn-default" 
+					  		ng-class="{'active':banner.overlay}"
+					  		ng-click="banner.overlay = true">Yes</button>
+					  <button type="button" class="btn btn-sm btn-default" 
+					  		ng-class="{'active':!banner.overlay}"
+					  		ng-click="banner.overlay = false">No</button>
+					</div>
+				</div>
+
 
 				<legend>Content</legend>
 				<div class="form-group">

@@ -22,6 +22,9 @@ define(['angular'], function(angular) {
                             if (values.line > 64)
                                 scope.banner.text.font.line = 64;
                         });
+                        scope.$watch('banner.selected', function() {
+                            scope.banner.overlay = true;
+                        });
 
                         // update template top menu
                         $timeout(function() {
@@ -41,9 +44,9 @@ define(['angular'], function(angular) {
                                 var wH = {
                                     w: 332,
                                     h: 200,
-                                    y: 340-200-10
+                                    y: 340 - 200 - 10
                                 };
-                                // angular.extend(scope.banner.text.attrs, wH);
+                                angular.extend(scope.banner.text.attrs, wH);
                                 break;
                             case '3':
                                 angular.extend(scope.banner.logo.attrs, {
@@ -61,14 +64,14 @@ define(['angular'], function(angular) {
                                     w: 730,
                                     h: 130
                                 };
-                                // angular.extend(scope.banner.text.attrs, textAttrs);
+                                angular.extend(scope.banner.text.attrs, textAttrs);
                                 break;
                             default:
                                 break;
                         };
 
                         var paper = this.paper = Raphael(ID, 810, scope.banner.dimension[tpl].attrs.h);
-                        angular.element(paper.canvas).attr('height','{{ banner.dimension['+ tpl +'].attrs.h }}');
+                        angular.element(paper.canvas).attr('height', '{{ banner.dimension[' + tpl + '].attrs.h }}');
 
                         this.tpl = tpl;
 
@@ -85,10 +88,10 @@ define(['angular'], function(angular) {
                         // add definition styles for foreignObject HTML
                         var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
                         var css = {
-                            0: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-0 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;margin:0;padding:0 20px}",
-                            1: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-1 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
-                            2: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-2 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
-                            3: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-3 h2{float:left;width:40%;margin:0;padding:20px;border-bottom:none}.foreign-object-3 h2~p{padding:20px}.foreign-object-prize-3{text-align:center;}.foreign-object-prize-3 h2{margin:0;padding:0 5px;border-bottom:none}.foreign-object-prize-3 p{width:250px;height:67px;padding:0;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
+                            0: "svg{background-color:#FFF}body{background-color:transparent;height:100%;}.foreign-object-0 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-0 h2~p{text-align:left;margin:0;padding:0 20px}",
+                            1: "svg{background-color:#FFF}body{background-color:transparent;height:100%;}.foreign-object-1 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-1 h2~p{text-align:left;padding:0 20px}.foreign-object-prize-1 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-1 span{display:block;text-align:center}.foreign-object-prize-1 p{width:340px;height:50px;padding:0 15px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
+                            2: "svg{background-color:#FFF}body{background-color:transparent;height:100%;}.foreign-object-2 h2{text-align:left;margin:0;padding:10px 20px;border-bottom:none}.foreign-object-2 h2~p{text-align:left;padding:0 20px;top:10px}.foreign-object-prize-2 h2{margin:0;padding:3px 5px 0;text-align:center;border-bottom:none}.foreign-object-prize-2 span{display:block;text-align:center}.foreign-object-prize-2 p{width:203px;height:30px;padding:0 10px;text-align:center;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}",
+                            3: "svg{background-color:#FFF}body{background-color:transparent}.foreign-object-3 h2{float:left;width:40%;height:100%;;margin:0;padding:20px;border-bottom:none}.foreign-object-3 h2~p{padding:20px}.foreign-object-prize-3{text-align:center;}.foreign-object-prize-3 h2{margin:0;padding:0 5px;border-bottom:none}.foreign-object-prize-3 p{width:250px;height:67px;padding:0;vertical-align:middle;display:table-cell}.prize-black-text{color:#333!important}"
                         };
                         var _css = css[tpl];
                         var style = document.createElement('style');
@@ -140,7 +143,7 @@ define(['angular'], function(angular) {
                             var placeholder = null;
 
                             var x = params.distance ? params.model.attrs.x + params.distance.x : params.model.attrs.x;
-                            var x = params.margin   ? (params.model.attrs.x + 10) + (params.model.attrs.w + 2) + params.margin : x;
+                            var x = params.margin ? (params.model.attrs.x + 10) + (params.model.attrs.w + 2) + params.margin : x;
 
                             if (params.placeholder) {
                                 placeholder = paper.rect(
@@ -159,13 +162,6 @@ define(['angular'], function(angular) {
                                     'stroke': '{{ banner.' + params.title + '.placeholder.nostroke ? \'none\' : banner.' + params.title + '.placeholder.strokeColor }}',
                                     'stroke-width': '{{ banner.' + params.title + '.placeholder.strokeWidth }}'
                                 };
-                                if( params.title == 'text' ){
-                                    var textAttrs = 'text.attrs['+ tpl +']';   
-                                    attrs['x'] = '{{ banner.'+ textAttrs +'.x }}';
-                                    attrs['y'] = '{{ banner.'+ textAttrs +'.y }}';
-                                    attrs['width']  = '{{ banner.'+ textAttrs +'.w }}';
-                                    attrs['height'] = '{{ banner.'+ textAttrs +'.h }}';
-                                }
                                 if (params.model.placeholder.y) {
                                     attrs['y'] = '{{ banner.' + params.title + '.placeholder.y.value }}';
                                 }
@@ -191,15 +187,6 @@ define(['angular'], function(angular) {
                                 params.model.attrs.w,
                                 params.height ? params.height : params.model.attrs.h, (params.className) ? params.className : className
                             );
-                            if( params.title == 'text' ){
-                                var textAttrs = 'text.attrs['+ tpl +']';
-                                angular.element(text.node).attr({
-                                    'x':'{{ banner.'+ textAttrs +'.x }}',
-                                    'y':'{{ banner.'+ textAttrs +'.y }}',
-                                    'width':'{{ banner.'+ textAttrs +'.w }}',
-                                    'height':'{{ banner.'+ textAttrs +'.h }}'
-                                });
-                            }
 
                             if (params.model.placeholder.y) {
                                 angular.element(text.node).attr('y', '{{ banner.' + params.title + '.placeholder.y.value }}');
@@ -242,7 +229,7 @@ define(['angular'], function(angular) {
                     var background = ctrl.createImage({
                         placeholder: false,
                         id: 'background',
-                        value: '{{ banner.background['+tpl+'].image }}',
+                        value: '{{ banner.background[' + tpl + '].image }}',
                         model: scope.banner.background[tpl],
                         onClick: onClickHandler
                     });
@@ -267,7 +254,7 @@ define(['angular'], function(angular) {
                     var logo = ctrl.createImage({
                         placeholder: true,
                         id: 'logo',
-                        value: '{{ banner.logo.image['+ tpl +'] }}',
+                        value: '{{ banner.logo.image[' + tpl + '] }}',
                         model: scope.banner.logo,
                         onClick: onClickHandler
                     });
@@ -283,10 +270,10 @@ define(['angular'], function(angular) {
                     /* Content element */
 
                     var content = ctrl.createText({
-                        placeholder : true,
-                        model       : scope.banner.text,
-                        title       : 'text',
-                        onClick     : onClickHandler
+                        placeholder: true,
+                        model: scope.banner.text,
+                        title: 'text',
+                        onClick: onClickHandler
                     });
                     // grouping place & text
                     ctrl.addToGroup([content.placeholder, content.text], 'group-image-' + tpl);
@@ -297,25 +284,9 @@ define(['angular'], function(angular) {
                     // gSetText.freeTransform.attrs.translate.y = 235;
                     gSetText.freeTransform.apply();
 
-                    scope.banner.overlay = function( isOverlay ){
-                        var dimension, content = null;
-                        if( isOverlay ){
-                            dimension = 380;
-                            content   = 0;
-                        } else {
-                            var h     = scope.banner.text.attrs[0].h;
-                            dimension = scope.banner.dimension[0].attrs.h +  h + 20;
-                            content   = h + 20;
-                        }
-
-                        scope.banner.dimension[0].attrs.h = dimension;
-                        gSetText.freeTransform.attrs.translate.y = content;
-                        scope.$apply(); gSetText.freeTransform.apply();
-                    };
-
                     /* Prizes element */
 
-                    var ftPrizeHeader, ftPrizeImage = null;
+                    var gSetPrizeHeader, gSetPrizeImage, ftPrizeHeader, ftPrizeImage = null;
                     switch (tpl) {
                         case '1':
                             // header
@@ -332,12 +303,12 @@ define(['angular'], function(angular) {
                             gPrizeHeader.push(prize.placeholder).push(prize.text);
                             // set transform elements
                             options.configSize = 'small';
-                            var gSetPrizeHeader = paper.set(prize.placeholder, prize.text);
+                            gSetPrizeHeader = paper.set(prize.placeholder, prize.text);
                             ftPrizeHeader = paper.freeTransform(gSetPrizeHeader, options, onTransform).hideHandles();
                             angular.extend(gSetPrizeHeader.freeTransform.attrs, scope.banner.prize[1].header.transform);
                             gSetPrizeHeader.freeTransform.apply();
 
-                            var gSetPrizeImage = paper.set();
+                            gSetPrizeImage = paper.set();
                             angular.forEach([0], function(value, index) {
                                 // image
                                 var prizeImage = ctrl.createImage({
@@ -397,12 +368,12 @@ define(['angular'], function(angular) {
                             });
                             // set transform elements
                             options.configSize = 'small';
-                            var gSetPrizeHeader = paper.set(prize.placeholder, prize.text);
+                            gSetPrizeHeader = paper.set(prize.placeholder, prize.text);
                             ftPrizeHeader = paper.freeTransform(gSetPrizeHeader, options, onTransform).hideHandles();
                             angular.extend(gSetPrizeHeader.freeTransform.attrs, scope.banner.prize[2].header.transform);
                             gSetPrizeHeader.freeTransform.apply();
 
-                            var gSetPrizeImage = paper.set();
+                            gSetPrizeImage = paper.set();
                             angular.forEach([0, 10], function(value, index) {
                                 // image
                                 var prizeImage = ctrl.createImage({
@@ -455,12 +426,12 @@ define(['angular'], function(angular) {
                             });
                             // set transform elements
                             options.configSize = 'small';
-                            var gSetPrizeHeader = paper.set(prize.placeholder, prize.text);
+                            gSetPrizeHeader = paper.set(prize.placeholder, prize.text);
                             ftPrizeHeader = paper.freeTransform(gSetPrizeHeader, options, onTransform).hideHandles();
                             angular.extend(gSetPrizeHeader.freeTransform.attrs, scope.banner.prize[3].header.transform);
                             gSetPrizeHeader.freeTransform.apply();
 
-                            var gSetPrizeImage = paper.set();
+                            gSetPrizeImage = paper.set();
                             angular.forEach([0, 265, 530], function(value, index) {
                                 // image
                                 var prizeImage = ctrl.createImage({
@@ -506,6 +477,54 @@ define(['angular'], function(angular) {
                             gSetPrizeImage.freeTransform.apply();
                             break;
                     }
+
+                    scope.$watch('banner.overlay', function(isOverlay) {
+                        var dimension, content, color, placeholder = null;
+
+                        if (scope.banner.selected == 2) dimension = 340;
+                        else if (scope.banner.selected == 3) dimension = 670;
+                        else dimension = 380;
+
+                        if (isOverlay) {
+                            content = 0;
+                            color = '#ffffff';
+                            placeholder = false;
+                            if (scope.banner.selected == 3) {
+                                // prize header
+                                gSetPrizeHeader.freeTransform.attrs.translate.y = 0;
+                                gSetPrizeHeader.freeTransform.apply();
+                                // prize image
+                                gSetPrizeImage.freeTransform.attrs.translate.y = 0;
+                                gSetPrizeImage.freeTransform.apply();
+                            }
+                        } else {
+                            color = '#000000';
+                            placeholder = true;
+                            if (scope.banner.selected == 2) {
+                                dimension += 220;
+                                content = 220;
+                            } else if (scope.banner.selected == 3) {
+                                dimension += 150;
+                                content = 150;
+                                // prize header
+                                gSetPrizeHeader.freeTransform.attrs.translate.y = 130;
+                                gSetPrizeHeader.freeTransform.apply();
+                                // prize image
+                                gSetPrizeImage.freeTransform.attrs.translate.y = 130;
+                                gSetPrizeImage.freeTransform.apply();
+                            } else {
+                                dimension += 255;
+                                content = 255;
+                            }
+                        }
+
+                        scope.banner.text.font.color = color;
+                        scope.banner.text.placeholder.hide = placeholder;
+                        scope.banner.dimension[scope.banner.selected].attrs.h = dimension;
+                        // content
+                        gSetText.freeTransform.attrs.translate.y = content;
+                        gSetText.freeTransform.apply();
+                    });
 
                     /* Callback */
 

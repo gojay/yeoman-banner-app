@@ -45,8 +45,7 @@ define(['angular'], function(angular) {
                             }
                         }
                     ],
-                    background: [
-                        {
+                    background: [{
                             attrs: {
                                 x: 0,
                                 y: 0,
@@ -150,31 +149,39 @@ define(['angular'], function(angular) {
                             "ratio": 1
                             */
                         },
-                        image: ['http://placehold.it/160x100','http://placehold.it/160x100','http://placehold.it/160x100','http://placehold.it/122x80']
+                        image: ['http://placehold.it/160x100', 'http://placehold.it/160x100', 'http://placehold.it/160x100', 'http://placehold.it/122x80']
                     },
                     text: {
                         name: 'Content',
+                        attrs: {
+                            x: 10,
+                            y: 135,
+                            w: 404,
+                            h: 235
+                        },
+                        /*
                         attrs: [{
                             x: 10,
                             y: 135,
                             w: 404,
                             h: 235
-                        },{ // 1
+                        }, { // 1
                             x: 10,
                             y: 135,
                             w: 404,
                             h: 235
-                        },{ // 2
+                        }, { // 2
                             x: 10,
-                            y: 340-200-10,
+                            y: 340 - 200 - 10,
                             w: 332,
                             h: 200
-                        },{ // 3
+                        }, { // 3
                             x: 40,
-                            y: 165 + 10,
+                            y: 175,
                             w: 730,
                             h: 130
                         }],
+                        */
                         font: {
                             family: 'Arial, "Helvetica Neue", Helvetica, sans-serif, "websafe"',
                             color: '#ffffff',
@@ -196,7 +203,7 @@ define(['angular'], function(angular) {
                             strokeWidth: 1
                         },
                         content: {
-                            title: 'Contest Name, Contest',
+                            title: 'Contest Name, Contest Title, Contest',
                             description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum.',
                         },
                         transform: {}
@@ -444,6 +451,7 @@ define(['angular'], function(angular) {
                         }
                     },
                     selected: 0,
+                    overlay: 1,
                     selectedEl: null,
                     onEdit: false,
                     draw: null
