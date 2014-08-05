@@ -78,10 +78,6 @@ input[type="range"]::-webkit-slider-thumb {
     min-height: 294px;
     padding: 15px;
 }
-#home .cols:nth-child(4n+4) {
-    /*margin-left: 0;
-    padding-left: 0;*/
-}
 #home .cols ul {
     list-style: none outside none;
     margin-left: 0;
@@ -91,7 +87,10 @@ input[type="range"]::-webkit-slider-thumb {
     border-bottom: 1px solid #ccc;
     padding: 15px 0;
 }
-#home .cols ul li:nth-child(4n+4) {
+#home .cols ul li:first-child {
+    border-bottom: 1px solid #ccc !important;
+}
+#home .cols ul li:last-child {
     border-bottom: none;
 }
 

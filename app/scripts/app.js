@@ -1,32 +1,33 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator', 'controllers/fabric'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
-        'bannerAppApp.controllers.MainCtrl',
-        'bannerAppApp.controllers.BootstrapCtrl',
-        'bannerAppApp.controllers.BannerCtrl',
-        'bannerAppApp.controllers.ConversationCtrl',
-        'bannerAppApp.controllers.RaphaelCtrl',
-        'bannerAppApp.filters.Comatonewline',
-        'bannerAppApp.filters.Splitintolines',
-        'bannerAppApp.services.Banner',
-        'bannerAppApp.directives.Bannercreator',
-        /*angJSDeps*/
-        'ngCookies',
-        'ngResource',
-        'ngSanitize',
-        'ngRoute',
+            'bannerAppApp.controllers.MainCtrl',
+            'bannerAppApp.controllers.BootstrapCtrl',
+            'bannerAppApp.controllers.BannerCtrl',
+            'bannerAppApp.controllers.ConversationCtrl',
+            'bannerAppApp.controllers.RaphaelCtrl',
+            'bannerAppApp.filters.Comatonewline',
+            'bannerAppApp.filters.Splitintolines',
+            'bannerAppApp.services.Banner',
+            'bannerAppApp.directives.Bannercreator',
+            'bannerAppApp.controllers.FabricCtrl',
+            /*angJSDeps*/
+            'ngCookies',
+            'ngResource',
+            'ngSanitize',
+            'ngRoute',
 
-        'ngAnimate',
+            'ngAnimate',
 
-        'ui.bootstrap',
-        'ui.utils',
-        'angularSpinkit',
-        // 'snap',
-        'jdFontselect',
-        'slidePushMenu'
-    ])
+            'ui.bootstrap',
+            'ui.utils',
+            'angularSpinkit',
+            // 'snap',
+            // 'jdFontselect',
+            'slidePushMenu'
+        ])
         .constant('jdFontselectConfig', {
             googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         })
@@ -55,6 +56,9 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             }
         ])
         .config(function($routeProvider, $locationProvider) {
+            // compile sanitazion
+            // $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file):/);
+            // route
             $routeProvider
                 .when('/', {
                     templateUrl: 'views/main.html',
@@ -88,6 +92,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         }
                     }
                 })
+                .when('/fabric', {
+                    templateUrl: 'views/fabric.html',
+                    controller: 'FabricCtrl'
+                })
                 .otherwise({
                     redirectTo: '/'
                 });
@@ -97,7 +105,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             //     .hashPrefix('!');
         })
         .run(['$rootScope', '$window', '$timeout', /*'snapRemote',*/
-            function($rootScope, $window, $timeout/*, snapRemote*/) {
+            function($rootScope, $window, $timeout /*, snapRemote*/ ) {
                 // sidemenu
                 $rootScope.menus = {
                     top: {

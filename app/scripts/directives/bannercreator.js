@@ -1,7 +1,7 @@
-define(['angular'], function(angular) {
+define(['angular', 'angular-font-select'], function(angular) {
     'use strict';
 
-    angular.module('bannerAppApp.directives.Bannercreator', [])
+    angular.module('bannerAppApp.directives.Bannercreator', ['jdFontselect'])
         .directive('bannerCreator', function($rootScope, $compile, slidePush) {
             return {
                 template: '<div style="margin:5px 0;padding:5px;text-align:center;border:1px solid"></div>',
@@ -259,13 +259,26 @@ define(['angular'], function(angular) {
                         onClick: onClickHandler
                     });
                     // transform element
-                    var gSetLogo = paper.set(logo.image);
+                    var gSetLogo = paper.set(logo.image, logo.placeholder);
                     var ftLogo = paper.freeTransform(gSetLogo, defaultOptions, onTransform).hideHandles();
                     angular.extend(gSetLogo.freeTransform.attrs, scope.banner.logo.transform);
                     gSetLogo.freeTransform.apply();
 
+                    scope.$watch('banner.logo.show', function(isShowed) {
+                        if (isShowed)
+                            gSetLogo.show();
+                        else
+                            gSetLogo.hide();
+                    });
+                    scope.$watch('banner.logo.placeholder', function(isShowed) {
+                        if (isShowed)
+                            logo.placeholder.show();
+                        else
+                            logo.placeholder.hide();
+                    });
+
                     // grouping elements: background, fb & logo
-                    ctrl.addToGroup([background.image, fb.image, logo.placeholder, logo.image], 'group-image-' + tpl);
+                    ctrl.addToGroup([background.image, fb.image, logo.placeholder, logo.image], 'group-background-' + tpl);
 
                     /* Content element */
 
@@ -276,7 +289,7 @@ define(['angular'], function(angular) {
                         onClick: onClickHandler
                     });
                     // grouping place & text
-                    ctrl.addToGroup([content.placeholder, content.text], 'group-image-' + tpl);
+                    ctrl.addToGroup([content.placeholder, content.text], 'group-content-' + tpl);
                     // transform text
                     var gSetText = paper.set(content.placeholder, content.text);
                     var ftText = paper.freeTransform(gSetText, options, onTransform).hideHandles();
@@ -473,17 +486,18 @@ define(['angular'], function(angular) {
                     scope.$watch('banner.overlay', function(isOverlay) {
                         var svgHeight, contentYAxis = null;
                         var pHeaderYAxis, pImageYAxis = null;
+                        var hasHeader = true;
                         switch (scope.banner.selected) {
-                            case '1':
-                                svgHeight = isOverlay ? 380 : (380 + 255);
+                            case 1:
+                                svgHeight = isOverlay ? 380 : 635;
                                 contentYAxis = isOverlay ? 0 : 255;
                                 pHeaderYAxis = isOverlay ? 0 : 255;
                                 pImageYAxis = isOverlay ? 0 : 255;
                                 scope.banner.prize[1].header.font.color = isOverlay ? '#ffffff' : '#000000';
                                 scope.banner.prize[1].header.placeholder.hide = isOverlay ? false : true;
                                 break;
-                            case '2':
-                                svgHeight = isOverlay ? 340 : (340 + 220);
+                            case 2:
+                                svgHeight = isOverlay ? 340 : 560;
                                 contentYAxis = isOverlay ? 0 : 220;
                                 pHeaderYAxis = isOverlay ? 0 : 220;
                                 pImageYAxis = isOverlay ? 0 : 220;
@@ -491,14 +505,16 @@ define(['angular'], function(angular) {
                                 scope.banner.prize[2].header.font.color = isOverlay ? '#ffffff' : '#000000';
                                 scope.banner.prize[2].header.placeholder.hide = isOverlay ? false : true;
                                 break;
-                            case '3':
-                                svgHeight = isOverlay ? 670 : (670 + 150);
+                            case 3:
+                                svgHeight = isOverlay ? 670 : 805;
                                 contentYAxis = isOverlay ? 0 : 150;
                                 pHeaderYAxis = isOverlay ? 0 : 130;
                                 pImageYAxis = isOverlay ? 0 : 130;
+                                console.log('3', svgHeight);
                                 break;
                             default:
-                                svgHeight = isOverlay ? 380 : (380 + 255);
+                                hasHeader = false;
+                                svgHeight = isOverlay ? 380 : 635;
                                 contentYAxis = isOverlay ? 0 : 255;
                                 break;
                         }
@@ -510,7 +526,9 @@ define(['angular'], function(angular) {
                         gSetText.freeTransform.attrs.translate.y = contentYAxis;
                         gSetText.freeTransform.apply();
                         // prize header & image
-                        if (pHeaderYAxis !== null && pImageYAxis !== null) {
+                        if (hasHeader && gSetPrizeHeader && gSetPrizeImage) {
+                            console.log('gSetPrizeHeader', gSetPrizeHeader)
+                            console.log('gSetPrizeImage', gSetPrizeImage)
                             // prize header
                             gSetPrizeHeader.freeTransform.attrs.translate.y = pHeaderYAxis;
                             gSetPrizeHeader.freeTransform.apply();

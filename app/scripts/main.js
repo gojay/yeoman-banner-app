@@ -28,7 +28,10 @@ require.config({
         'raphael-filter': 'lib/raphael/fraphael',
         'raphael-transform': 'lib/raphael/raphael.transform',
         'raphael-json': 'lib/raphael/raphael.json',
-        'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min'
+        'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min',
+
+        'fabric': 'lib/fabric/fabric',
+        'fabricUtils': 'lib/fabric/utils'
     },
     shim: {
         'angular': {
@@ -65,7 +68,10 @@ require.config({
         'raphael-filter': ['raphael'],
         'raphael-transform': ['raphael'],
         'raphael-json': ['raphael'],
-        'raphael-svg-import': ['raphael']
+        'raphael-svg-import': ['raphael'],
+
+        'fabric': ['jquery'],
+        'fabricUtils': ['fabric']
     },
     priority: [
         'angular'
@@ -89,7 +95,7 @@ require([
     'angular-spinkit',
     // 'snap',
     // 'angular-snap',
-    'angular-font-select',
+    // 'angular-font-select',
     'angular-slide-push',
     'bootstrap'
 ], function(jquery, angular, app, ngRoutes, ngCookies, ngSanitize, ngResource) {

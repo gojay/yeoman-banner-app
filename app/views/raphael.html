@@ -4,6 +4,10 @@
 			<banner-creator id="canvas-2" ng-model="banner" tpl="1" ng-show="banner.selected == 1"></banner-creator>
 			<banner-creator id="canvas-3" ng-model="banner" tpl="2" ng-show="banner.selected == 2"></banner-creator>
 			<banner-creator id="canvas-4" ng-model="banner" tpl="3" ng-show="banner.selected == 3"></banner-creator>
+
+			<div style="margin: 10px 0; text-align:center; border: 1px solid">
+				<img ng-src="{{banner.imgPreview}}" alt="">
+			</div>
 		</div>
 		<div class="col-lg-3" data-snap-ignore="true">
 			<!-- <pre>Selected : {{ banner.selected }}</pre>
@@ -11,6 +15,9 @@
 			 -->
 
 			<form action="" method="POST" role="form">
+				<div class="form-group">
+					<a class="btn btn-sm btn-primary" ng-click="banner.generate()">Generate</a>
+				</div>
 				<div class="form-group">
 					<label class="radio-inline">
 					  <input type="radio" ng-model="draw"> None
@@ -65,6 +72,16 @@
 					  		ng-class="{'active':!banner.overlay}"
 					  		ng-click="banner.overlay = false">No</button>
 					</div>
+				</div>
+
+				<legend>Logo</legend>
+				<div class="form-group">
+					<label for="title" style="width:100px;">Show</label>
+					<input type="checkbox" ng-model="banner.logo.show">
+				</div>
+				<div class="form-group">
+					<label for="title" style="width:100px;">Placeholder</label>
+					<input type="checkbox" ng-model="banner.logo.placeholder">
 				</div>
 
 
