@@ -31,7 +31,15 @@ require.config({
         'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min',
 
         'fabric': 'lib/fabric/fabric',
-        'fabricUtils': 'lib/fabric/utils'
+        'fabricUtils': 'lib/fabric/utils',
+
+        'fabricAngular': 'lib/fabric/fabricAngular',
+        'fabricCanvas': 'lib/fabric/fabricCanvas',
+        'fabricConstants': 'lib/fabric/fabricConstants',
+        'fabricDirective': 'lib/fabric/fabricDirective',
+        'fabricDirtyStatus': 'lib/fabric/fabricDirtyStatus',
+        'fabricUtilities': 'lib/fabric/fabricUtilities',
+        'fabricWindow': 'lib/fabric/fabricWindow'
     },
     shim: {
         'angular': {
@@ -71,7 +79,15 @@ require.config({
         'raphael-svg-import': ['raphael'],
 
         'fabric': ['jquery'],
-        'fabricUtils': ['fabric']
+        'fabricUtils': ['fabric'],
+
+        'fabricAngular': ['fabric'],
+        'fabricCanvas': ['fabric'],
+        'fabricConstants': ['fabric'],
+        'fabricDirective': ['fabric'],
+        'fabricDirtyStatus': ['fabric'],
+        'fabricUtilities': ['fabric'],
+        'fabricWindow': ['fabric']
     },
     priority: [
         'angular'

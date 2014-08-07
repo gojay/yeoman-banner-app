@@ -30,6 +30,9 @@ define(['angular'], function(angular) {
                 }, {
                     title: 'FabricJS',
                     link: 'fabric'
+                }, {
+                    title: 'FabricJS 2',
+                    link: 'fabric2'
                 }]
             };
 

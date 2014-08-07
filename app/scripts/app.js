@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator', 'controllers/fabric'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator', 'controllers/fabric', 'controllers/fabric2'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -13,7 +13,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.services.Banner',
             'bannerAppApp.directives.Bannercreator',
             'bannerAppApp.controllers.FabricCtrl',
-            /*angJSDeps*/
+            'bannerAppApp.controllers.Fabric2Ctrl',
+/*angJSDeps*/
             'ngCookies',
             'ngResource',
             'ngSanitize',
@@ -95,6 +96,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 .when('/fabric', {
                     templateUrl: 'views/fabric.html',
                     controller: 'FabricCtrl'
+                })
+                .when('/fabric2', {
+                  templateUrl: 'views/fabric2.html',
+                  controller: 'Fabric2Ctrl'
                 })
                 .otherwise({
                     redirectTo: '/'
