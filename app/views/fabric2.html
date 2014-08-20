@@ -110,6 +110,12 @@
                         Shapes
                     </button>
 
+                    <button ng-click='addGroup()' class='btn btn-default'>
+                        <i class='fa fa-star'></i>
+                        <div class='clearfix'></div>
+                        Group
+                    </button>
+
                     <button ng-click="fabric.clearCanvas(); fabric.setDirty(true)" class='btn btn-default'>
                         <i class='fa fa-refresh'></i>
                         <div class='clearfix'></div>
@@ -221,6 +227,12 @@
             
             <div class='col-xs-3'>
                 <div ng-if='fabric.selectedObject'>
+                    <button ng-click="fabric.toggleImage()" class='btn'>
+                        Toggle Image <i class='fa fa-file-image-o'></i>
+                    </button>
+                    <button ng-click="fabric.toggleBorder()" class='btn'>
+                        Toggle border <i class='fa fa-ban'></i>
+                    </button>
                     <div ng-switch='fabric.selectedObject.type'>
                         <div ng-switch-when='text'>
                             <p>
@@ -296,6 +308,20 @@
                                     <i class='fa fa-tint'></i>
                                 </button>
                                 <input type="text" class='input-small' ng-model='fabric.selectedObject.tint' />
+                            </div>
+                        </div>
+
+                        <div ng-switch-when="group">
+                            <div class="input-prepend">
+                                <button ng-class="{ 'btn-primary': fabric.isGroupHidden(1), 'btn-default': !fabric.isGroupHidden(1) }" ng-click="fabric.toggleHidden(1)" class='btn'>
+                                    1 <i class='fa' ng-class="{ 'fa-eye': fabric.isGroupHidden(1), 'fa-eye-slash':!fabric.isGroupHidden(1) }"></i>
+                                </button>
+                                <button ng-class="{ 'btn-primary': fabric.isGroupHidden(2), 'btn-default': !fabric.isGroupHidden(2) }" ng-click="fabric.toggleHidden(2)" class='btn'>
+                                    2 <i class='fa' ng-class="{ 'fa-eye': fabric.isGroupHidden(2), 'fa-eye-slash':!fabric.isGroupHidden(2) }"></i>
+                                </button>
+                                <button ng-class="{ 'btn-primary': fabric.isGroupHidden(3), 'btn-default': !fabric.isGroupHidden(3) }" ng-click="fabric.toggleHidden(3)" class='btn'>
+                                    3 <i class='fa' ng-class="{ 'fa-eye': fabric.isGroupHidden(3), 'fa-eye-slash':!fabric.isGroupHidden(3) }"></i>
+                                </button>
                             </div>
                         </div>
                     </div>

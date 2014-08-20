@@ -222,6 +222,17 @@ angular.module('common.fabric', [
 			fabric.Image.fromURL(imageURL, function(object) {
 				object.id = self.createId();
 
+				console.log('object', object)
+
+				// var rect = new fabric.Rect({
+				// 	name: 'figure',
+				//   	fill: 'red',
+				//   	width: object.width + 10,
+				//   	height: object.height + 10,
+				//   	left: object.originalLeft - 10,
+				//   	top : object.originalTop - 10
+				// });
+
 				for (var p in self.imageOptions) {
 					object[p] = self.imageOptions[p];
 				}
@@ -235,16 +246,88 @@ angular.module('common.fabric', [
 				object.filters.push(filter);
 				object.applyFilters(canvas.renderAll.bind(canvas));
 
+				object.stroke = 'red';
+				object.strokeWidth = 10;
+
+				// var group = new fabric.Group([ rect, object ], {
+				// 	name: 'image'
+				// });
+
 				self.addObjectToCanvas(object);
+
+				var PolaroidPhoto = fabric.util.createClass(fabric.Object, fabric.Observable, {
+				    H_PADDING: 10,
+				    V_PADDING: 50,
+				    originX: 'left',
+				    originY: 'top',
+				    initialize: function(src, options) {
+				      this.callSuper('initialize', options);
+				      this.image = new Image();
+				      this.image.src = src;
+				      this.image.onload = (function() {
+				        this.width = this.image.width;
+				        this.height = this.image.height;
+				        this.loaded = true;
+				        this.setCoords();
+				        this.fire('image:loaded');
+				      }).bind(this);
+				    },
+				    _render: function(ctx) {
+				      if (this.loaded) {
+				        ctx.fillStyle = '#13987E';
+				        ctx.fillRect(
+				          -(this.width / 2) - this.H_PADDING,
+				          -(this.height / 2) - this.H_PADDING,
+				          this.width + this.H_PADDING * 2,
+				          this.height + this.H_PADDING * 2);
+				        ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
+				      }
+				    }
+				  });
+				var photo = new PolaroidPhoto('images/logo.png', {
+				    // top: 0,
+				    // left: 0,
+				    // scaleX: 0.2,
+				    // scaleY: 0.2
+				  });
+				  photo.on('image:loaded', canvas.renderAll.bind(canvas));
+				  photo.drawBorders = photo.drawCorners = function() { return this };
+				 console.log('PolaroidPhoto', photo);
+				self.addObjectToCanvas(photo);
+
 			}, self.imageDefaults);
+		};
+
+		self.toggleImage = function(){
+			var activeObject = canvas.getActiveObject();
+
+			console.log('activeObject', activeObject)
+			console.log('self.selectedObject', self.selectedObject)
+
+			if (! activeObject ) {
+				return;
+			}
+
+			activeObject.scaleX = 0.2;
+			activeObject.scaleY = 0.2;
+			activeObject.image.src = 'images/pug.jpg';
+			self.render();
+		}
+		self.toggleBorder = function(){
+			var activeObject = canvas.getActiveObject();
+			var stroke = activeObject.stroke == 'transparent' ? 'red' : 'transparent';
+
+			activeObject.stroke = stroke;
+			self.render();
 		};
 
 		//
 		// Shape
 		// ==============================================================
 		self.addShape = function(svgURL) {
-			fabric.loadSVGFromURL(svgURL, function(objects) {
-				var object = fabric.util.groupSVGElements(objects, self.shapeDefaults);
+			fabric.loadSVGFromURL(svgURL, function(objects, options) {
+				// var object = fabric.util.groupSVGElements(objects, self.shapeDefaults);
+				var object = fabric.util.groupSVGElements(objects, options);
 				object.id = self.createId();
 
 				for (var p in self.shapeDefaults) {
@@ -280,6 +363,82 @@ angular.module('common.fabric', [
 
 		self.setText = function(value) {
 			setActiveProp('text', value);
+		};
+
+		//
+		// Group
+		// ==============================================================
+		self.addGroup = function() {
+			var circle1 = new fabric.Circle({
+				name: 'circle1',
+			  	radius: 50,
+			  	fill: 'red',
+			  	left: 0
+			});
+			var circle2 = new fabric.Circle({
+				name: 'circle2',
+			  	radius: 50,
+			  	fill: 'green',
+			  	left: 100
+			});
+			var circle3 = new fabric.Circle({
+				name: 'circle3',
+			  	radius: 50,
+			  	fill: 'blue',
+			  	left: 200
+			});
+			var group = new fabric.Group([ circle1, circle2, circle3 ], {
+				name: 'group',
+			  	left: 0,
+			  	top: 0
+			});
+			self.addObjectToCanvas(group);
+		};
+		self.isGroupHidden = function(index){
+			var object = canvas.getActiveObject();
+			if( !object || object.name != 'group' ) return false;
+
+			index -= 1;
+			return object.item(index).visible;
+		};
+		self.toggleHidden = function( index ){
+			var group  = self.getObjectByName('group');
+			var circle = self.getObjectByName('circle' + index, group);
+			circle.visible = !circle.visible;
+			self.render();
+		};
+
+		//
+		// Group all objects
+		// ==============================================================
+		self.groupAll = function( index ){
+			var objs = canvas.getObjects().map(function(o) {
+				console.log('object:', o.type, o);
+			  	return o.set('active', true);
+			});
+
+			var group = new fabric.Group(objs, {
+			  	originX: 'center', 
+			  	originY: 'center'
+			});
+			canvas._activeObject = null;
+			canvas.setActiveGroup(group.setCoords()).renderAll();
+		};
+
+		//
+		// Get Object By Name
+		// ==============================================================
+		self.getObjectByName = function(name, items) {
+		  var object = null,
+		      objects = items ? items.getObjects() : canvas.getObjects();
+
+		  for (var i = 0, len = items ? items.size() : canvas.size(); i < len; i++) {
+		    if (objects[i].name && objects[i].name === name) {
+		      object = objects[i];
+		      break;
+		    }
+		  }
+		  return object;
 		};
 
 		//
@@ -538,7 +697,7 @@ angular.module('common.fabric', [
 
 		self.setFill = function(value) {
 			var object = canvas.getActiveObject();
-			if (object) {
+			if (object && object.type !== 'group') {
 				if (object.type === 'text') {
 					setActiveStyle('fill', value);
 				} else {
@@ -641,7 +800,8 @@ angular.module('common.fabric', [
 		// ==============================================================
 		self.selectActiveObject = function() {
 			var activeObject = canvas.getActiveObject();
-			if (! activeObject) {
+
+			if (! activeObject ) {
 				return;
 			}
 
@@ -846,6 +1006,7 @@ angular.module('common.fabric', [
 		// ============================================================
 		self.startCanvasListeners = function() {
 			canvas.on('object:selected', function() {
+				console.info('object:selected');
 				self.stopContinuousRendering();
 				$timeout(function() {
 					self.selectActiveObject();
@@ -854,20 +1015,24 @@ angular.module('common.fabric', [
 			});
 
 			canvas.on('selection:created', function() {
+				console.info('selection:created');
 				self.stopContinuousRendering();
 			});
 
 			canvas.on('selection:cleared', function() {
+				console.info('selection:cleared');
 				$timeout(function() {
 					self.deselectActiveObject();
 				});
 			});
 
 			canvas.on('after:render', function() {
+				console.info('after:render');
 				canvas.calcOffset();
 			});
 
 			canvas.on('object:modified', function() {
+				console.info('object:modified');
 				self.stopContinuousRendering();
 				$timeout(function() {
 					self.updateActiveObjectOriginals();

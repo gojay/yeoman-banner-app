@@ -34,12 +34,16 @@ define([
 			};
 
 			$scope.addImage = function(image) {
-				$scope.fabric.addImage('images/yeoman.png');
+				$scope.fabric.addImage('images/logo.png');
 			};
 
 			$scope.addImageUpload = function(data) {
 				var obj = angular.fromJson(data);
 				$scope.addImage(obj.filename);
+			};
+
+			$scope.addGroup = function(data) {
+				$scope.fabric.addGroup();
 			};
 
 			//

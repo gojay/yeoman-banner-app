@@ -72,6 +72,7 @@ angular.module('common.fabric.directive', [
 			});
 
 			$scope.$watch('fabric.selectedObject.fill', function(newVal) {
+				console.log('fabric.selectedObject.fill', newVal);
 				if (typeof newVal === 'string') {
 					$scope.fabric.setFill(newVal);
 					$scope.fabric.render();
