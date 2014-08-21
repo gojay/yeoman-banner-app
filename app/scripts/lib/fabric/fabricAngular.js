@@ -220,18 +220,8 @@ angular.module('common.fabric', [
 		// ==============================================================
 		self.addImage = function(imageURL) {
 			fabric.Image.fromURL(imageURL, function(object) {
-				object.id = self.createId();
-
-				console.log('object', object)
-
-				// var rect = new fabric.Rect({
-				// 	name: 'figure',
-				//   	fill: 'red',
-				//   	width: object.width + 10,
-				//   	height: object.height + 10,
-				//   	left: object.originalLeft - 10,
-				//   	top : object.originalTop - 10
-				// });
+				object.id   = self.createId();
+				object.name = "image"+object.id;
 
 				for (var p in self.imageOptions) {
 					object[p] = self.imageOptions[p];
@@ -246,53 +236,14 @@ angular.module('common.fabric', [
 				object.filters.push(filter);
 				object.applyFilters(canvas.renderAll.bind(canvas));
 
-				object.stroke = 'red';
-				object.strokeWidth = 10;
-
-				// var group = new fabric.Group([ rect, object ], {
-				// 	name: 'image'
-				// });
-
-				self.addObjectToCanvas(object);
-
-				var PolaroidPhoto = fabric.util.createClass(fabric.Object, fabric.Observable, {
-				    H_PADDING: 10,
-				    V_PADDING: 50,
-				    originX: 'left',
-				    originY: 'top',
-				    initialize: function(src, options) {
-				      this.callSuper('initialize', options);
-				      this.image = new Image();
-				      this.image.src = src;
-				      this.image.onload = (function() {
-				        this.width = this.image.width;
-				        this.height = this.image.height;
-				        this.loaded = true;
-				        this.setCoords();
-				        this.fire('image:loaded');
-				      }).bind(this);
-				    },
-				    _render: function(ctx) {
-				      if (this.loaded) {
-				        ctx.fillStyle = '#13987E';
-				        ctx.fillRect(
-				          -(this.width / 2) - this.H_PADDING,
-				          -(this.height / 2) - this.H_PADDING,
-				          this.width + this.H_PADDING * 2,
-				          this.height + this.H_PADDING * 2);
-				        ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
-				      }
-				    }
-				  });
-				var photo = new PolaroidPhoto('images/logo.png', {
-				    // top: 0,
-				    // left: 0,
-				    // scaleX: 0.2,
-				    // scaleY: 0.2
-				  });
-				  photo.on('image:loaded', canvas.renderAll.bind(canvas));
-				  photo.drawBorders = photo.drawCorners = function() { return this };
-				 console.log('PolaroidPhoto', photo);
+				var photo = new fabric.PolaroidPhoto('images/logo.png', {
+			    	// top: 0,
+			    	// left: 0,
+			    	// scaleX: 0.2,
+			    	// scaleY: 0.2
+			  	});
+				photo.on('image:loaded', canvas.renderAll.bind(canvas));
+				photo.drawBorders = photo.drawCorners = function() { return this };
 				self.addObjectToCanvas(photo);
 
 			}, self.imageDefaults);
@@ -301,18 +252,30 @@ angular.module('common.fabric', [
 		self.toggleImage = function(){
 			var activeObject = canvas.getActiveObject();
 
-			console.log('activeObject', activeObject)
-			console.log('self.selectedObject', self.selectedObject)
+			console.log('activeObject', activeObject);
 
 			if (! activeObject ) {
 				return;
 			}
 
-			activeObject.scaleX = 0.2;
-			activeObject.scaleY = 0.2;
+			// activeObject.scaleX = 0.2;
+			// activeObject.scaleY = 0.2;
 			activeObject.image.src = 'images/pug.jpg';
-			self.render();
+			this.render();
 		}
+		self.toggleImageFrame = function(){
+			var activeObject = canvas.getActiveObject();
+
+			console.log('activeObject', activeObject);
+			console.log('activeObject:type', activeObject.type);
+
+			if (! activeObject ) {
+				return;
+			}
+
+			activeObject.toggleFrame();
+			this.render();
+		};
 		self.toggleBorder = function(){
 			var activeObject = canvas.getActiveObject();
 			var stroke = activeObject.stroke == 'transparent' ? 'red' : 'transparent';
