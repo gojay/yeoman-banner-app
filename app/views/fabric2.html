@@ -115,6 +115,18 @@
                         <div class='clearfix'></div>
                         Group
                     </button>
+                    <button ng-click='addCircle()' class='btn btn-default'>
+                        <i class='fa fa-circle'></i>
+                        <div class='clearfix'></div>
+                        Cirlce
+                    </button>
+
+                    <button ng-click='fabric.addSquare()' class='btn btn-default'>
+                        <i class='fa fa-square'></i>
+                        <div class='clearfix'></div>
+                        Square
+                    </button>
+
 
                     <button ng-click="fabric.clearCanvas(); fabric.setDirty(true)" class='btn btn-default'>
                         <i class='fa fa-refresh'></i>
@@ -139,6 +151,11 @@
                                 Reset
                             </button>
                         </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-12">
+                        	<input type="text" ng-model="fabric.canvasScale">
+                    	</div>
                     </div>
                 </div>
 
@@ -314,6 +331,30 @@
                             </div>
                         </div>
 
+                        <div ng-switch-when="circle">
+		                    <div class="row">
+		                    	<div class="col-sm-3"><label for="">Radius</label></div>
+		                        <div class="col-sm-6">
+                            		<input type='range' class='pull-left' min='10' max='500' step='1' ng-change='fabric.updateRadiusCircle()' ng-model='fabric.radius' />
+		                        </div>
+		                    	<div class="col-sm-3">
+									<input type="text" ng-model="fabric.radius" class="col-sm-12" style="padding:3px">
+		                    	</div>
+		                    </div>
+                        </div>
+
+                        <div ng-switch-when="rect">
+		                    <div class="row">
+		                    	<div class="col-sm-3"><label for="">Length</label></div>
+		                        <div class="col-sm-6">
+                            		<input type='range' class='pull-left' min='.5' max='3' step='.1' ng-change='fabric.updateSquare()' ng-model='fabric.length' />
+		                        </div>
+		                    	<div class="col-sm-3">
+									<input type="text" ng-model="fabric.length" class="col-sm-12" style="padding:3px">
+		                    	</div>
+		                    </div>
+                        </div>
+
                         <div ng-switch-when="group">
                             <div class="input-prepend">
                                 <button ng-class="{ 'btn-primary': fabric.isGroupHidden(1), 'btn-default': !fabric.isGroupHidden(1) }" ng-click="fabric.toggleHidden(1)" class='btn'>
@@ -330,8 +371,9 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-12">
-                            <input class='col-sm-12' title="Transparency" type='range' min="0" max="1" step=".01" ng-model="fabric.selectedObject.opacity" />
+                    	<div class="col-sm-4"><label for="">Transparency</label></div>
+                        <div class="col-sm-8">
+                            <input class='col-sm-8' title="Transparency" type='range' min="0" max="1" step=".01" ng-model="fabric.selectedObject.opacity" />
                         </div>
                     </div>
 

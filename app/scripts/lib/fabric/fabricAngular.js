@@ -27,7 +27,7 @@ angular.module('common.fabric', [
 			dirty: false,
 			initialized: false,
 			userHasClickedCanvas: false,
-			downloadMultipler: 2,
+			downloadMultipler: 3,
 			imageDefaults: {},
 			textDefaults: {},
 			shapeDefaults: {},
@@ -161,6 +161,8 @@ angular.module('common.fabric', [
 		};
 
 		self.setCanvasSize = function(width, height) {
+			// console.log('setCanvasSize', width, height);
+
 			self.stopContinuousRendering();
 			var initialCanvasScale = self.canvasScale;
 			self.resetZoom();
@@ -175,7 +177,14 @@ angular.module('common.fabric', [
 			canvas.originalHeight = height;
 			canvas.setHeight(height);
 
+			// A4 200/300 PPI
+			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
+				self.addImage('images/a4_'+width+'x'+height+'.jpg', true);
+				initialCanvasScale = 0.3;
+			}
+
 			self.canvasScale = initialCanvasScale;
+
 			self.render();
 			self.setZoom();
 			self.render();
@@ -207,6 +216,8 @@ angular.module('common.fabric', [
 			object.originalLeft = object.left;
 			object.originalTop = object.top;
 
+			console.log('object:type', object.type);
+
 			canvas.add(object);
 			self.setObjectZoom(object);
 			canvas.setActiveObject(object);
@@ -215,10 +226,14 @@ angular.module('common.fabric', [
 			self.render();
 		};
 
+		self.setBackgroundImage = function(image){
+			canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas));
+		};
+
 		//
 		// Image
 		// ==============================================================
-		self.addImage = function(imageURL) {
+		self.addImage = function(imageURL, lock) {
 			fabric.Image.fromURL(imageURL, function(object) {
 				object.id   = self.createId();
 				object.name = "image"+object.id;
@@ -236,15 +251,28 @@ angular.module('common.fabric', [
 				object.filters.push(filter);
 				object.applyFilters(canvas.renderAll.bind(canvas));
 
-				var photo = new fabric.PolaroidPhoto('images/logo.png', {
-			    	// top: 0,
-			    	// left: 0,
-			    	// scaleX: 0.2,
-			    	// scaleY: 0.2
-			  	});
-				photo.on('image:loaded', canvas.renderAll.bind(canvas));
-				photo.drawBorders = photo.drawCorners = function() { return this };
-				self.addObjectToCanvas(photo);
+				if( lock ){
+					object.hasBorders = false;
+					object.hasControls  = false;
+					object.lockMovementX = true;
+					object.lockMovementY = true;
+					object.lockScalingX  = true;
+					object.lockScalingY  = true;
+					object.lockUniScaling = true;
+					object.lockRotation  = true;
+				}
+
+				self.addObjectToCanvas(object);
+
+				// var photo = new fabric.PolaroidPhoto('images/logo.png', {
+			 //    	// top: 0,
+			 //    	// left: 0,
+			 //    	// scaleX: 0.2,
+			 //    	// scaleY: 0.2
+			 //  	});
+				// photo.on('image:loaded', canvas.renderAll.bind(canvas));
+				// photo.drawBorders = photo.drawCorners = function() { return this };
+				// self.addObjectToCanvas(photo);
 
 			}, self.imageDefaults);
 		};
@@ -258,9 +286,9 @@ angular.module('common.fabric', [
 				return;
 			}
 
-			// activeObject.scaleX = 0.2;
-			// activeObject.scaleY = 0.2;
-			activeObject.image.src = 'images/pug.jpg';
+			// activeObject.scaleX = 10;
+			// activeObject.scaleY = 10;
+			activeObject.image.src = 'images/fabric.js.png';
 			this.render();
 		}
 		self.toggleImageFrame = function(){
@@ -368,6 +396,43 @@ angular.module('common.fabric', [
 			var group  = self.getObjectByName('group');
 			var circle = self.getObjectByName('circle' + index, group);
 			circle.visible = !circle.visible;
+			self.render();
+		};
+
+		self.addCircle = function(){
+			self.radius = 210;
+			var circle = new fabric.Circle({
+				name: 'circle',
+			  	radius: self.radius,
+			  	fill: 'green',
+			});
+			self.addObjectToCanvas(circle);
+		}
+		self.updateRadiusCircle = function(){
+			if( !self.radius ) return;
+			console.log('radius', self.radius);
+			var circle = canvas.getActiveObject();
+			circle.setRadius(self.radius);
+			self.render();
+		};
+
+		self.addSquare = function(){
+			self.length = 1;
+			var square = new fabric.Rect({
+				name: 'square',
+			  	width : 100,
+			  	height: 100,
+			  	fill: 'red',
+			});
+			self.addObjectToCanvas(square);
+		};
+		self.updateSquare = function(){
+			if( !self.length ) return;
+
+			console.log('length', self.length);
+			var square = canvas.getActiveObject();
+			square.scaleX  = self.length;
+			square.scaleY = self.length;
 			self.render();
 		};
 
@@ -721,6 +786,8 @@ angular.module('common.fabric', [
 		};
 
 		self.setCanvasZoom = function() {
+			console.log('setCanvasZoom', self.canvasScale);
+
 			var width = self.canvasOriginalWidth;
 			var height = self.canvasOriginalHeight;
 
@@ -852,6 +919,12 @@ angular.module('common.fabric', [
 		// ==============================================================
 		self.getCanvasData = function() {
 			var data = canvas.toDataURL({
+				width: canvas.getWidth(),
+				height: canvas.getHeight(),
+				multiplier: self.downloadMultipler
+			});
+
+			console.log('getCanvasData', {
 				width: canvas.getWidth(),
 				height: canvas.getHeight(),
 				multiplier: self.downloadMultipler

@@ -33,6 +33,12 @@ define([
 				$scope.fabric.addShape('assets/25.svg');
 			};
 
+			$scope.addBackgroundImage = function(image) {
+				console.log('canvasOriginalWidth', $scope.fabric.canvasOriginalWidth);
+				console.log('canvasOriginalHeight', $scope.fabric.canvasOriginalHeight);
+				$scope.fabric.addImage('images/a4_2480x3508.jpg');
+			};
+
 			$scope.addImage = function(image) {
 				$scope.fabric.addImage('images/logo.png');
 			};
@@ -45,6 +51,22 @@ define([
 			$scope.addGroup = function(data) {
 				$scope.fabric.addGroup();
 			};
+
+			$scope.addCircle = function(data) {
+				$scope.fabric.addCircle();
+			};
+
+			$scope.$watch('fabric.radius', function(radius){
+				$scope.fabric.updateRadiusCircle(radius);
+			});
+
+			$scope.$watch('fabric.length', function(length){
+				$scope.fabric.updateSquare(length);
+			});
+
+			$scope.$watch('fabric.canvasScale', function(length){
+				$scope.fabric.setZoom();
+			});
 
 			//
 			// Editing Canvas Size

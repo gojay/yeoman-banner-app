@@ -70,6 +70,16 @@ angular.module('common.fabric.constants', [])
 				name: 'Facebook Full-Width Photo Post',
 				height: 504,
 				width: 843
+			},
+			{
+				name: 'A4 - 200 PPI',
+				height: 2339,
+				width: 1654
+			},
+			{
+				name: 'A4 - 300 PPI',
+				height: 3508,
+				width: 2480
 			}
 		],
 
