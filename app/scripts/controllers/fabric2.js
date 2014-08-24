@@ -40,7 +40,7 @@ define([
 			};
 
 			$scope.addImage = function(image) {
-				$scope.fabric.addImage('images/logo.png');
+				$scope.fabric.addImage('images/avatar2.jpg', null, true);
 			};
 
 			$scope.addImageUpload = function(data) {

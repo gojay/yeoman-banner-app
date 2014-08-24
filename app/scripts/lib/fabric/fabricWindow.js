@@ -22,6 +22,12 @@ angular.module('common.fabric.window', [])
 	        }).bind(this);
 	    },
 	    _render: function(ctx) {
+	    	// ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
+		    // ctx.globalCompositeOperation = 'destination-in';
+		    // ctx.beginPath();
+		    // var radius = this.width < this.height ? (this.width / 2) : (this.height / 2);
+		    // ctx.arc(0, 0, radius, 0, 2*Math.PI, true);
+		    // ctx.fill();
 	        if (this.loaded) {
 	            if (this.hideframe) {
 	                ctx.fillStyle = "transparent";

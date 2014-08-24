@@ -179,7 +179,6 @@ angular.module('common.fabric', [
 
 			// A4 200/300 PPI
 			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
-				self.addImage('images/a4_'+width+'x'+height+'.jpg', true);
 				initialCanvasScale = 0.3;
 			}
 
@@ -187,8 +186,13 @@ angular.module('common.fabric', [
 
 			self.render();
 			self.setZoom();
-			self.render();
-			self.setZoom();
+
+			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
+				canvas.setBackgroundImage( 'images/a4_'+width+'x'+height+'.jpg', canvas.renderAll.bind(canvas), {
+					scaleX:self.canvasScale,
+					scaleY:self.canvasScale
+				});
+			}
 		};
 
 		self.isLoading = function() {
@@ -225,15 +229,10 @@ angular.module('common.fabric', [
 			self.center();
 			self.render();
 		};
-
-		self.setBackgroundImage = function(image){
-			canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas));
-		};
-
 		//
 		// Image
 		// ==============================================================
-		self.addImage = function(imageURL, lock) {
+		self.addImage = function(imageURL, lock, clip) {
 			fabric.Image.fromURL(imageURL, function(object) {
 				object.id   = self.createId();
 				object.name = "image"+object.id;
@@ -262,9 +261,20 @@ angular.module('common.fabric', [
 					object.lockRotation  = true;
 				}
 
+				if( clip ){
+					object.width = 380;
+					object.height = 380;
+					object.clipTo = function(ctx) {
+					    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
+					    ctx.lineWidth = 50;
+					    ctx.strokeStyle = 'white';
+					    ctx.stroke();
+					};
+				}
+
 				self.addObjectToCanvas(object);
 
-				// var photo = new fabric.PolaroidPhoto('images/logo.png', {
+				// var photo = new fabric.PolaroidPhoto('images/avatar2.jpg', {
 			 //    	// top: 0,
 			 //    	// left: 0,
 			 //    	// scaleX: 0.2,
@@ -276,6 +286,22 @@ angular.module('common.fabric', [
 
 			}, self.imageDefaults);
 		};
+
+		self.clip = function() {
+            var obj = canvas.getActiveObject();
+			console.log('clip',obj)
+            if (!obj) return;
+
+            if (obj.clipTo) {
+                obj.clipTo = null;
+            } else {
+                var radius = obj.width < obj.height ? (obj.width / 2) : (obj.height / 2);
+                obj.clipTo = function(ctx) {
+                    ctx.arc(0, 0, radius, 0, Math.PI * 2, true);
+                };
+            }
+            self.render();
+        };
 
 		self.toggleImage = function(){
 			var activeObject = canvas.getActiveObject();
@@ -420,8 +446,8 @@ angular.module('common.fabric', [
 			self.length = 1;
 			var square = new fabric.Rect({
 				name: 'square',
-			  	width : 100,
-			  	height: 100,
+			  	width : 125,
+			  	height: 125,
 			  	fill: 'red',
 			});
 			self.addObjectToCanvas(square);
@@ -796,6 +822,12 @@ angular.module('common.fabric', [
 
 			canvas.setWidth(tempWidth);
 			canvas.setHeight(tempHeight);
+
+			console.log('backgroundImage', canvas.backgroundImage);
+			if( canvas.backgroundImage ){
+				canvas.backgroundImage.setScaleX(self.canvasScale);
+				canvas.backgroundImage.setScaleY(self.canvasScale);
+			}
 		};
 
 		self.updateActiveObjectOriginals = function() {
