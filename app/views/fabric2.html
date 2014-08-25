@@ -127,6 +127,12 @@
                         Square
                     </button>
 
+                    <button ng-click='addQRCode()' class='btn btn-default'>
+                        <i class='fa fa-star'></i>
+                        <div class='clearfix'></div>
+                        QR
+                    </button>
+
 
                     <button ng-click="fabric.clearCanvas(); fabric.setDirty(true)" class='btn btn-default'>
                         <i class='fa fa-refresh'></i>
@@ -238,21 +244,16 @@
                 <div class='image-builder' parent-click="fabric.deactivateAll()">
                     <div class='fabric-container'>
                         <canvas fabric='fabric'></canvas>
+                        <div id="qrcode"></div>
                     </div>
                 </div>
             </div>
             
             <div class='col-xs-3'>
                 <div ng-if='fabric.selectedObject'>
-                    <button ng-click="fabric.toggleImage()" class='btn'>
-                        Toggle Image <i class='fa fa-file-image-o'></i>
-                    </button>
-                    <button ng-click="fabric.toggleImageFrame()" class='btn'>
-                        Toggle Image Frame <i class='fa fa-ban'></i>
-                    </button>
-                    <button ng-click="fabric.toggleBorder()" class='btn'>
+                    <!-- <button ng-click="fabric.toggleBorder()" class='btn'>
                         Toggle border <i class='fa fa-ban'></i>
-                    </button>
+                    </button> -->
                     <div ng-switch='fabric.selectedObject.type'>
                         <div ng-switch-when='text'>
                             <p>
@@ -323,6 +324,12 @@
                         </div>
 
                         <div ng-switch-when="image">
+		                    <button ng-click="fabric.toggleImage()" class='btn'>
+		                        Toggle Image <i class='fa fa-file-image-o'></i>
+		                    </button>
+		                    <button ng-click="fabric.toggleImageFrame()" class='btn'>
+		                        Toggle Image Frame <i class='fa fa-ban'></i>
+		                    </button>
                             <div class="input-prepend">
                                 <button ng-class="{ active: fabric.isTinted() }" ng-click="fabric.toggleTint()" class='btn'>
                                     <i class='fa fa-tint'></i>
@@ -367,13 +374,6 @@
                                     3 <i class='fa' ng-class="{ 'fa-eye': fabric.isGroupHidden(3), 'fa-eye-slash':!fabric.isGroupHidden(3) }"></i>
                                 </button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                    	<div class="col-sm-4"><label for="">Transparency</label></div>
-                        <div class="col-sm-8">
-                            <input class='col-sm-8' title="Transparency" type='range' min="0" max="1" step=".01" ng-model="fabric.selectedObject.opacity" />
                         </div>
                     </div>
 
@@ -434,6 +434,50 @@
                     <button ng-click='fabric.toggleLockActiveObject(); fabric.setDirty(true)' ng-class="{ active: fabric.selectedObject.lockObject }" class='btn btn-small btn-block'>
                         Lock
                     </button>
+
+                    <div class="row">
+                    	<div class="col-sm-4"><label for="">Transparency</label></div>
+                        <div class="col-sm-8">
+                            <input class='col-sm-8' title="Transparency" type='range' min="0" max="1" step=".01" ng-model="fabric.selectedObject.opacity" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                    	<div class="col-sm-3"><label for="">Angel</label></div>
+                        <div class="col-sm-6">
+                    		<input type='range' class='pull-left' min="-90" max="90" step='1' ng-model='fabric.controls.angle' />
+                        </div>
+                    	<div class="col-sm-3">
+							<input type="text" ng-model="fabric.controls.angle" class="col-sm-12" style="padding:1px">
+                    	</div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-sm-3"><label for="">Left</label></div>
+                        <div class="col-sm-6">
+                    		<input type='range' class='pull-left' min="0" max="{{fabric.maxBounding.left}}" step='1' ng-model='fabric.controls.left' />
+                        </div>
+                    	<div class="col-sm-3">
+							<input type="number" ng-model="fabric.controls.left" class="col-sm-12" style="padding:1px">
+                    	</div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-sm-3"><label for="">Top</label></div>
+                        <div class="col-sm-6">
+                    		<input type='range' class='pull-left' min="0" max="{{fabric.maxBounding.top}}" step='1' ng-model='fabric.controls.top' />
+                        </div>
+                    	<div class="col-sm-3">
+							<input type="number" ng-model="fabric.controls.top" class="col-sm-12" style="padding:1px">
+                    	</div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-sm-3"><label for="">Scale</label></div>
+                        <div class="col-sm-6">
+                    		<input type='range' class='pull-left' min='.1' max='3' step='.1' ng-model='fabric.controls.scale' />
+                        </div>
+                    	<div class="col-sm-3">
+							<input type="number" ng-model="fabric.controls.scale" step='.1' class="col-sm-12" style="padding:1px">
+                    	</div>
+                    </div>
                 </div>
             </div>
         </div>

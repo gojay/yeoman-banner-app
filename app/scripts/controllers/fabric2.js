@@ -6,7 +6,8 @@ define([
 	'fabricDirective', 
 	'fabricDirtyStatus',
 	'fabricUtilities',
-	'fabricWindow'
+	'fabricWindow',
+	'qrcode'
 ], function (angular) {
   'use strict';
 
@@ -22,6 +23,8 @@ define([
     	'FabricConstants', 
     	'Keypress', 
     	function($scope, $http, Fabric, FabricConstants, Keypress){
+			
+			var qrcode = angular.element('#qrcode');
 
 	    	$scope.fabric = {};
 			$scope.FabricConstants = FabricConstants;
@@ -56,6 +59,27 @@ define([
 				$scope.fabric.addCircle();
 			};
 
+			$scope.addQRCode = function(){
+				// var r = qrcode.makeCode("http://naver.com");
+				// console.log(r)
+				qrcode.qrcode({
+				    "render": "canvas",
+				    "width": 100,
+				    "height": 100,
+				    "color": "#3a3",
+				    "text": "http://larsjung.de/qrcode"
+				});
+				var canvasQR = qrcode.find('canvas')[0];
+                var imgDataURI = canvasQR.toDataURL('image/jpeg');
+                qrcode.empty();
+                console.log(imgDataURI);
+
+                $scope.fabric.toggleImage2(imgDataURI);
+
+                // var objectQR1 = $scope.fabric.getObjectByName('qr1');
+                // console.log('objectQR1', objectQR1, objectQR1.getElement());
+			};
+
 			$scope.$watch('fabric.radius', function(radius){
 				$scope.fabric.updateRadiusCircle(radius);
 			});
@@ -66,6 +90,23 @@ define([
 
 			$scope.$watch('fabric.canvasScale', function(length){
 				$scope.fabric.setZoom();
+			});
+
+			$scope.$watch('fabric.controls.angle', function(value){
+				$scope.fabric.angleControl();
+			});
+			$scope.$watch('fabric.controls.left', function(value){
+				// if( value < 0) $scope.fabric.controls.left = 0;
+				// else if ( value > $scope.fabric.maxBounding.left) $scope.fabric.controls.left = $scope.fabric.maxBounding.left;
+				$scope.fabric.leftControl();
+			});
+			$scope.$watch('fabric.controls.top', function(value){
+				// if( value < 0) $scope.fabric.controls.top = 0;
+				// else if ( value > $scope.fabric.maxBounding.top) $scope.fabric.controls.top = $scope.fabric.maxBounding.top;
+				$scope.fabric.topControl();
+			});
+			$scope.$watch('fabric.controls.scale', function(value){
+				$scope.fabric.scaleControl();
 			});
 
 			//

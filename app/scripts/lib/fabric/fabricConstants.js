@@ -72,12 +72,12 @@ angular.module('common.fabric.constants', [])
 				width: 843
 			},
 			{
-				name: 'A4 - 200 PPI',
+				name: 'A4 - 200 PPI (1654x2339)',
 				height: 2339,
 				width: 1654
 			},
 			{
-				name: 'A4 - 300 PPI',
+				name: 'A4 - 300 PPI (2480x3508)',
 				height: 3508,
 				width: 2480
 			}

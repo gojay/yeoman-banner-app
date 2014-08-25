@@ -22,6 +22,7 @@ require.config({
         'jquery': '../bower_components/jquery/dist/jquery.min',
         'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
         // 'snap': 'lib/snap.min',
+        'qrcode' : 'lib/jquery.qrcode.min',
 
         'raphael': 'lib/raphael/raphael',
         'raphael-group': 'lib/raphael/raphael.group',
@@ -70,6 +71,7 @@ require.config({
         },
 
         'bootstrap': ['jquery'],
+        'qrcode': ['jquery'],
 
         'raphael': ['jquery'],
         'raphael-group': ['raphael'],

@@ -38,6 +38,17 @@ angular.module('common.fabric', [
 			},
 			canvasDefaults: {
 				selection: false
+			},
+
+			maxBounding: {
+				left: 0,
+				top: 0
+			},
+			controls: {
+				angle: 0,
+				left: 0,
+				top: 0,
+				scale: 0
 			}
 		}, options);
 
@@ -179,6 +190,19 @@ angular.module('common.fabric', [
 
 			// A4 200/300 PPI
 			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
+				// create image dummy for qr code
+				fabric.Image.fromURL('images/avatar2.jpg', function(object) {
+					object.id   = self.createId();
+					object.name = 'qr1';
+
+					object.width  = 300; // original 100
+					object.height = 300; // original 100
+					object.left = 780;	 // original 234 / 558
+					object.top  = 2513;  // original 754
+					object.opacity = 0;
+
+					self.addObjectToCanvas(object);
+				});
 				initialCanvasScale = 0.3;
 			}
 
@@ -214,7 +238,7 @@ angular.module('common.fabric', [
 		//
 		// Creating Objects
 		// ==============================================================
-		self.addObjectToCanvas = function(object) {
+		self.addObjectToCanvas = function(object, notCenter) {
 			object.originalScaleX = object.scaleX;
 			object.originalScaleY = object.scaleY;
 			object.originalLeft = object.left;
@@ -226,7 +250,7 @@ angular.module('common.fabric', [
 			self.setObjectZoom(object);
 			canvas.setActiveObject(object);
 			object.bringToFront();
-			self.center();
+			if( notCenter === null && !notCenter ) self.center();
 			self.render();
 		};
 		//
@@ -315,6 +339,16 @@ angular.module('common.fabric', [
 			// activeObject.scaleX = 10;
 			// activeObject.scaleY = 10;
 			activeObject.image.src = 'images/fabric.js.png';
+			this.render();
+		}
+		self.toggleImage2 = function( src ){
+			var object = self.getObjectByName('qr1');
+
+			if (! object ) {
+				return;
+			}
+
+			object.getElement().src = src;
 			this.render();
 		}
 		self.toggleImageFrame = function(){
@@ -446,9 +480,9 @@ angular.module('common.fabric', [
 			self.length = 1;
 			var square = new fabric.Rect({
 				name: 'square',
-			  	width : 125,
-			  	height: 125,
-			  	fill: 'red',
+			  	width : 90,
+			  	height: 90,
+			  	fill: 'red'
 			});
 			self.addObjectToCanvas(square);
 		};
@@ -1069,15 +1103,72 @@ angular.module('common.fabric', [
 			FabricWindow.Object.prototype.padding = self.windowDefaults.padding;
 		};
 
+		self.updateBounding = function(){
+			var activeObject = canvas.getActiveObject();
+			if( !activeObject ) return;
+
+			self.maxBounding.left = self.canvasWidth - activeObject.getWidth();
+			self.maxBounding.top  = self.canvasHeight - activeObject.getHeight();
+
+			console.log('updateBounding', self.maxBounding);
+		};
+
+		self.updateControls = function(){
+			var activeObject = canvas.getActiveObject();
+			if( !activeObject ) return;
+
+			self.controls.angle = activeObject.getAngle();
+			self.controls.left  = activeObject.getLeft();
+			self.controls.top   = activeObject.getTop();
+			self.controls.scale = activeObject.getScaleX();
+
+			console.log('controls', self.controls);
+		};
+
+		self.angleControl = function(){
+			var activeObject = canvas.getActiveObject();
+			if( !activeObject ) return;
+
+			var value = self.controls.angle = parseInt(self.controls.angle, 10);
+			activeObject.setAngle(value);
+			self.render();
+		};
+		self.leftControl = function(){
+			var activeObject = canvas.getActiveObject();
+			if( !activeObject ) return;
+
+			var value = self.controls.left = parseInt(self.controls.left, 10);
+			// if( value < 0) value = self.controls.left = 0;
+			activeObject.setLeft(value);
+			self.render();
+		};
+		self.topControl = function(){
+			var activeObject = canvas.getActiveObject();
+			if( !activeObject ) return;
+
+			var value = self.controls.top = parseInt(self.controls.top, 10);
+			// if( value < 0) value = self.controls.top = 0;
+			activeObject.setTop(value);
+			self.render();
+		};
+		self.scaleControl = function(){
+			var activeObject = canvas.getActiveObject();
+			if( !activeObject ) return;
+
+			activeObject.scale(parseFloat(self.controls.scale));
+			self.render();
+		};
+
 		//
 		// Canvas Listeners
 		// ============================================================
 		self.startCanvasListeners = function() {
 			canvas.on('object:selected', function() {
-				console.info('object:selected');
 				self.stopContinuousRendering();
 				$timeout(function() {
 					self.selectActiveObject();
+					self.updateBounding();
+					self.updateControls();
 					self.setDirty(true);
 				});
 			});
@@ -1104,16 +1195,24 @@ angular.module('common.fabric', [
 				self.stopContinuousRendering();
 				$timeout(function() {
 					self.updateActiveObjectOriginals();
+					self.updateControls();
 					self.setDirty(true);
 				});
 			});
+
+		  	canvas.on({
+			    'object:moving'  : self.updateControls,
+			    'object:scaling' : self.updateControls,
+			    'object:resizing': self.updateControls,
+			    'object:rotating': self.updateControls
+		  	});
 		};
 
 		//
 		// Constructor
 		// ==============================================================
 		self.init = function() {
-			canvas = FabricCanvas.getCanvas();
+			self.canvas = canvas = FabricCanvas.getCanvas();
 			self.canvasId = FabricCanvas.getCanvasId();
 			canvas.clear();
 
