@@ -197,7 +197,40 @@ angular.module('common.fabric.constants', [])
 			fontSize: 40,
 			fill: '#454545',
 			textAlign: 'left'
-		}, objectDefaults)
+		}, objectDefaults),
+
+		QRObjectAttributes: {
+			'a4': {
+				200 : [{
+					width: 60,
+					height: 60,
+					left: 157,
+					top: 503
+				}, {
+					width: 60,
+					height: 60,
+					left: 371,
+					top: 503
+				}],
+				// ss
+				//---------------
+				// w: 644
+				// h: 1138
+				// left: 97
+				// top: 254
+				300 : [{
+					width: 90,
+					height: 90,
+					left: 234,
+					top: 754
+				}, {
+					width: 90,
+					height: 90,
+					left: 558,
+					top: 754
+				}] 
+			}
+		}
 
 	};
 

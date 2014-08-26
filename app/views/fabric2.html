@@ -72,6 +72,20 @@
 	.object-font-family-preview {
 	    text-transform: capitalize;
 	}
+
+	.double-bounce-spinner, .wave-spinner {
+		display: none;
+		margin: 0 !important;
+		position: absolute; 
+		left: 40%;
+		top: 8px;
+	}
+	.load-qr input {
+		opacity: .3;
+	}
+	.load-qr .double-bounce-spinner, .load-qr .wave-spinner {
+		display: block;
+	}
 </style>
 <div class="row">
     <div class='image-builder-container'>
@@ -127,12 +141,17 @@
                         Square
                     </button>
 
+                    <button ng-click='addRect()' class='btn btn-default'>
+                        <i class='fa fa-square'></i>
+                        <div class='clearfix'></div>
+                        Rect
+                    </button>
+
                     <button ng-click='addQRCode()' class='btn btn-default'>
                         <i class='fa fa-star'></i>
                         <div class='clearfix'></div>
                         QR
                     </button>
-
 
                     <button ng-click="fabric.clearCanvas(); fabric.setDirty(true)" class='btn btn-default'>
                         <i class='fa fa-refresh'></i>
@@ -179,6 +198,27 @@
                         Download
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <div class='row' ng-show='showDimension'>
+            <div class='col-sm-offset-5'>
+                <form class="col-sm-4" ng-submit='submitRect()'>
+                    <div class='form-group'>
+                        <label>Width</label>
+                        <input type='number' ng-model='rectDimension.width' class='form-control' />
+                    </div>
+
+                    <div class='form-group'>
+                        <label>Height</label>
+                        <input type='number' ng-model='rectDimension.height' class='form-control' />
+                    </div>
+
+                    <button type='submit' class='btn btn-success'>
+                        Submit
+                    </button>
+                    <button type="button" class="btn btn-danger" ng-click="showDimension = false">Close</button>
+                </form>
             </div>
         </div>
 
@@ -254,6 +294,7 @@
                     <!-- <button ng-click="fabric.toggleBorder()" class='btn'>
                         Toggle border <i class='fa fa-ban'></i>
                     </button> -->
+
                     <div ng-switch='fabric.selectedObject.type'>
                         <div ng-switch-when='text'>
                             <p>
@@ -323,7 +364,15 @@
                             </div>
                         </div>
 
-                        <div ng-switch-when="image">
+	                    <div ng-switch-when="image">
+	                    	<div class="row">
+		                        <div class="col-sm-12">
+		                            <input type="text" class='form-control' ng-model="fabric.selectedObject.fill" />
+		                        </div>
+	                    	</div>
+	                    </div>
+
+                        <!-- <div ng-switch-when="image">
 		                    <button ng-click="fabric.toggleImage()" class='btn'>
 		                        Toggle Image <i class='fa fa-file-image-o'></i>
 		                    </button>
@@ -336,7 +385,7 @@
                                 </button>
                                 <input type="text" class='input-small' ng-model='fabric.selectedObject.tint' />
                             </div>
-                        </div>
+                        </div> -->
 
                         <div ng-switch-when="circle">
 		                    <div class="row">
@@ -350,7 +399,7 @@
 		                    </div>
                         </div>
 
-                        <div ng-switch-when="rect">
+                        <!-- <div ng-switch-when="rect">
 		                    <div class="row">
 		                    	<div class="col-sm-3"><label for="">Length</label></div>
 		                        <div class="col-sm-6">
@@ -360,7 +409,7 @@
 									<input type="text" ng-model="fabric.length" class="col-sm-12" style="padding:3px">
 		                    	</div>
 		                    </div>
-                        </div>
+                        </div> -->
 
                         <div ng-switch-when="group">
                             <div class="input-prepend">
@@ -377,6 +426,7 @@
                         </div>
                     </div>
 
+					<!-- Flip -->
                     <div class="row mbm">
                         <div class="col-sm-12">
                             <button class='btn btn-small btn-block' ng-class="{ active: fabric.getFlipX() }" ng-click="{ active: fabric.toggleFlipX() }">
@@ -385,12 +435,7 @@
                         </div>
                     </div>
 
-                    <div class="row" ng-hide="fabric.selectedObject.type == 'image'">
-                        <div class="col-sm-12">
-                            <input type="text" class='form-control' ng-model="fabric.selectedObject.fill" />
-                        </div>
-                    </div>
-
+					<!-- Centering -->
                     <div class="row">
                         <div class="btn-group col-xs-12 btn-group-vertical">
                             <button ng-click='fabric.center()' class='btn btn-small btn-block'>
@@ -409,6 +454,7 @@
 
                     <p/>
 
+					<!-- Z Index -->
                     <div class="row">
                         <div class="btn-group col-xs-12 btn-group-vertical">
                             <button ng-click='fabric.bringToFront(); fabric.setDirty(true)' class='btn btn-small btn-block'>
@@ -431,10 +477,24 @@
 
                     <p/>
 
-                    <button ng-click='fabric.toggleLockActiveObject(); fabric.setDirty(true)' ng-class="{ active: fabric.selectedObject.lockObject }" class='btn btn-small btn-block'>
-                        Lock
-                    </button>
+					<!-- Movement -->
+                    <div class="row">
+                        <div class="btn-group col-xs-12 btn-group-vertical">
+		                    <button ng-click='fabric.toggleLockMovementXActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementX }" class='btn btn-small btn-block'>
+		                        Lock Movement X
+		                    </button>
+		                    <button ng-click='fabric.toggleLockMovementYActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementY }" class='btn btn-small btn-block'>
+		                        Lock Movement Y
+		                    </button>
+		                    <button ng-click='fabric.toggleLockActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockObject }" class='btn btn-small btn-block'>
+		                        Lock All
+		                    </button>
+                        </div>
+                    </div>
 
+                    <p/>
+
+					<!-- Transparency -->
                     <div class="row">
                     	<div class="col-sm-4"><label for="">Transparency</label></div>
                         <div class="col-sm-8">
@@ -442,40 +502,56 @@
                         </div>
                     </div>
 
+					<!-- Controls -->
+					<div class="row">
+						<button ng-click='fabric.toggleControlObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': !fabric.selectedObject.hasControls }" class='btn btn-small btn-block'>
+	                        Toggle Control
+	                    </button>
+					</div>
                     <div class="row">
-                    	<div class="col-sm-3"><label for="">Angel</label></div>
-                        <div class="col-sm-6">
-                    		<input type='range' class='pull-left' min="-90" max="90" step='1' ng-model='fabric.controls.angle' />
+                    	<div class="col-sm-2"><label for="">Angel</label></div>
+                        <div class="col-sm-5">
+                    		<input type='range' min="-90" max="90" step='1' ng-model='fabric.controls.angle' />
                         </div>
-                    	<div class="col-sm-3">
-							<input type="text" ng-model="fabric.controls.angle" class="col-sm-12" style="padding:1px">
+                    	<div class="col-sm-5">
+							<input type="text" ng-model="fabric.controls.angle" class="col-sm-12 form-control">
                     	</div>
                     </div>
                     <div class="row">
-                    	<div class="col-sm-3"><label for="">Left</label></div>
-                        <div class="col-sm-6">
-                    		<input type='range' class='pull-left' min="0" max="{{fabric.maxBounding.left}}" step='1' ng-model='fabric.controls.left' />
+                    	<div class="col-sm-2"><label for="">Left</label></div>
+                        <div class="col-sm-5">
+                    		<input type='range' min="0" max="{{fabric.maxBounding.left}}" step='1' ng-model='fabric.controls.left' />
                         </div>
-                    	<div class="col-sm-3">
-							<input type="number" ng-model="fabric.controls.left" class="col-sm-12" style="padding:1px">
+                    	<div class="col-sm-5">
+							<input type="number" ng-model="fabric.controls.left" class="col-sm-12 form-control">
                     	</div>
                     </div>
                     <div class="row">
-                    	<div class="col-sm-3"><label for="">Top</label></div>
-                        <div class="col-sm-6">
-                    		<input type='range' class='pull-left' min="0" max="{{fabric.maxBounding.top}}" step='1' ng-model='fabric.controls.top' />
+                    	<div class="col-sm-2"><label for="">Top</label></div>
+                        <div class="col-sm-5">
+                    		<input type='range' min="0" max="{{fabric.maxBounding.top}}" step='1' ng-model='fabric.controls.top' />
                         </div>
-                    	<div class="col-sm-3">
-							<input type="number" ng-model="fabric.controls.top" class="col-sm-12" style="padding:1px">
+                    	<div class="col-sm-5">
+							<input type="number" ng-model="fabric.controls.top" class="col-sm-12 form-control">
                     	</div>
                     </div>
                     <div class="row">
-                    	<div class="col-sm-3"><label for="">Scale</label></div>
-                        <div class="col-sm-6">
-                    		<input type='range' class='pull-left' min='.1' max='3' step='.1' ng-model='fabric.controls.scale' />
+                    	<div class="col-sm-2"><label for="">Scale</label></div>
+                        <div class="col-sm-5">
+                    		<input type='range' min='.1' max='3' step='.1' ng-model='fabric.controls.scale' />
                         </div>
-                    	<div class="col-sm-3">
-							<input type="number" ng-model="fabric.controls.scale" step='.1' class="col-sm-12" style="padding:1px">
+                    	<div class="col-sm-5">
+							<input type="number" ng-model="fabric.controls.scale" step='.1' class="col-sm-12 form-control">
+                    	</div>
+                    </div>
+
+                    <div class="row">
+                    	<div class="col-sm-3"><label for="">QR URL</label></div>
+                    	<div class="col-sm-9" ng-class="{ 'load-qr':qr.loading, 'has-error': qr.valid === false, 'has-success': qr.valid === true }">
+							<input type="url" class="col-sm-12 form-control" required 
+								   ng-model="qr.url"
+								   ui-event="{ focus: 'qr.onFocus($event)', blur:'qr.onBlur($event)' }">
+							<wave-spinner></wave-spinner>
                     	</div>
                     </div>
                 </div>

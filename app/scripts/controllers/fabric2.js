@@ -19,15 +19,69 @@ define([
     .controller('Fabric2Ctrl', [
     	'$scope', 
     	'$http', 
+    	'$timeout',
     	'Fabric', 
     	'FabricConstants', 
     	'Keypress', 
-    	function($scope, $http, Fabric, FabricConstants, Keypress){
-			
-			var qrcode = angular.element('#qrcode');
+    	function($scope, $http, $timeout, Fabric, FabricConstants, Keypress){
 
 	    	$scope.fabric = {};
 			$scope.FabricConstants = FabricConstants;
+			
+			//
+			// QR Code
+			// ================================================================
+			var qrcode = angular.element('#qrcode');
+			$scope.qr = {
+				url  : null,
+				valid: null,
+				loading: false
+			};
+			var currentQRURL = null;
+			$scope.qr.onFocus = function(e){
+                // device name
+            	currentQRURL = e.target.value;
+                console.log('onFocus', currentQRURL);
+            };
+            $scope.qr.onBlur = function(e){
+            	var url = e.target.value;
+            	$scope.qr.valid = e.target.validity.valid;
+                // if url is valid && url not same before
+                if( e.target.validity.valid && currentQRURL != url ){
+                	$scope.qr.loading = true;
+                	$timeout(function(){
+		                qrcode.qrcode({
+						    "render": "canvas",
+						    "width": 100,
+						    "height": 100,
+						    "color": "#3a3",
+						    "text": url
+						});
+						var canvasQR   = qrcode.find('canvas')[0];
+		                var imgDataURI = canvasQR.toDataURL('image/jpeg');
+		                qrcode.empty();
+
+		                $scope.qr.loading = false;
+		                $scope.qr.url = url;
+		                setQRImage(imgDataURI);
+                	}, 3000);
+	            }
+            };
+			function setQRImage ( src ){
+				var fabric = $scope.fabric;
+
+				var qr1 = fabric.getObjectByName('qr1');
+				var qr2 = fabric.getObjectByName('qr2');
+				if ( !qr1 && !qr2 ) {
+					return;
+				}
+
+				qr1.getElement().src = src;
+				qr2.getElement().src = src;
+				qr1.opacity = 1;
+				qr2.opacity = 1;
+				fabric.render();
+			}
 
 			//
 			// Creating Canvas Objects
@@ -59,9 +113,20 @@ define([
 				$scope.fabric.addCircle();
 			};
 
+			$scope.rectDimension = {
+				width : 100,
+				height: 100
+			};
+			$scope.addRect = function() {
+				$scope.showDimension = true;
+			};
+			$scope.submitRect = function(){
+				$scope.fabric.addRect( $scope.rectDimension.width, $scope.rectDimension.height );
+				$scope.fabric.setDirty(true);
+				delete $scope.showDimension;
+			};
+
 			$scope.addQRCode = function(){
-				// var r = qrcode.makeCode("http://naver.com");
-				// console.log(r)
 				qrcode.qrcode({
 				    "render": "canvas",
 				    "width": 100,
@@ -75,9 +140,6 @@ define([
                 console.log(imgDataURI);
 
                 $scope.fabric.toggleImage2(imgDataURI);
-
-                // var objectQR1 = $scope.fabric.getObjectByName('qr1');
-                // console.log('objectQR1', objectQR1, objectQR1.getElement());
 			};
 
 			$scope.$watch('fabric.radius', function(radius){
@@ -133,7 +195,8 @@ define([
 					JSONExportProperties: FabricConstants.JSONExportProperties,
 					textDefaults: FabricConstants.textDefaults,
 					shapeDefaults: FabricConstants.shapeDefaults,
-					json: {}
+					json: {},
+					QRObjectAttributes: FabricConstants.QRObjectAttributes
 				});
 			};
 

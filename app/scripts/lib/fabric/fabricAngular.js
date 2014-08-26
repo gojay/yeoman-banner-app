@@ -27,7 +27,7 @@ angular.module('common.fabric', [
 			dirty: false,
 			initialized: false,
 			userHasClickedCanvas: false,
-			downloadMultipler: 3,
+			downloadMultipler: 1,
 			imageDefaults: {},
 			textDefaults: {},
 			shapeDefaults: {},
@@ -172,8 +172,6 @@ angular.module('common.fabric', [
 		};
 
 		self.setCanvasSize = function(width, height) {
-			// console.log('setCanvasSize', width, height);
-
 			self.stopContinuousRendering();
 			var initialCanvasScale = self.canvasScale;
 			self.resetZoom();
@@ -188,22 +186,47 @@ angular.module('common.fabric', [
 			canvas.originalHeight = height;
 			canvas.setHeight(height);
 
-			// A4 200/300 PPI
+			// get QR Properties
+			var QRObjectAttributes = self.QRObjectAttributes['a4'];
+
+			// A4 200/300 PPI , QR Image
 			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
-				// create image dummy for qr code
-				fabric.Image.fromURL('images/avatar2.jpg', function(object) {
+				initialCanvasScale = 0.3;
+				// 200 / 300 PPI property
+				var qrAttribute = width == 1654 ? QRObjectAttributes[200] : QRObjectAttributes[300];
+				// create dummy image
+				fabric.Image.fromURL('images/avatar.jpg', function(object) {
 					object.id   = self.createId();
 					object.name = 'qr1';
 
-					object.width  = 300; // original 100
-					object.height = 300; // original 100
-					object.left = 780;	 // original 234 / 558
-					object.top  = 2513;  // original 754
+					var Qr1 = qrAttribute[0];
+					// console.log('Qr1:properties', Qr1);
+
+					object.width  = Qr1.width / initialCanvasScale; // original 90
+					object.height = Qr1.height / initialCanvasScale; // original 90
+					object.left = Qr1.left /  initialCanvasScale; // original 234 / 558
+					object.top  = Qr1.top / initialCanvasScale;  // original 754
 					object.opacity = 0;
 
 					self.addObjectToCanvas(object);
+
+					fabric.Image.fromURL('images/avatar2.jpg', function(object2) {
+						object2.id   = self.createId();
+						object2.name = 'qr2';
+						object2.transparentCorners = false;
+						
+						var Qr2 = qrAttribute[1];
+						// console.log('Qr2:properties', Qr2);
+
+						object2.width  = Qr2.width / initialCanvasScale; // original 90
+						object2.height = Qr2.width / initialCanvasScale; // original 90
+						object2.left = Qr2.left /  initialCanvasScale; // original 234 / 558
+						object2.top  = Qr2.top / initialCanvasScale;  // original 754
+						object2.opacity = 0;
+
+						self.addObjectToCanvas(object2);
+					});
 				});
-				initialCanvasScale = 0.3;
 			}
 
 			self.canvasScale = initialCanvasScale;
@@ -211,8 +234,10 @@ angular.module('common.fabric', [
 			self.render();
 			self.setZoom();
 
+			// set A4 background image 
 			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
-				canvas.setBackgroundImage( 'images/a4_'+width+'x'+height+'.jpg', canvas.renderAll.bind(canvas), {
+				var backgroundImageName = 'stiker_a4_'+ width +'x'+ height +'.jpg';
+				canvas.setBackgroundImage( 'images/'+ backgroundImageName, canvas.renderAll.bind(canvas), {
 					scaleX:self.canvasScale,
 					scaleY:self.canvasScale
 				});
@@ -299,21 +324,20 @@ angular.module('common.fabric', [
 				self.addObjectToCanvas(object);
 
 				// var photo = new fabric.PolaroidPhoto('images/avatar2.jpg', {
-			 //    	// top: 0,
-			 //    	// left: 0,
-			 //    	// scaleX: 0.2,
-			 //    	// scaleY: 0.2
-			 //  	});
+			    	// top: 0,
+			    	// left: 0,
+			    	// scaleX: 0.2,
+			    	// scaleY: 0.2
+			  	// });
 				// photo.on('image:loaded', canvas.renderAll.bind(canvas));
 				// photo.drawBorders = photo.drawCorners = function() { return this };
 				// self.addObjectToCanvas(photo);
 
-			}, self.imageDefaults);
+			}, { crossOrigin: 'anonymous' });
 		};
 
 		self.clip = function() {
             var obj = canvas.getActiveObject();
-			console.log('clip',obj)
             if (!obj) return;
 
             if (obj.clipTo) {
@@ -339,16 +363,6 @@ angular.module('common.fabric', [
 			// activeObject.scaleX = 10;
 			// activeObject.scaleY = 10;
 			activeObject.image.src = 'images/fabric.js.png';
-			this.render();
-		}
-		self.toggleImage2 = function( src ){
-			var object = self.getObjectByName('qr1');
-
-			if (! object ) {
-				return;
-			}
-
-			object.getElement().src = src;
 			this.render();
 		}
 		self.toggleImageFrame = function(){
@@ -482,9 +496,19 @@ angular.module('common.fabric', [
 				name: 'square',
 			  	width : 90,
 			  	height: 90,
-			  	fill: 'red'
+			  	fill  : "#"+((1<<24)*Math.random()|0).toString(16)
 			});
 			self.addObjectToCanvas(square);
+		};
+		self.addRect = function( width, height ){
+			var rect = new fabric.Rect({
+				name  : 'rect',
+			  	width : width,
+			  	height: height,
+			  	fill  : "#"+((1<<24)*Math.random()|0).toString(16)
+			});
+			console.log('object', rect);
+			self.addObjectToCanvas(rect);
 		};
 		self.updateSquare = function(){
 			if( !self.length ) return;
@@ -887,6 +911,28 @@ angular.module('common.fabric', [
 				activeObject.lockUniScaling = !activeObject.lockUniScaling;
 				activeObject.lockRotation = !activeObject.lockRotation;
 				activeObject.lockObject = !activeObject.lockObject;
+				self.render();
+			}
+		};
+		self.toggleLockMovementXActiveObject = function() {
+			var activeObject = canvas.getActiveObject();
+			if (activeObject) {
+				activeObject.lockMovementX = !activeObject.lockMovementX;
+				self.render();
+			}
+		};
+		self.toggleLockMovementYActiveObject = function() {
+			var activeObject = canvas.getActiveObject();
+			if (activeObject) {
+				activeObject.lockMovementY = !activeObject.lockMovementY;
+				self.render();
+			}
+		};
+
+		self.toggleControlObject = function(){
+			var activeObject = canvas.getActiveObject();
+			if (activeObject) {
+				activeObject.hasControls = !activeObject.hasControls;
 				self.render();
 			}
 		};
