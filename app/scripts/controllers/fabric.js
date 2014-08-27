@@ -182,6 +182,7 @@ define(['angular', 'fabric', 'fabricUtils'], function(angular) {
             return getActiveProp('fontFamily').toLowerCase();
         };
         $scope.setFontFamily = function(value) {
+            console.log('setFontFamily', value.toLowerCase())
             setActiveProp('fontFamily', value.toLowerCase());
         };
 

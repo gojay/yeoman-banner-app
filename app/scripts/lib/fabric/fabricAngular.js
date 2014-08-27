@@ -40,6 +40,7 @@ angular.module('common.fabric', [
 				selection: false
 			},
 
+			presetSize: {},
 			maxBounding: {
 				left: 0,
 				top: 0
@@ -93,6 +94,7 @@ angular.module('common.fabric', [
 		function setActiveProp(name, value) {
 			var object = canvas.getActiveObject();
 			object.set(name, value);
+			console.log('SET', name, value, object);
 			self.render();
 		}
 
@@ -186,62 +188,10 @@ angular.module('common.fabric', [
 			canvas.originalHeight = height;
 			canvas.setHeight(height);
 
-			// get QR Properties
-			var QRObjectAttributes = self.QRObjectAttributes['a4'];
-
-			// A4 200/300 PPI , QR Image
-			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
-				initialCanvasScale = 0.3;
-				// 200 / 300 PPI property
-				var qrAttribute = width == 1654 ? QRObjectAttributes[200] : QRObjectAttributes[300];
-				// create dummy image
-				fabric.Image.fromURL('images/avatar.jpg', function(object) {
-					object.id   = self.createId();
-					object.name = 'qr1';
-
-					var Qr1 = qrAttribute[0];
-					// console.log('Qr1:properties', Qr1);
-
-					object.width  = Qr1.width / initialCanvasScale; // original 90
-					object.height = Qr1.height / initialCanvasScale; // original 90
-					object.left = Qr1.left /  initialCanvasScale; // original 234 / 558
-					object.top  = Qr1.top / initialCanvasScale;  // original 754
-					object.opacity = 0;
-
-					self.addObjectToCanvas(object);
-
-					fabric.Image.fromURL('images/avatar2.jpg', function(object2) {
-						object2.id   = self.createId();
-						object2.name = 'qr2';
-						object2.transparentCorners = false;
-						
-						var Qr2 = qrAttribute[1];
-						// console.log('Qr2:properties', Qr2);
-
-						object2.width  = Qr2.width / initialCanvasScale; // original 90
-						object2.height = Qr2.width / initialCanvasScale; // original 90
-						object2.left = Qr2.left /  initialCanvasScale; // original 234 / 558
-						object2.top  = Qr2.top / initialCanvasScale;  // original 754
-						object2.opacity = 0;
-
-						self.addObjectToCanvas(object2);
-					});
-				});
-			}
-
-			self.canvasScale = initialCanvasScale;
+			if( self.callbackCanvasSize ) self.callbackCanvasSize( self );
 
 			self.render();
 			self.setZoom();
-
-			// set A4 background image 
-			if( width == 1654 && height == 2339 || width == 2480 && height == 3508 ){
-				var backgroundImageName = 'stiker_a4_'+ width +'x'+ height +'.jpg';
-				canvas.setBackgroundImage( 'images/'+ backgroundImageName, canvas.renderAll.bind(canvas), {
-					scaleX:self.canvasScale,
-					scaleY:self.canvasScale
-				});
-			}
 		};
 
 		self.isLoading = function() {
@@ -281,7 +231,7 @@ angular.module('common.fabric', [
 		//
 		// Image
 		// ==============================================================
-		self.addImage = function(imageURL, lock, clip) {
+		self.addImage = function(imageURL, callback) {
 			fabric.Image.fromURL(imageURL, function(object) {
 				object.id   = self.createId();
 				object.name = "image"+object.id;
@@ -299,29 +249,31 @@ angular.module('common.fabric', [
 				object.filters.push(filter);
 				object.applyFilters(canvas.renderAll.bind(canvas));
 
-				if( lock ){
-					object.hasBorders = false;
-					object.hasControls  = false;
-					object.lockMovementX = true;
-					object.lockMovementY = true;
-					object.lockScalingX  = true;
-					object.lockScalingY  = true;
-					object.lockUniScaling = true;
-					object.lockRotation  = true;
-				}
+				// if( lock ){
+				// 	object.hasBorders = false;
+				// 	object.hasControls  = false;
+				// 	object.lockMovementX = true;
+				// 	object.lockMovementY = true;
+				// 	object.lockScalingX  = true;
+				// 	object.lockScalingY  = true;
+				// 	object.lockUniScaling = true;
+				// 	object.lockRotation  = true;
+				// }
 
-				if( clip ){
-					object.width = 380;
-					object.height = 380;
-					object.clipTo = function(ctx) {
-					    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
-					    ctx.lineWidth = 50;
-					    ctx.strokeStyle = 'white';
-					    ctx.stroke();
-					};
-				}
+				if( callback ) callback( object );
 
-				self.addObjectToCanvas(object);
+				// if( clip ){
+				// 	object.width = 380;
+				// 	object.height = 380;
+				// 	object.clipTo = function(ctx) {
+				// 	    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
+				// 	    ctx.lineWidth = 50;
+				// 	    ctx.strokeStyle = 'red';
+				// 	    ctx.stroke();
+				// 	};
+				// }
+
+				self.addObjectToCanvas(object, true);
 
 				// var photo = new fabric.PolaroidPhoto('images/avatar2.jpg', {
 			    	// top: 0,
@@ -428,6 +380,15 @@ angular.module('common.fabric', [
 
 		self.setText = function(value) {
 			setActiveProp('text', value);
+		};
+		self.setStroke = function(value) {
+			setActiveProp('stroke', value);
+		};
+		self.getStroke = function() {
+			return getActiveProp('stroke');
+		};
+		self.setStrokeWidth = function(value) {
+			setActiveProp('strokeWidth', value);
 		};
 
 		//
@@ -551,6 +512,10 @@ angular.module('common.fabric', [
 		    }
 		  }
 		  return object;
+		};
+
+		self.getSize = function(){
+			return self.presetSize;
 		};
 
 		//
@@ -886,6 +851,7 @@ angular.module('common.fabric', [
 				canvas.backgroundImage.setScaleX(self.canvasScale);
 				canvas.backgroundImage.setScaleY(self.canvasScale);
 			}
+			self.updateControls();
 		};
 
 		self.updateActiveObjectOriginals = function() {
@@ -943,6 +909,8 @@ angular.module('common.fabric', [
 		self.selectActiveObject = function() {
 			var activeObject = canvas.getActiveObject();
 
+			console.log('activeObject', activeObject);
+
 			if (! activeObject ) {
 				return;
 			}
@@ -956,6 +924,7 @@ angular.module('common.fabric', [
 			self.selectedObject.fontFamily = self.getFontFamily();
 			self.selectedObject.fill = self.getFill();
 			self.selectedObject.tint = self.getTint();
+			self.selectedObject.stroke = self.getStroke();
 		};
 
 		self.deselectActiveObject = function() {
@@ -1147,6 +1116,8 @@ angular.module('common.fabric', [
 			FabricWindow.Object.prototype.transparentCorners = self.windowDefaults.transparentCorners;
 			FabricWindow.Object.prototype.rotatingPointOffset = self.windowDefaults.rotatingPointOffset;
 			FabricWindow.Object.prototype.padding = self.windowDefaults.padding;
+
+			FabricWindow.Object.prototype.hasControls = self.windowDefaults.hasControls;
 		};
 
 		self.updateBounding = function(){
@@ -1261,6 +1232,7 @@ angular.module('common.fabric', [
 			self.canvas = canvas = FabricCanvas.getCanvas();
 			self.canvasId = FabricCanvas.getCanvasId();
 			canvas.clear();
+			canvas.hoverCursor = 'pointer';
 
 			// For easily accessing the json
 			JSONObject = angular.fromJson(self.json);

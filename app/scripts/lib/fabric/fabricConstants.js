@@ -10,7 +10,8 @@ angular.module('common.fabric.constants', [])
 		cornerSize: 10,
 		transparentCorners: false,
 		hasRotatingPoint: true,
-		centerTransform: true
+		centerTransform: true,
+		hasControls: false
 	};
 
 	return {
@@ -73,19 +74,23 @@ angular.module('common.fabric.constants', [])
 			},
 			{
 				name: 'A4 - 200 PPI (1654x2339)',
+				type  : 'a4',
+				ppi   : 200,
 				height: 2339,
 				width: 1654
 			},
 			{
 				name: 'A4 - 300 PPI (2480x3508)',
+				type  : 'a4',
+				ppi   : 300,
 				height: 3508,
-				width: 2480
+				width : 2480
 			}
 		],
 
 		fonts: [
 			{ name: 'Arial' },
-			{ name: 'Lora' },
+			{ name: 'Myriad Pro' },
 			{ name: 'Croissant One' },
 			{ name: 'Architects Daughter' },
 			{ name: 'Emblema One' },
@@ -193,42 +198,107 @@ angular.module('common.fabric.constants', [])
 			originX: 'left',
 			scaleX: 1,
 			scaleY: 1,
-			fontFamily: 'Arial',
+			fontFamily: 'Georgia',
 			fontSize: 40,
-			fill: '#454545',
-			textAlign: 'left'
+			fill: '#434343',
+			textAlign: 'left',
+			strokeWidth: 1,
+			stroke: '#454545'
 		}, objectDefaults),
 
-		QRObjectAttributes: {
+		CustomAttributes: {
 			'a4': {
-				200 : [{
-					width: 60,
-					height: 60,
-					left: 157,
-					top: 503
-				}, {
-					width: 60,
-					height: 60,
-					left: 371,
-					top: 503
-				}],
+				200 : {
+					'ss': {
+						width: 640, // 644
+						height: 1136,
+						left: 324,
+						top : 842
+					},
+					'qr': {
+						'iphone': {
+							width: 280,
+							height: 280,
+							top : 1836, // 1836
+							left: 1306 // 1306
+						},
+						'android': {
+							width: 280,
+							height: 280,
+							top : 1836, // 1836
+							left: 1906 // 1906
+						}
+					},
+					'people': {
+						left: {
+							width : 380, // 380 
+							height: 380, // 380
+							top : 2506, // 2506
+							left: 176 // 176 52
+						},
+						right: {
+							width : 380, // 380
+							height: 380, // 380
+							top : 2506, // 2506 751
+							left: 1316 // 1316 394
+						}
+					}
+				},
 				// ss
 				//---------------
-				// w: 644
+				// w: 644 842
 				// h: 1138
-				// left: 97
-				// top: 254
-				300 : [{
-					width: 90,
-					height: 90,
-					left: 234,
-					top: 754
-				}, {
-					width: 90,
-					height: 90,
-					left: 558,
-					top: 754
-				}] 
+				// left: 97 324
+				// top: 254 842
+				//---------------
+				// 300 : [{
+				// 	width: 90,
+				// 	height: 90,
+				// 	left: 234,
+				// 	top: 754
+				// }, {
+				// 	width: 90,
+				// 	height: 90,
+				// 	top: 551,
+				// 	left: 572
+				// }] 
+
+				300: {
+					'ss': {
+						width: 640, // 644
+						height: 1136,
+						left: 324,
+						top : 842
+					},
+					'qr': {
+						'iphone': {
+							width: 280,
+							height: 280,
+							top : 1836, // 1836
+							left: 1306 // 1306
+						},
+						'android': {
+							width: 280,
+							height: 280,
+							top : 1836, // 1836
+							left: 1906 // 1906
+						}
+					},
+					'people': {
+						left: {
+							width : 380, // 380 
+							height: 380, // 380
+							top : 2506, // 2506
+							left: 176 // 176 52
+						},
+						right: {
+							width : 380, // 380
+							height: 380, // 380
+							top : 2506, // 2506 751
+							left: 1316 // 1316 394
+						}
+					}
+				}
 			}
 		}
 

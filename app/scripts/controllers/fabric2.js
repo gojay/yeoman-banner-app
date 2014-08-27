@@ -27,6 +27,10 @@ define([
 
 	    	$scope.fabric = {};
 			$scope.FabricConstants = FabricConstants;
+
+			$scope.dropdown = {
+				isOpen: false
+			};
 			
 			//
 			// QR Code
@@ -97,7 +101,40 @@ define([
 			};
 
 			$scope.addImage = function(image) {
-				$scope.fabric.addImage('images/avatar2.jpg', null, true);
+				// a4 / a5 ?
+				var isPaper = $scope.fabric.presetSize.hasOwnProperty('type');
+				var callback = null;
+				if( isPaper ) {
+					var canvasScale = $scope.fabric.canvasScale;
+					var type = $scope.fabric.presetSize['type'];
+
+					callback = function( object, index ){
+						var CustomAttributes = FabricConstants.CustomAttributes[type];
+						var peopleAttributes = CustomAttributes[300]['peoples'][index];
+
+						object.width  = peopleAttributes.width / canvasScale;
+						object.height = peopleAttributes.height / canvasScale;
+						object.left   = peopleAttributes.left / canvasScale;
+						object.top    = peopleAttributes.top / canvasScale;
+						object.hasControls = false;
+						object.clipTo = function(ctx) {
+						    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
+						    ctx.lineWidth = 50;
+						    ctx.strokeStyle = 'red';
+						    ctx.stroke();
+						};
+					}
+				}
+				$scope.fabric.addImage('images/avatar.jpg', function(object){
+					if( isPaper && callback ) {
+						callback( object, 1 );
+					}
+				});
+				$scope.fabric.addImage('images/avatar2.jpg', function(object){
+					if( isPaper && callback ) {
+						callback( object, 2 );
+					}
+				});
 			};
 
 			$scope.addImageUpload = function(data) {
@@ -196,7 +233,8 @@ define([
 					textDefaults: FabricConstants.textDefaults,
 					shapeDefaults: FabricConstants.shapeDefaults,
 					json: {},
-					QRObjectAttributes: FabricConstants.QRObjectAttributes
+					CustomAttributes: FabricConstants.CustomAttributes,
+					callbackCanvasSize: callbackCanvasSize
 				});
 			};
 
@@ -205,6 +243,78 @@ define([
 			Keypress.onSave(function() {
 				$scope.updatePage();
 			});
+
+			function callbackCanvasSize( self ){
+
+				console.log('presetSize', self.presetSize);
+
+				var canvas  = self.canvas;
+
+				if( self.presetSize && self.presetSize.hasOwnProperty('type') ){
+					// if is paper a4 / a5, set canvas scale
+					var initialCanvasScale = self.canvasScale = 0.3;
+
+					// set background image
+					var backgroundImageName = 'stiker_a4_'+ self.presetSize.width +'x'+ self.presetSize.height +'.jpg';
+					canvas.setBackgroundImage( 'images/'+ backgroundImageName, canvas.renderAll.bind(canvas), {
+						scaleX: initialCanvasScale,
+						scaleY: initialCanvasScale
+					});
+
+					// get QR Properties
+					var type = self.presetSize.type;
+					var ppi  = self.presetSize.ppi;
+					var CustomAttributes = self.CustomAttributes[type];
+
+					var callback = function( object, type, index ){
+						var attributes = CustomAttributes[ppi][type][index];
+						object.name   = type + '-' + index;
+						object.width  = attributes.width;
+						object.height = attributes.height;
+						object.left   = attributes.left;
+						object.top    = attributes.top;
+						object.hasControls = false;
+						if( type == 'people'){
+							object.clipTo = function(ctx) {
+							    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
+							    ctx.lineWidth = 50;
+							    ctx.strokeStyle = 'red';
+							    ctx.stroke();
+							};
+						}
+					}
+
+					// A4 200/300 PPI : peoples, QR Images
+					if( type == 'a4' ){
+						// set qr
+						$scope.fabric.addImage('images/avatar.jpg', function(object){
+							callback( object, 'qr', 'iphone' );
+						});
+						$scope.fabric.addImage('images/avatar2.jpg', function(object){
+							callback( object, 'qr', 'android' );
+						});
+						// set people images
+						$scope.fabric.addImage('images/avatar.jpg', function(object){
+							callback( object, 'people', 'left' );
+						});
+						$scope.fabric.addImage('images/avatar2.jpg', function(object){
+							callback( object, 'people', 'right' );
+						});
+					}
+
+					var ss = CustomAttributes[ppi]['ss'];
+					var rect = new fabric.Rect({
+						name  : 'rect',
+					  	width : ss.width,
+					  	height: ss.height,
+					  	left  : ss.left,
+					  	top   : ss.top,
+					  	fill  : "#"+((1<<24)*Math.random()|0).toString(16)
+					});
+					self.addObjectToCanvas(rect);
+
+				}
+			}
     	}
     ]);
 });
