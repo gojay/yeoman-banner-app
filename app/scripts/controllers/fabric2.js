@@ -29,7 +29,8 @@ define([
 			$scope.FabricConstants = FabricConstants;
 
 			$scope.dropdown = {
-				isOpen: false
+				sizeIsOpen: false,
+				fontIsOpen: false
 			};
 			
 			//
@@ -101,40 +102,7 @@ define([
 			};
 
 			$scope.addImage = function(image) {
-				// a4 / a5 ?
-				var isPaper = $scope.fabric.presetSize.hasOwnProperty('type');
-				var callback = null;
-				if( isPaper ) {
-					var canvasScale = $scope.fabric.canvasScale;
-					var type = $scope.fabric.presetSize['type'];
-
-					callback = function( object, index ){
-						var CustomAttributes = FabricConstants.CustomAttributes[type];
-						var peopleAttributes = CustomAttributes[300]['peoples'][index];
-
-						object.width  = peopleAttributes.width / canvasScale;
-						object.height = peopleAttributes.height / canvasScale;
-						object.left   = peopleAttributes.left / canvasScale;
-						object.top    = peopleAttributes.top / canvasScale;
-						object.hasControls = false;
-						object.clipTo = function(ctx) {
-						    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
-						    ctx.lineWidth = 50;
-						    ctx.strokeStyle = 'red';
-						    ctx.stroke();
-						};
-					}
-				}
-				$scope.fabric.addImage('images/avatar.jpg', function(object){
-					if( isPaper && callback ) {
-						callback( object, 1 );
-					}
-				});
-				$scope.fabric.addImage('images/avatar2.jpg', function(object){
-					if( isPaper && callback ) {
-						callback( object, 2 );
-					}
-				});
+				$scope.fabric.addImage('images/avatar.jpg');
 			};
 
 			$scope.addImageUpload = function(data) {
@@ -249,6 +217,7 @@ define([
 				console.log('presetSize', self.presetSize);
 
 				var canvas  = self.canvas;
+				canvas.backgroundImage = null;
 
 				if( self.presetSize && self.presetSize.hasOwnProperty('type') ){
 					// if is paper a4 / a5, set canvas scale
@@ -286,7 +255,15 @@ define([
 
 					// A4 200/300 PPI : peoples, QR Images
 					if( type == 'a4' ){
-						// set qr
+						var textAttribute = CustomAttributes[ppi]['text'];
+						// set app name
+						$scope.fabric.addText('Name of App', function(object){
+							var attribute = textAttribute['app'];
+							object.top  = attribute.top;
+							object.left = attribute.left;
+							object.fontSize = 95;
+						});
+						// set qr images
 						$scope.fabric.addImage('images/avatar.jpg', function(object){
 							callback( object, 'qr', 'iphone' );
 						});

@@ -203,7 +203,8 @@ angular.module('common.fabric.constants', [])
 			fill: '#434343',
 			textAlign: 'left',
 			strokeWidth: 1,
-			stroke: '#454545'
+			stroke: '#454545',
+			keepCenterH: true
 		}, objectDefaults),
 
 		CustomAttributes: {
@@ -264,6 +265,13 @@ angular.module('common.fabric.constants', [])
 				// }] 
 
 				300: {
+					'text':{
+						app : {
+							size: 195, // 65 * 3
+							left: 964, // 314 * 3
+							top: 360 // 120 * 3
+						}
+					},
 					'ss': {
 						width: 640, // 644
 						height: 1136,

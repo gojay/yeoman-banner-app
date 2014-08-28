@@ -72,7 +72,6 @@ angular.module('common.fabric.directive', [
 			});
 
 			$scope.$watch('fabric.selectedObject.fill', function(newVal) {
-				console.log('fabric.selectedObject.fill', newVal);
 				if (typeof newVal === 'string') {
 					$scope.fabric.setFill(newVal);
 					$scope.fabric.render();
@@ -82,6 +81,20 @@ angular.module('common.fabric.directive', [
 			$scope.$watch('fabric.selectedObject.tint', function(newVal) {
 				if (typeof newVal === 'string') {
 					$scope.fabric.setTint(newVal);
+					$scope.fabric.render();
+				}
+			});
+
+			$scope.$watch('fabric.selectedObject.stroke', function(newVal) {
+				if (typeof newVal === 'string' || typeof newVal === 'number') {
+					$scope.fabric.setStroke(newVal);
+					$scope.fabric.render();
+				}
+			});
+
+			$scope.$watch('fabric.selectedObject.strokeWidth', function(newVal) {
+				if (typeof newVal === 'string' || typeof newVal === 'number') {
+					$scope.fabric.setStrokeWidth(newVal);
 					$scope.fabric.render();
 				}
 			});

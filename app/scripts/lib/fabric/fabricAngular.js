@@ -366,12 +366,14 @@ angular.module('common.fabric', [
 		//
 		// Text
 		// ==============================================================
-		self.addText = function(str) {
+		self.addText = function(str, callback) {
 			str = str || 'New Text';
 			var object = new FabricWindow.Text(str, self.textDefaults);
 			object.id = self.createId();
 
-			self.addObjectToCanvas(object);
+			if( callback ) callback(object);
+
+			self.addObjectToCanvas(object, true);
 		};
 
 		self.getText = function() {
@@ -380,12 +382,16 @@ angular.module('common.fabric', [
 
 		self.setText = function(value) {
 			setActiveProp('text', value);
+			if( self.textDefaults.keepCenterH ) self.centerH();
+		};
+		self.getStroke = function() {
+			return getActiveProp('stroke');
 		};
 		self.setStroke = function(value) {
 			setActiveProp('stroke', value);
 		};
-		self.getStroke = function() {
-			return getActiveProp('stroke');
+		self.getStrokeWidth = function() {
+			return getActiveProp('strokeWidth');
 		};
 		self.setStrokeWidth = function(value) {
 			setActiveProp('strokeWidth', value);
@@ -395,29 +401,40 @@ angular.module('common.fabric', [
 		// Group
 		// ==============================================================
 		self.addGroup = function() {
-			var circle1 = new fabric.Circle({
-				name: 'circle1',
-			  	radius: 50,
-			  	fill: 'red',
-			  	left: 0
-			});
-			var circle2 = new fabric.Circle({
-				name: 'circle2',
-			  	radius: 50,
-			  	fill: 'green',
-			  	left: 100
-			});
-			var circle3 = new fabric.Circle({
-				name: 'circle3',
-			  	radius: 50,
-			  	fill: 'blue',
-			  	left: 200
-			});
-			var group = new fabric.Group([ circle1, circle2, circle3 ], {
-				name: 'group',
+			// var circle1 = new fabric.Circle({
+			// 	name: 'circle1',
+			//   	radius: 50,
+			//   	fill: 'red',
+			//   	left: 0
+			// });
+			// var circle2 = new fabric.Circle({
+			// 	name: 'circle2',
+			//   	radius: 50,
+			//   	fill: 'green',
+			//   	left: 100
+			// });
+			// var circle3 = new fabric.Circle({
+			// 	name: 'circle3',
+			//   	radius: 50,
+			//   	fill: 'blue',
+			//   	left: 200
+			// });
+			// var group = new fabric.Group([ circle1, circle2, circle3 ], {
+			// 	name: 'group',
+			//   	left: 0,
+			//   	top: 0
+			// });
+
+			var textTop = new FabricWindow.Text('Text top', self.textDefaults);
+			textTop.name = 'text-top';
+			var textBottom = new FabricWindow.Text('Text bottom', self.textDefaults);
+			textBottom.name = 'text-bottom';
+			var group = new fabric.Group([ textTop, textBottom ], {
+				name: 'testimoni',
 			  	left: 0,
 			  	top: 0
 			});
+
 			self.addObjectToCanvas(group);
 		};
 		self.isGroupHidden = function(index){
@@ -846,10 +863,11 @@ angular.module('common.fabric', [
 			canvas.setWidth(tempWidth);
 			canvas.setHeight(tempHeight);
 
-			console.log('backgroundImage', canvas.backgroundImage);
 			if( canvas.backgroundImage ){
-				canvas.backgroundImage.setScaleX(self.canvasScale);
-				canvas.backgroundImage.setScaleY(self.canvasScale);
+				canvas.backgroundImage.set({
+					scaleX: self.canvasScale,
+					scaleY: self.canvasScale
+				});
 			}
 			self.updateControls();
 		};
@@ -895,10 +913,10 @@ angular.module('common.fabric', [
 			}
 		};
 
-		self.toggleControlObject = function(){
+		self.toggleControlObject = function(value){
 			var activeObject = canvas.getActiveObject();
 			if (activeObject) {
-				activeObject.hasControls = !activeObject.hasControls;
+				activeObject.hasControls = (value !== null) ? value : !activeObject.hasControls;
 				self.render();
 			}
 		};
