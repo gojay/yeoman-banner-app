@@ -603,6 +603,42 @@
 									<wave-spinner></wave-spinner>
 		                    	</div>
 		                    </div>
+		                    <div class="row" ng-show="fabric.selectedObject.type == 'i-text'">
+		                    	<!-- <button ng-click="fabric.getSelectionStyle();">Get Selection style</button> -->
+		                    	<button ng-show="fabric.selectedObject.isEditing" ng-click="fabric.setSelectionStyle('fontWeight', 'bold');">Set Bold</button>
+		                    	<button ng-show="fabric.selectedObject.isEditing" ng-click="fabric.setSelectionStyle('fontStyle', 'italic');">Set Italic</button>
+		                    	<button ng-show="fabric.selectedObject.isEditing" ng-click="fabric.setSelectionStyle('fill', 'red');">Random Color</button>
+		                    </div>
+		                    <div class="row">
+								<div class="col-sm-12">
+									<legend>Color</legend>
+								</div>
+								<div class="col-sm-6">
+                                	<input type='color' class="input-sm form-control" ng-model="fabric.selectedObject.fill" />
+                                </div>
+								<div class="col-sm-6">
+                                	<input type='text' class="input-sm form-control" ng-model="fabric.selectedObject.fill" />
+								</div>
+							</div>
+	                        <div class="row">
+	                            <div class='btn-group col-sm-12'>
+	                                <button ng-class="{ 'btn-default': fabric.isBold() }" ng-click="fabric.toggleBold()" class='btn btn-sm'>
+	                                    <i class='fa fa-bold'></i>
+	                                </button>
+
+	                                <button ng-class="{ 'btn-default': fabric.isItalic() }" ng-click="fabric.toggleItalic()" class='btn btn-sm'>
+	                                    <i class='fa fa-italic'></i>
+	                                </button>
+
+	                                <button ng-class="{ 'btn-default': fabric.isUnderline() }" ng-click="fabric.toggleUnderline()" class='btn btn-sm'>
+	                                    <i class='fa fa-underline'></i>
+	                                </button>
+
+	                                <button ng-class="{ 'btn-default': fabric.isLinethrough() }" ng-click="fabric.toggleLinethrough()" class='btn btn-sm'>
+	                                    <i class='fa fa-strikethrough'></i>
+	                                </button>
+	                            </div>
+							</div>
 						</accordion-group>
                     </accordion>
                 </div>

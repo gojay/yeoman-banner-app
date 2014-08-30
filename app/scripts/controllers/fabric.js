@@ -709,6 +709,10 @@ define(['angular', 'fabric', 'fabricUtils'], function(angular) {
                             fontSize: 60
                         },
 
+                        5: {
+                            textBackgroundColor: 'black'
+                        },
+
                         6: {
                             textBackgroundColor: 'yellow'
                         },

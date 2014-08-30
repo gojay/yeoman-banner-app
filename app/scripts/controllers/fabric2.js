@@ -263,6 +263,22 @@ define([
 							object.left = attribute.left;
 							object.fontSize = 95;
 						});
+
+						var iText = new fabric.IText('lorem ipsum\ndolor sit Amet\nconsectetur\nYour Name', {
+							fontFamily: 'Helvetica',
+							fill: '#333',
+							styles: {
+								3: {
+									0: {
+			                            fontWeight: 'bold'
+			                        },
+			                        1: {
+			                            fontWeight: 'bold'
+			                        },
+								}
+							}
+						});
+						$scope.fabric.addObjectToCanvas(iText);
 						// set qr images
 						$scope.fabric.addImage('images/avatar.jpg', function(object){
 							callback( object, 'qr', 'iphone' );

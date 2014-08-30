@@ -74,9 +74,13 @@ angular.module('common.fabric', [
 		function setActiveStyle(styleName, value, object) {
 			object = object || canvas.getActiveObject();
 
-			if (object.setSelectionStyles && object.isEditing) {
+			console.log('object.isEditing', object.isEditing);
+			console.log('object.setSelectionStyles', object.setSelectionStyles());
+			console.log('object.getSelectedText', object.getSelectedText());
+			if (object.setSelectionStyles && object.isEditing && object.getSelectedText() != '') {
 				var style = { };
 				style[styleName] = value;
+				console.log('ok', style)
 				object.setSelectionStyles(style);
 			} else {
 				object[styleName] = value;
@@ -368,13 +372,58 @@ angular.module('common.fabric', [
 		// ==============================================================
 		self.addText = function(str, callback) {
 			str = str || 'New Text';
-			var object = new FabricWindow.Text(str, self.textDefaults);
-			object.id = self.createId();
+			// var object = new FabricWindow.Text(str, self.textDefaults);
+			// object.id = self.createId();
+
+			var object = new fabric.IText('lorem ipsum\ndolor sit Amet\nconsectetur\nYour Name', {
+				fontFamily: 'Helvetica',
+				fill: '#333',
+				styles: {
+					3: {
+						0: {
+                            fontWeight: 'bold'
+                        },
+                        1: {
+                            fontWeight: 'bold'
+                        },
+					}
+				}
+			});
 
 			if( callback ) callback(object);
 
 			self.addObjectToCanvas(object, true);
 		};
+
+		self.getStyle = function(styleName) {
+			var object = canvas.getActiveObject();
+		  	return (object.getSelectionStyles && object.isEditing)
+		    ? object.getSelectionStyles()[styleName]
+		    : object[styleName];
+		}
+		self.getSelectionStyle = function(){
+			var object = canvas.getActiveObject();
+			if( !object && !object.getSelectionStyles ) return;
+			console.log('getSelectedText', object.getSelectedText());
+			console.log('getSelectionStyles', object.getSelectionStyles());
+		}
+
+		self.setSelectionStyle = function(styleName, value){
+			var object = canvas.getActiveObject();
+			if( !object && !object.getSelectionStyles() ) return;
+
+			if (object.setSelectionStyles && object.isEditing) {
+			    var styleValue = self.getStyle(styleName);
+			    var style = { };
+			    if( styleName == 'fill' ) {
+			    	style['fill'] = "#"+((1<<24)*Math.random()|0).toString(16)
+			    } else {
+    				style[styleName] = styleValue === value ? '' : value;
+			    }
+			    object.setSelectionStyles(style);
+			}
+			canvas.renderAll();
+		}
 
 		self.getText = function() {
 			return getActiveProp('text');
@@ -384,6 +433,14 @@ angular.module('common.fabric', [
 			setActiveProp('text', value);
 			if( self.textDefaults.keepCenterH ) self.centerH();
 		};
+
+		function setActiveProp(name, value) {
+			var object = canvas.getActiveObject();
+			object.set(name, value);
+			console.log('SET', name, value, object);
+			self.render();
+		}
+
 		self.getStroke = function() {
 			return getActiveProp('stroke');
 		};
@@ -401,36 +458,26 @@ angular.module('common.fabric', [
 		// Group
 		// ==============================================================
 		self.addGroup = function() {
-			// var circle1 = new fabric.Circle({
-			// 	name: 'circle1',
-			//   	radius: 50,
-			//   	fill: 'red',
-			//   	left: 0
-			// });
-			// var circle2 = new fabric.Circle({
-			// 	name: 'circle2',
-			//   	radius: 50,
-			//   	fill: 'green',
-			//   	left: 100
-			// });
-			// var circle3 = new fabric.Circle({
-			// 	name: 'circle3',
-			//   	radius: 50,
-			//   	fill: 'blue',
-			//   	left: 200
-			// });
-			// var group = new fabric.Group([ circle1, circle2, circle3 ], {
-			// 	name: 'group',
-			//   	left: 0,
-			//   	top: 0
-			// });
-
-			var textTop = new FabricWindow.Text('Text top', self.textDefaults);
-			textTop.name = 'text-top';
-			var textBottom = new FabricWindow.Text('Text bottom', self.textDefaults);
-			textBottom.name = 'text-bottom';
-			var group = new fabric.Group([ textTop, textBottom ], {
-				name: 'testimoni',
+			var circle1 = new fabric.Circle({
+				name: 'circle1',
+			  	radius: 50,
+			  	fill: 'red',
+			  	left: 0
+			});
+			var circle2 = new fabric.Circle({
+				name: 'circle2',
+			  	radius: 50,
+			  	fill: 'green',
+			  	left: 100
+			});
+			var circle3 = new fabric.Circle({
+				name: 'circle3',
+			  	radius: 50,
+			  	fill: 'blue',
+			  	left: 200
+			});
+			var group = new fabric.Group([ circle1, circle2, circle3 ], {
+				name: 'group',
 			  	left: 0,
 			  	top: 0
 			});
@@ -792,7 +839,7 @@ angular.module('common.fabric', [
 		self.setFill = function(value) {
 			var object = canvas.getActiveObject();
 			if (object && object.type !== 'group') {
-				if (object.type === 'text') {
+				if (object.type === 'text' || object.type === 'i-text') {
 					setActiveStyle('fill', value);
 				} else {
 					self.setFillPath(object, value);
@@ -943,6 +990,12 @@ angular.module('common.fabric', [
 			self.selectedObject.fill = self.getFill();
 			self.selectedObject.tint = self.getTint();
 			self.selectedObject.stroke = self.getStroke();
+
+			if( activeObject.type == 'group' && activeObject.name == 'testimoni' ){
+				console.log(activeObject.item(0), activeObject.item(1))
+				self.selectedObject.textTop = activeObject.item(0).text;
+				self.selectedObject.textBottom = activeObject.item(1).text;
+			}
 		};
 
 		self.deselectActiveObject = function() {
@@ -1221,7 +1274,7 @@ angular.module('common.fabric', [
 			});
 
 			canvas.on('after:render', function() {
-				console.info('after:render');
+				// console.info('after:render');
 				canvas.calcOffset();
 			});
 
