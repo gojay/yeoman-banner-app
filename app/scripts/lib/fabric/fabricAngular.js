@@ -74,9 +74,6 @@ angular.module('common.fabric', [
 		function setActiveStyle(styleName, value, object) {
 			object = object || canvas.getActiveObject();
 
-			console.log('object.isEditing', object.isEditing);
-			console.log('object.setSelectionStyles', object.setSelectionStyles());
-			console.log('object.getSelectedText', object.getSelectedText());
 			if (object.setSelectionStyles && object.isEditing && object.getSelectedText() != '') {
 				var style = { };
 				style[styleName] = value;
@@ -192,14 +189,10 @@ angular.module('common.fabric', [
 			canvas.originalHeight = height;
 			canvas.setHeight(height);
 
-			if( self.callbackCanvasSize ) self.callbackCanvasSize( self );
+			if( self.onChangeCanvasSize ) self.onChangeCanvasSize( self );
 
 			self.render();
 			self.setZoom();
-		};
-
-		self.isLoading = function() {
-			return self.isLoading;
 		};
 
 		self.deactivateAll = function() {
@@ -229,9 +222,21 @@ angular.module('common.fabric', [
 			self.setObjectZoom(object);
 			canvas.setActiveObject(object);
 			object.bringToFront();
-			if( notCenter === null && !notCenter ) self.center();
+
+			if( notCenter === null || !notCenter ) self.center();
+
 			self.render();
 		};
+
+		self.getObjects = function(){
+			return canvas.getObjects();
+		};
+		self.setActiveObject = function(object){
+			canvas.setActiveObject(object);
+
+			console.log('Objects', self.getObjects())
+		};
+
 		//
 		// Image
 		// ==============================================================
@@ -253,29 +258,7 @@ angular.module('common.fabric', [
 				object.filters.push(filter);
 				object.applyFilters(canvas.renderAll.bind(canvas));
 
-				// if( lock ){
-				// 	object.hasBorders = false;
-				// 	object.hasControls  = false;
-				// 	object.lockMovementX = true;
-				// 	object.lockMovementY = true;
-				// 	object.lockScalingX  = true;
-				// 	object.lockScalingY  = true;
-				// 	object.lockUniScaling = true;
-				// 	object.lockRotation  = true;
-				// }
-
 				if( callback ) callback( object );
-
-				// if( clip ){
-				// 	object.width = 380;
-				// 	object.height = 380;
-				// 	object.clipTo = function(ctx) {
-				// 	    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
-				// 	    ctx.lineWidth = 50;
-				// 	    ctx.strokeStyle = 'red';
-				// 	    ctx.stroke();
-				// 	};
-				// }
 
 				self.addObjectToCanvas(object, true);
 
@@ -372,27 +355,25 @@ angular.module('common.fabric', [
 		// ==============================================================
 		self.addText = function(str, callback) {
 			str = str || 'New Text';
-			// var object = new FabricWindow.Text(str, self.textDefaults);
-			// object.id = self.createId();
-
-			var object = new fabric.IText('lorem ipsum\ndolor sit Amet\nconsectetur\nYour Name', {
-				fontFamily: 'Helvetica',
-				fill: '#333',
-				styles: {
-					3: {
-						0: {
-                            fontWeight: 'bold'
-                        },
-                        1: {
-                            fontWeight: 'bold'
-                        },
-					}
-				}
-			});
+			var object = new FabricWindow.Text(str, self.textDefaults);
+			object.id = self.createId();
 
 			if( callback ) callback(object);
 
 			self.addObjectToCanvas(object, true);
+		};
+		self.addIText = function(str, callback) {
+			str = str || 'New Text';
+
+			var object = new fabric.IText(str, self.textDefaults);
+
+			if( callback ) callback(object);
+
+			self.addObjectToCanvas(object, true);
+
+			object.top  = 2253;
+			object.left = 603;
+			self.render();
 		};
 
 		self.getStyle = function(styleName) {
@@ -497,7 +478,9 @@ angular.module('common.fabric', [
 			circle.visible = !circle.visible;
 			self.render();
 		};
-
+//
+		// Circle
+		// ==============================================================
 		self.addCircle = function(){
 			self.radius = 210;
 			var circle = new fabric.Circle({
@@ -514,17 +497,9 @@ angular.module('common.fabric', [
 			circle.setRadius(self.radius);
 			self.render();
 		};
-
-		self.addSquare = function(){
-			self.length = 1;
-			var square = new fabric.Rect({
-				name: 'square',
-			  	width : 90,
-			  	height: 90,
-			  	fill  : "#"+((1<<24)*Math.random()|0).toString(16)
-			});
-			self.addObjectToCanvas(square);
-		};
+//
+		// Rect
+		// ==============================================================
 		self.addRect = function( width, height ){
 			var rect = new fabric.Rect({
 				name  : 'rect',
@@ -534,15 +509,6 @@ angular.module('common.fabric', [
 			});
 			console.log('object', rect);
 			self.addObjectToCanvas(rect);
-		};
-		self.updateSquare = function(){
-			if( !self.length ) return;
-
-			console.log('length', self.length);
-			var square = canvas.getActiveObject();
-			square.scaleX  = self.length;
-			square.scaleY = self.length;
-			self.render();
 		};
 
 		//
@@ -974,8 +940,6 @@ angular.module('common.fabric', [
 		self.selectActiveObject = function() {
 			var activeObject = canvas.getActiveObject();
 
-			console.log('activeObject', activeObject);
-
 			if (! activeObject ) {
 				return;
 			}
@@ -990,12 +954,6 @@ angular.module('common.fabric', [
 			self.selectedObject.fill = self.getFill();
 			self.selectedObject.tint = self.getTint();
 			self.selectedObject.stroke = self.getStroke();
-
-			if( activeObject.type == 'group' && activeObject.name == 'testimoni' ){
-				console.log(activeObject.item(0), activeObject.item(1))
-				self.selectedObject.textTop = activeObject.item(0).text;
-				self.selectedObject.textBottom = activeObject.item(1).text;
-			}
 		};
 
 		self.deselectActiveObject = function() {

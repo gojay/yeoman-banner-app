@@ -33,9 +33,36 @@ angular.module('common.fabric.utilities', [])
 				cb();
 
 				return false;
-			}
+			} 
 		});
 	};
+
+	self.onControls = function(cb){
+		$(document).keydown(function(event) {
+			switch( event.which ){
+				// arrow left
+				case 37:
+					event.preventDefault();
+					cb.left();
+					break;
+				// arrow up
+				case 38:
+					event.preventDefault();
+					cb.up();
+					break;
+				// arrow right
+				case 39:
+					event.preventDefault();
+					cb.right();
+					break;
+				// arrow down
+				case 40:
+					event.preventDefault();
+					cb.down();
+					break;
+			}
+		});
+	}
 
 	return self;
 }])

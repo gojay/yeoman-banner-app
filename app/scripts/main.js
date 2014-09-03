@@ -12,6 +12,8 @@ require.config({
         'angular-bootstrap': '../bower_components/angular-bootstrap/ui-bootstrap-tpls.min',
         'angular-ui-utils': '../bower_components/angular-ui-utils/ui-utils.min',
         'angular-spinkit': '../bower_components/angular-spinkit/build/angular-spinkit.min',
+        'angular-file-upload': '../bower_components/ng-file-upload/angular-file-upload',
+        'angular-file-upload-shim': '../bower_components/ng-file-upload-shim/angular-file-upload-shim',
         // 'angular-snap': '../bower_components/angular-snap/angular-snap',
 
         'angular-slide-push': 'lib/slide-push/slide.and.push',
@@ -42,8 +44,9 @@ require.config({
         'fabricUtilities': 'lib/fabric/fabricUtilities',
         'fabricWindow': 'lib/fabric/fabricWindow'
     },
-    shim: {
+    shim: {        
         'angular': {
+            deps: ['angular-file-upload-shim'],
             'exports': 'angular'
         },
         'angular-route': ['angular'],
@@ -58,6 +61,8 @@ require.config({
         'angular-bootstrap': ['angular'],
         'angular-ui-utils': ['angular'],
         'angular-spinkit': ['angular'],
+        'angular-file-upload': ['angular'],
+        // 'angular-file-upload-shim': ['angular'],
         // 'angular-snap': ['angular', 'snap'],
 
         'angular-font-select': ['angular', 'webfontloader'],
@@ -101,6 +106,7 @@ window.name = 'NG_DEFER_BOOTSTRAP!';
 
 require([
     'jquery',
+    'angular-file-upload-shim',
     'angular',
     'app',
     'angular-route',
@@ -116,7 +122,7 @@ require([
     // 'angular-font-select',
     'angular-slide-push',
     'bootstrap'
-], function(jquery, angular, app, ngRoutes, ngCookies, ngSanitize, ngResource) {
+], function(jquery, angularFileUploadShim, angular, app) {
     'use strict';
     /* jshint ignore:start */
     var $html = angular.element(document.getElementsByTagName('html')[0]);

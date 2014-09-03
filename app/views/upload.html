@@ -1,0 +1,156 @@
+<style>
+
+input[type="file"] {	
+	width: 6.3em \0/IE9;
+	height: 1.5em;
+	margin: 5px;
+}
+
+input[multiple] {
+	width: 6.2em \0/IE9;
+}
+
+.sel-file {
+	padding: 1px 5px;
+	font-size: smaller;
+	color: grey;
+}
+
+.response {
+	padding-top: 30px;
+}
+
+.response>ul {
+	list-style-type: decimal;
+}
+
+.response li, .response .reqh {
+	color: blue;
+	font-size: smaller;
+	padding-bottom: 5px; 
+}
+
+.progress {
+	display: inline-block;
+	width: 100px;	
+	border: 3px groove #CCC;
+}
+
+.progress div {
+	font-size: smaller;
+	background: orange;
+	width: 0;
+}
+
+.drop-box {
+	background: #F8F8F8;
+	border: 5px dashed #DDD;
+	width: 200px;
+	height: 65px; 
+	text-align: center;
+	padding-top: 35px; 
+}
+
+.drop-box.dragover {
+	border: 5px dashed blue;
+}
+
+/* for IE*/
+.js-fileapi-wrapper {
+	display: inline-block;
+	vertical-align: middle;	
+}
+
+button {
+	padding: 1px 5px;
+	font-size: smaller;
+	margin: 0 3px; 
+}
+
+.ng-v {
+	float: right;
+}
+
+.sel-file img {
+	float: left;
+	width: 18px;
+	height: 18px;
+	padding-right: 10px;
+}
+
+.sub {
+	font-size: smaller;
+	color: #777;
+	padding-top: 5px;
+	padding-left: 10px;
+}
+
+.err {
+	font-size: 12px;
+	color: #C53F00;
+	margin: 15px;
+	padding: 15px;
+	background-color: #F0F0F0;
+	border: 1px solid black;
+}
+</style>
+<h1>Angular file upload Demo</h1>
+<h3>
+	Visit <a href="https://github.com/danialfarid/angular-file-upload">angular-file-upload</a> on github
+</h3>
+<div class="upload-div">
+	http method: <input type="radio" ng-model="httpMethod" value="POST"/>post <input type="radio" ng-model="httpMethod" value='PUT'/>put<br/>
+	<br/>
+	How to upload:<br/>
+	<label><input type="radio" name="howToSend" ng-model="howToSend" value="1" ng-init="howToSend = 1">Multupart/form-data upload using $upload.upload() service cross browser</label>
+	<br/>
+	<label><input type="radio" name="howToSend" ng-model="howToSend" value="2" ng-disabled="!dropSupported">File binary content with the file type as Content-Type header using $upload.http() service</label>
+	<div class="sub">The second option could be used to upload files to <a href="https://github.com/danialfarid/angular-file-upload/issues/88">CouchDB</a>, 
+		<a href="https://github.com/danialfarid/angular-file-upload/issues/87">imgur</a>, etc... for HTML5 FileReader browsers.<br/>
+	</div><br/>
+	myModel: <input type="text" ng-model="myModel"> model object to be sent with the file.<br/>
+	choose a single file: <input type="file" ng-file-select="onFileSelect($files)" onclick="this.value=null">
+	<br/>
+	or multiple files: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="file" ng-file-select="onFileSelect($files)" multiple onclick="this.value=null">
+	<br/>
+	<br/>
+	<div ng-show="dropSupported" class="drop-box" ng-file-drop="onFileSelect($files);" ng-file-drop-available="dropSupported=true">or drop files here</div>
+	<div ng-show="!dropSupported">HTML5 Drop File is not supported on this browser</div>
+	<br/>
+	<input type="checkbox" ng-model="uploadRightAway">Upload right away
+	<br/>
+	<div class="err" ng-show="errorMsg != null">{{errorMsg}}</div>
+	<br/>
+	Progress:
+	<br/>
+	<br/>
+	<div ng-show="selectedFiles != null">
+		<div class="sel-file" ng-repeat="f in selectedFiles">
+			{{($index + 1) + '.'}}
+			<img ng-show="dataUrls[$index]" ng-src="{{dataUrls[$index]}}">
+			<button class="button" ng-click="start($index)" ng-show="progress[$index] < 0">Start</button>
+			<span class="progress" ng-show="progress[$index] >= 0">						
+				<div style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>
+			</span>				
+			<button class="button" ng-click="abort($index)" ng-show="hasUploader($index) && progress[$index] < 100">Abort</button>
+			{{f.name}} - size: {{f.size}}B - type: {{f.type}}
+		</div>
+	</div>
+	<div class="response" ng-show="uploadResult.length > 0">
+		Server Response:
+		<ul>
+			<li ng-repeat="result in uploadResult">
+				<ul>
+					<li ng-repeat="item in result.result">
+						<div data-ng-show="item.name">file name: {{item.name}}</div>
+						<div data-ng-show="item.fieldName">name: {{item.fieldName}}</div>
+						<div data-ng-show="item.size">size on the serve: {{item.size}}</div>
+						<div data-ng-show="item.value">value: {{item.value}}</div>
+					</li>
+				</ul>
+				<div data-ng-show="result.requestHeaders" class="reqh">request headers: {{result.requestHeaders}}</div>
+			</li>
+		</ul>
+	</div>
+</div>
+<div style="position:fixed;bottom:10px;right:10px;font-size:smaller;color:#777">Last update: 2014-05-08</div>

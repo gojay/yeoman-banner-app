@@ -9,6 +9,8 @@ angular.module('common.fabric.directive', [
 			fabric: '='
 		},
 		controller: function($scope, $element) {
+			console.log('directive', $scope);
+			
 			FabricCanvas.setElement($element);
 			FabricCanvas.createCanvas();
 
