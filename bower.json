@@ -18,7 +18,6 @@
     "angular-animate": "~1.2.18",
     "bootstrap-flatly": "*",
     "raphael": "~2.1.2",
-    "raphael-svg-import-classic": "~0.2.1",
     "angular-spinkit": "~0.0.2",
     "ng-file-upload": "~1.6.5",
     "ng-file-upload-shim": "~1.6.5"

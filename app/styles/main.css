@@ -221,6 +221,9 @@ input[type="range"]::-webkit-slider-thumb {
 #settings .panel-primary > .panel-heading {
   background-color: #fff;
 }
+#settings .panel-primary .panel-body {
+  background-color: #ecf0f1;
+}
 #settings .panel-primary .panel-title {
   font-weight: bold;
   font-size:  18px;

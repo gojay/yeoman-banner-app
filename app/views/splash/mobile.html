@@ -114,7 +114,7 @@
 								</div>
 							</fieldset>
 							<fieldset>
-								<legend>Testimonials</legend>
+								<legend>Testimonial</legend>
 								<div class="form-group">
 									<label for="testimoni-left" class="col-md-6 control-label">Photo Left</label>
 									<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -141,13 +141,6 @@
 									</div>
 								</div>
 							</fieldset>
-
-							<div class="form-group">
-								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-									<button class="btn btn-sm btn-block btn-primary"><i class="fa fa-gear"></i> Generate</button>
-									<button class="btn btn-sm btn-block btn-success"><i class="fa fa-download"></i> Download</button>
-								</div>
-							</div>
 						</div>
 					</div>
 		        </accordion-group>
@@ -294,6 +287,11 @@
 					</div>
 		        </accordion-group>
 		    </accordion>
+
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<button class="btn btn-sm btn-block btn-primary"><i class="fa fa-gear"></i> Generate</button>
+				<button class="btn btn-sm btn-block btn-success"><i class="fa fa-download"></i> Download</button>
+			</div>
 		</aside>
 		<section id="editor" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
 			<div class='row' style="text-align:center">
@@ -301,32 +299,34 @@
                     <i class='fa fa-search-minus pull-left'></i>
                 </div>
                 <div class='col-xs-9'>
-                    <input type='range' class='pull-left' min='.1' max='3' step='.1' ng-change='fabric.setZoom()' ng-model='fabric.canvasScale' />
+                    <input type='range' class='pull-left' min='.1' max='1' step='.1' ng-change='fabric.setZoom()' ng-model='fabric.canvasScale' />
                 </div>
                 <div class='col-xs-1 text-center'>
                     <i class='fa fa-search-plus'></i>
                 </div>
 			</div>
 
-			<div class="row" ng-if="fabric.getObjects().length > 0">
+			<div class="row margin-top-bottom" ng-if="fabric.getObjects().length > 0">
 			    <div class="col-md-9" id="objects">
-			        <button class="btn btn-small span3" ng-repeat="object in fabric.getObjects()" ng-click="fabric.setActiveObject(object)" ng-class="{'btn-primary': object.active, 'btn-default': !object.active}">
-			            <i ng-if="object.type == 'text' || object.type == 'i-text'" class="icon-font"></i>
-			            <i ng-if="object.type == 'image'" class="icon-picture"></i>
-			            <i ng-if="object.type == 'group'" class="icon-group"></i>
-			            <i ng-if="object.type == 'path-group'" class="icon-star"></i>
-			            <i ng-if="object.type == 'circle'" class="icon-circle"></i>
-			            <i ng-if="object.type == 'rect'" class="icon-square"></i>
-			            {{ object.name ? object.name : object.id }}
-			        </button>
+			 		<div class="field-top col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-repeat="object in fabric.getObjects()">
+				        <button class="btn btn-sm btn-block" ng-click="fabric.setActiveObject(object)" ng-class="{'btn-primary': object.active, 'btn-default': !object.active}">
+				            <i ng-if="object.type == 'text' || object.type == 'i-text'" class="fa fa-font"></i>
+				            <i ng-if="object.type == 'image'" class="fa fa-image"></i>
+				            <i ng-if="object.type == 'group'" class="fa fa-group"></i>
+				            <i ng-if="object.type == 'path-group'" class="fa fa-star"></i>
+				            <i ng-if="object.type == 'circle'" class="fa fa-circle"></i>
+				            <i ng-if="object.type == 'rect'" class="fa fa-square"></i>
+				            {{ object.name ? object.name : object.id }}
+				        </button>
+			 		</div>
 			    </div>
 			    <div class="col-md-3" ng-show="fabric.selectedObject">
-			        <button class="btn" ng-click="fabric.deactivateAll()">Deselect Object</button>
+			        <button class="btn btn-sm" ng-click="fabric.deactivateAll()">Deselect Object</button>
 			    </div>
 			</div>
 			<div class='image-builder margin-top-bottom' parent-click="fabric.deactivateAll()">
 			    <div id="canvas-mobile" class='fabric-container'>
-			        <canvas fabric="$parent.fabric"></canvas>
+			        <canvas fabric="fabric"></canvas>
 			        <div id="qrcode"></div>
 			    </div>
 			</div>

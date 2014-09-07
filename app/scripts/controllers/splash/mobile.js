@@ -82,7 +82,6 @@ define([
 			// Init
 			// ================================================================
 			$scope.init = function() {
-				alert('canvas:created')
 				$scope.fabric = new Fabric({
 					JSONExportProperties: FabricConstants.JSONExportProperties,
 					textDefaults: FabricConstants.textDefaults,
@@ -173,88 +172,86 @@ define([
 						}
 					}
 
-					// A4 200/300 PPI : peoples, QR Images
-					if( type == 'a4' ){
-						var ss = CustomAttributes[ppi]['ss'];
-						var qr = CustomAttributes[ppi]['qr'];
-						var textAttribute = CustomAttributes[ppi]['text'];
-						var text = 'Lorem ipsum dolor sit amet\nlorem ipsum dolor\namet consectetur\n\nYour Name'
+					var ss = CustomAttributes[ppi]['ss'];
+					var qr = CustomAttributes[ppi]['qr'];
+					var textAttribute = CustomAttributes[ppi]['text'];
+					var text = 'Lorem ipsum dolor sit amet\nlorem ipsum dolor\namet consectetur\n\nYour Name'
 
-						var rect = new fabric.Rect({
-							name  : 'screenshot',
-						  	width : ss.width,
-						  	height: ss.height,
-						  	left  : ss.left,
-						  	top   : ss.top,
-						  	fill  : "#"+((1<<24)*Math.random()|0).toString(16)
-						});
-						self.addObjectToCanvas(rect, true);
+					var rect = new fabric.Rect({
+						name  : 'screenshot',
+					  	width : ss.width,
+					  	height: ss.height,
+					  	left  : ss.left,
+					  	top   : ss.top,
+					  	fill  : "#"+((1<<24)*Math.random()|0).toString(16)
+					});
+					self.addObjectToCanvas(rect, true);
 
-						// $scope.fabric.addImage('images/'+ ss.width +'x'+ ss.height +'.jpg', function(object){
-						// 	object.set({
-						// 		left  : ss.left,
-						//   		top   : ss.top,
-						// 	})
-						// });
+					// $scope.fabric.addImage('images/'+ ss.width +'x'+ ss.height +'.jpg', function(object){
+					// 	object.set({
+					// 		left  : ss.left,
+					//   		top   : ss.top,
+					// 	})
+					// });
 
-						// add text name app
-						$scope.fabric.addText('Name of App', function(object){
-							var attribute = textAttribute['app'];
-							object.set({
-								name: 'app-name',
-								fill: '#434343',
-								stroke: '#434343',
-								fontSize: attribute.size,
-								left: attribute.left,
-								top: attribute.top,
-								textAlign: 'center',
-							});
+					// add text name app
+					$scope.fabric.addText('Name of App', function(object){
+						var attribute = textAttribute['app'];
+						object.set({
+							name: 'app-name',
+							fill: '#434343',
+							stroke: '#434343',
+							fontSize: attribute.size,
+							left: attribute.left,
+							top: attribute.top,
+							textAlign: 'center',
 						});
-						// add qr images
-						var qrIphone = qr['iphone'];
-						$scope.fabric.addImage('images/'+ qrIphone.width +'x'+ qrIphone.height +'.jpg', function(object){
-							callback( object, 'qr-iphone', 'qr', 'iphone' );
-						});
-						var qrAndroid = qr['android'];
-						$scope.fabric.addImage('images/'+ qrAndroid.width +'x'+ qrAndroid.height +'.jpg', function(object){
-							callback( object, 'qr-android', 'qr', 'android' );
-						});
+					});
+					// add qr images
+					var qrIphone = qr['iphone'];
+					$scope.fabric.addImage('images/'+ qrIphone.width +'x'+ qrIphone.height +'.jpg', function(object){
+						callback( object, 'qr-iphone', 'qr', 'iphone' );
+					});
+					var qrAndroid = qr['android'];
+					$scope.fabric.addImage('images/'+ qrAndroid.width +'x'+ qrAndroid.height +'.jpg', function(object){
+						callback( object, 'qr-android', 'qr', 'android' );
+					});
 
-						// add testimoni pic n text Left
-						$scope.fabric.addImage('images/avatar.jpg', function(object){
-							callback( object, 'testimoni-pic-left', 'people', 'left' );
+					// add testimoni pic n text Left
+					$scope.fabric.addImage('images/avatar.jpg', function(object){
+						callback( object, 'testimoni-pic-left', 'people', 'left' );
+					});
+					$scope.fabric.addIText(text, function(object){
+						var attribute = textAttribute['people']['left'];
+						object.set({
+							name: 'testimoni-text-left',
+							fill: '#313131',
+							stroke: '#313131',
+							fontSize: attribute.size,
+							left: attribute.left,
+							top: attribute.top,
+							// textAlign: 'right',
+							opacity: 0.5
 						});
-						$scope.fabric.addIText(text, function(object){
-							var attribute = textAttribute['people']['left'];
-							object.set({
-								name: 'testimoni-text-left',
-								fill: '#313131',
-								stroke: '#313131',
-								fontSize: attribute.size,
-								left: attribute.left,
-								top: attribute.top,
-								// textAlign: 'right',
-								opacity: 0.5
-							});
+					});
+					// add testimoni pic n text Right
+					$scope.fabric.addImage('images/avatar2.jpg', function(object){
+						callback( object, 'testimoni-pic-right', 'people', 'right' );
+					});
+					$scope.fabric.addIText(text, function(object){
+						var attribute = textAttribute['people']['right'];
+						object.set({
+							name: 'testimoni-text-right',
+							fill: '#313131',
+							stroke: '#313131',
+							fontSize: attribute.size,
+							left: attribute.left,
+							top: attribute.top,
+							// textAlign: 'right',
+							opacity: 0.5
 						});
-						// add testimoni pic n text Right
-						$scope.fabric.addImage('images/avatar2.jpg', function(object){
-							callback( object, 'testimoni-pic-right', 'people', 'right' );
-						});
-						$scope.fabric.addIText(text, function(object){
-							var attribute = textAttribute['people']['right'];
-							object.set({
-								name: 'testimoni-text-right',
-								fill: '#313131',
-								stroke: '#313131',
-								fontSize: attribute.size,
-								left: attribute.left,
-								top: attribute.top,
-								// textAlign: 'right',
-								opacity: 0.5
-							});
-						});
-					}
+					});
+					
 				}
 			}
 

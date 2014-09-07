@@ -24,14 +24,14 @@ require.config({
         'jquery': '../bower_components/jquery/dist/jquery.min',
         'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
         // 'snap': 'lib/snap.min',
-        'qrcode' : 'lib/jquery.qrcode.min',
+        'qrcode': 'lib/jquery.qrcode.min',
 
         'raphael': 'lib/raphael/raphael',
         'raphael-group': 'lib/raphael/raphael.group',
         'raphael-filter': 'lib/raphael/fraphael',
         'raphael-transform': 'lib/raphael/raphael.transform',
         'raphael-json': 'lib/raphael/raphael.json',
-        'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min',
+        // 'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min',
 
         'fabric': 'lib/fabric/fabric',
         'fabricUtils': 'lib/fabric/utils',
@@ -44,7 +44,7 @@ require.config({
         'fabricUtilities': 'lib/fabric/fabricUtilities',
         'fabricWindow': 'lib/fabric/fabricWindow'
     },
-    shim: {        
+    shim: {
         'angular': {
             deps: ['angular-file-upload-shim'],
             'exports': 'angular'
@@ -83,7 +83,7 @@ require.config({
         'raphael-filter': ['raphael'],
         'raphael-transform': ['raphael'],
         'raphael-json': ['raphael'],
-        'raphael-svg-import': ['raphael'],
+        // 'raphael-svg-import': ['raphael'],
 
         'fabric': ['jquery'],
         'fabricUtils': ['fabric'],
