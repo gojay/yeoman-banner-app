@@ -18,7 +18,7 @@ define(['angular', 'angular-font-select', 'raphael', 'raphael-filter', 'raphael-
                     template: '<div style="padding-top: 60px;"><ul class="list-group"><li class="list-group-item" ng-repeat="item in menus.left.model">{{item}}</li></ul></div>'
                 };
 
-                $scope.banner = Banner.dummy();
+                $scope.banner = Banner.dummy;
 
                 /**
                  * convert SVG to Image

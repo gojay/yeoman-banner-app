@@ -19,20 +19,29 @@ define(['angular'], function(angular) {
                     modal: true
                 }],
 
-                'Mobile': [{
-                    title: 'Splash Screen & Backgrounds',
-                    link: 'splash'
+                'Poster': [{
+                    title: 'Mobile',
+                    link: 'splash/mobile'
+                }, { 
+                    title: 'Facebook',
+                    link: 'splash/facebook'
+                }, {
+                    title: 'Custom',
+                    link: 'splash/custom'
                 }],
 
-                'SVG': [{
+                'SVG & Modules': [{
                     title: 'RaphaelJS',
-                    link: 'raphael'
+                    link: 'svg/raphael'
                 }, {
                     title: 'FabricJS',
-                    link: 'fabric'
+                    link: 'svg/fabric'
                 }, {
                     title: 'FabricJS 2',
-                    link: 'fabric2'
+                    link: 'svg/fabric2'
+                }, {
+                    title: 'ng-file-upload',
+                    link: 'module/ng-file-upload'
                 }]
             };
 

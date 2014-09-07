@@ -3,14 +3,15 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<ol class="breadcrumb bg-white">
 			  <li><a href="#" class="text-primary">Home</a></li>
-			  <li><a href="#" class="text-primary" disabled>Facebook Template</a></li>
-			  <li class="text-primary active">Empty Prize</li>
+			  <li><a href="#" class="text-primary" disabled>Facebook</a></li>
+			  <li class="text-primary active">{{banner.prize.text}}</li>
 			</ol>
 			<hr>
 		</div>
 	</div>
 	<div class="row">
-		<aside class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+		<aside id="setting-template" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+			<!-- templates -->
 			<div id="templates" ng-class="animation.templates" ng-hide="showEditor">
 				<h4 style="margin-left:15px">Default Templates</h4>
 				<div class="tabbable tabs-left">
@@ -25,16 +26,19 @@
 					</ul>
 				</div>
 			</div>
+			<!-- button -->
 			<button type="button" class="btn btn-sm btn-block"
+				style="{{ showEditor ? 'margin-top:15px' : '' }}" 
 				ng-class="showEditor ? 'btn-primary' : 'btn-success' "
 				ng-click="showEditor = !showEditor">
 				<i ng-class="showEditor ? 'fa fa-bars' : 'fa fa-gear' "></i> 
 				{{ showEditor? 'Templates' : 'Settings' }}
 			</button>
+			<!-- settings -->
 			<div id="settings" class="margin-top-bottom" ng-class="animation.settings" ng-hide="!showEditor">
-				<accordion close-others="settings.oneAtATime">
+				<accordion close-others="accordion.closeOthers">
 					<!-- Background -->
-			        <accordion-group heading="Background" is-open="settings.isFirstOpen" class="panel-primary">
+			        <accordion-group heading="Background" is-open="accordion.isFirstOpen" class="panel-primary">
 					   	<div class="form-horizontal">
 						    <div class="form-group">
 						      	<label for="inputLogo" class="col-md-4">Type</label>
@@ -148,8 +152,13 @@
 					    		<div class="col-md-7"><button class="btn btn-primary btn-sm">Select an image</button></div>
 					    	</div>
 					    	<div class="form-group">
-					    		<label class="col-md-5 control-label">Position ({{banner.prize.position}})</label>
-					    		<div class="col-md-7"><input type="range" min="0" max="10" ng-model="banner.prize.position"></div>
+					    		<label class="col-md-4 control-label">Position</label>
+					    		<div class="col-md-4">
+					    			<input type="range" min="0" max="10" step="1" ng-model="banner.prize.position" class="form-control input-sm">
+					    		</div>
+					    		<div class="col-md-4">
+					    			<input type="number" min="0" max="10" step="1" ng-model="banner.prize.position" class="form-control input-sm">
+					    		</div>
 					    	</div>
 					    </div>
 			        </accordion-group>
@@ -181,16 +190,32 @@
 			    </div>
 			</div>
 		</aside>
-		<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
-			<div class="tab-content text-center" style="margin-top: 60px;">
-	         	<div class="tab-pane active" id="empty-prize"><img src="http://placehold.it/810x381&text=Template+Empty+Prize"></div>
-	         	<div class="tab-pane" id="1-1prize"><img src="http://placehold.it/810x381&text=Template+1-1+Prize"></div>
-	         	<div class="tab-pane" id="1-2prizes"><img src="http://placehold.it/810x381&text=Template+1-2+Prizes"></div>
-	         	<div class="tab-pane" id="1-2prizes"><img src="http://placehold.it/810x381&text=Template+1-3+Prizes"></div>
-	         	<div class="tab-pane" id="2-1prize"><img src="http://placehold.it/810x381&text=Template+2-1+Prize"></div>
-	         	<div class="tab-pane" id="2-1prizes"><img src="http://placehold.it/810x381&text=Template+2-2+Prizes"></div>
-	         	<div class="tab-pane" id="2-3prizes"><img src="http://placehold.it/810x381&text=Template+2-3+Prize"></div>
+		<section id="editor" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+			<h3 style="text-align:center; margin:10px auto 15px; {{ showEditor ? 'visibility:visible' : 'visibility:hidden'}}">{{ banner.prize.text }}</h3>
+			<div class="tab-content text-center">
+	         	<div class="tab-pane active" id="empty-prize">
+				    <img src="http://placehold.it/810x381&text=Template+Empty+Prize">
+				</div>
+				<div class="tab-pane" id="1-1prize">
+				    <img src="http://placehold.it/810x381&text=Template+1-1+Prize">
+				</div>
+				<div class="tab-pane" id="1-2prizes">
+				    <img src="http://placehold.it/810x381&text=Template+1-2+Prizes">
+				</div>
+				<div class="tab-pane" id="1-2prizes">
+				    <img src="http://placehold.it/810x381&text=Template+1-3+Prizes">
+				</div>
+				<div class="tab-pane" id="2-1prize">
+				    <img src="http://placehold.it/810x381&text=Template+2-1+Prize">
+				</div>
+				<div class="tab-pane" id="2-1prizes">
+				    <img src="http://placehold.it/810x381&text=Template+2-2+Prizes">
+				</div>
+				<div class="tab-pane" id="2-3prizes">
+				    <img src="http://placehold.it/810x381&text=Template+2-3+Prize">
+				</div>
+
 	        </div>
-		</div>
+		</section>
 	</div>
 </div>

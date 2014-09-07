@@ -1,9 +1,9 @@
 	<div class="row">
 		<div class="col-lg-9">
-			<banner-creator id="canvas-1" ng-model="banner" ng-show="banner.selected == 0"></banner-creator>
-			<banner-creator id="canvas-2" ng-model="banner" tpl="1" ng-show="banner.selected == 1"></banner-creator>
-			<banner-creator id="canvas-3" ng-model="banner" tpl="2" ng-show="banner.selected == 2"></banner-creator>
-			<banner-creator id="canvas-4" ng-model="banner" tpl="3" ng-show="banner.selected == 3"></banner-creator>
+			<banner-creator id="canvas-1" banner="banner" ng-show="banner.selected == 0"></banner-creator>
+			<banner-creator id="canvas-2" banner="banner" tpl="1" ng-show="banner.selected == 1"></banner-creator>
+			<banner-creator id="canvas-3" banner="banner" tpl="2" ng-show="banner.selected == 2"></banner-creator>
+			<banner-creator id="canvas-4" banner="banner" tpl="3" ng-show="banner.selected == 3"></banner-creator>
 
 			<div style="margin: 10px 0; text-align:center; border: 1px solid">
 				<img ng-src="{{banner.imgPreview}}" alt="">

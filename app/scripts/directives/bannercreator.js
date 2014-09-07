@@ -7,7 +7,7 @@ define(['angular', 'angular-font-select'], function(angular) {
                 template: '<div style="margin:5px 0;padding:5px;text-align:center;border:1px solid"></div>',
                 restrict: 'E',
                 scope: {
-                    banner: '=ngModel'
+                    banner: '='
                 },
                 replace: true,
                 controller: ['$scope', '$attrs', '$rootScope', '$timeout',

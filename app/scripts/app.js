@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator', 'controllers/fabric', 'controllers/fabric2', 'controllers/upload'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -8,13 +8,16 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.controllers.BannerCtrl',
             'bannerAppApp.controllers.ConversationCtrl',
             'bannerAppApp.controllers.RaphaelCtrl',
+            'bannerAppApp.controllers.FabricCtrl',
+            'bannerAppApp.controllers.Fabric2Ctrl',
+            'bannerAppApp.controllers.UploadCtrl',
+            'bannerAppApp.controllers.SplashMobileCtrl',
+            'bannerAppApp.controllers.SplashFacebookCtrl',
+            'bannerAppApp.controllers.SplashCustomCtrl',
             'bannerAppApp.filters.Comatonewline',
             'bannerAppApp.filters.Splitintolines',
             'bannerAppApp.services.Banner',
             'bannerAppApp.directives.Bannercreator',
-            'bannerAppApp.controllers.FabricCtrl',
-            'bannerAppApp.controllers.Fabric2Ctrl',
-            'bannerAppApp.controllers.UploadCtrl',
             /*angJSDeps*/
             'ngCookies',
             'ngResource',
@@ -71,6 +74,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     templateUrl: 'views/bootstrap.html',
                     controller: 'BootstrapCtrl'
                 })
+                /* facebook */
                 .when('/facebook/banner', {
                     templateUrl: 'views/banner.html',
                     controller: 'BannerCtrl'
@@ -79,12 +83,26 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     templateUrl: 'views/conversation.html',
                     controller: 'ConversationCtrl'
                 })
-                .when('/raphael', {
+                /* splash/poster */
+                .when('/splash/mobile', {
+                  templateUrl: 'views/splash/mobile.html',
+                  controller: 'SplashMobileCtrl'
+                })
+                .when('/splash/facebook', {
+                  templateUrl: 'views/splash/facebook.html',
+                  controller: 'SplashFacebookCtrl'
+                })
+                .when('/splash/custom', {
+                  templateUrl: 'views/splash/custom.html',
+                  controller: 'SplashCustomCtrl'
+                })
+                .when('/svg/raphael', {
                     templateUrl: 'views/raphael.html',
                     controller: 'RaphaelCtrl',
                     resolve: {
                         delay: function($q, $timeout, $rootScope) {
                             console.log('delay');
+                            
                             $rootScope.isLoading = true;
                             var delay = $q.defer();
                             $timeout(function() {
@@ -95,15 +113,15 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         }
                     }
                 })
-                .when('/fabric', {
+                .when('/svg/fabric', {
                     templateUrl: 'views/fabric.html',
                     controller: 'FabricCtrl'
                 })
-                .when('/fabric2', {
+                .when('/svg/fabric2', {
                   templateUrl: 'views/fabric2.html',
                   controller: 'Fabric2Ctrl'
                 })
-                .when('/upload', {
+                .when('/module/ng-file-upload', {
                   templateUrl: 'views/upload.html',
                   controller: 'UploadCtrl'
                 })

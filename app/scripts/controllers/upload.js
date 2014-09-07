@@ -8,14 +8,13 @@ define(['angular', 'angular-file-upload'], function (angular) {
     	'$timeout', 
     	'$upload', 
     function ($scope, $http, $timeout, $upload) {
+    	// var uploadURL = 'http://angular-file-upload-cors-srv.appspot.com/upload';
+    	var uploadURL = 'http://api.local/banner/upload-test';
+    	
      	$scope.fileReaderSupported = window.FileReader != null;
 		$scope.uploadRightAway = true;
 		$scope.httpMethod = 'POST';
-		// $scope.changeAngularVersion = function() {
-		// 	window.location.hash = $scope.angularVersion;
-		// 	window.location.reload(true);
-		// };
-		// $scope.angularVersion = window.location.hash.length > 1 ? window.location.hash.substring(1) : '1.2.0';
+
 		$scope.hasUploader = function(index) {
 			return $scope.upload[index] != null;
 		};
@@ -63,10 +62,9 @@ define(['angular', 'angular-file-upload'], function (angular) {
 			$scope.errorMsg = null;
 			if ($scope.howToSend == 1) {
 				$scope.upload[index] = $upload.upload({
-					// url : 'http://angular-file-upload-cors-srv.appspot.com/upload',
-					url : 'http://dev.angularjs/_learn_/require-angular-banner-creator/api/upload-test',
-					method: 'POST',
-					headers: {'AuthToken': 'my-auth-token'},
+					url : uploadURL,
+					method: $scope.httpMethod,
+					headers: {'X-Auth-Token': 'my-auth-token'},
 					data : {
 						myModel : $scope.myModel
 					},
@@ -101,7 +99,7 @@ define(['angular', 'angular-file-upload'], function (angular) {
 				var fileReader = new FileReader();
 	            fileReader.onload = function(e) {
 			        $scope.upload[index] = $upload.http({
-					url : 'http://dev.angularjs/_learn_/require-angular-banner-creator/api/upload-test',
+					url : uploadURL,
 						headers: {'Content-Type': $scope.selectedFiles[index].type},
 						data: e.target.result
 			        }).then(function(response) {

@@ -5,8 +5,7 @@ define(['angular'], function(angular) {
     angular.module('bannerAppApp.services.Banner', [])
         .service('Banner', function Banner() {
             // AngularJS will instantiate a singleton by calling "new" on this function
-            this.dummy = function() {
-                return {
+            this.dummy = {
                     dimension: [
                         // 0
                         {
@@ -457,7 +456,6 @@ define(['angular'], function(angular) {
                     selectedEl: null,
                     onEdit: false,
                     draw: null
-                }
-            }
+            };
         });
 });

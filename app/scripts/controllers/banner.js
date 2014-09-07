@@ -2,7 +2,9 @@ define(['angular'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.BannerCtrl', [])
-    .controller('BannerCtrl', function ($scope) {
+    .controller('BannerCtrl', ['$scope', 'Banner', function ($scope,Banner) {
+
+    	console.log('Banner', Banner.dummy)
 
 		$scope.banner = {
 			background: {
@@ -27,6 +29,7 @@ define(['angular'], function (angular) {
 				]
 			},
 			prize: {
+				text: 'Template Empty Prize',
 				selected: 0,
 				position: 5
 			}
@@ -39,12 +42,14 @@ define(['angular'], function (angular) {
 			    $(this).tab('show');
 			}).on('shown.bs.tab', function (e) {
 				var prize = $(e.target).data('prize');
+
 			  	console.log('prize', prize) // activated tab
 			  	console.log('shown', e) // activated tab
 			  	console.log('active', e.target) // activated tab
 			  	console.log('previous', e.relatedTarget) // previous tab
-
+			  	$scope.banner.prize.text = e.target.text;
 			  	$scope.banner.prize.selected = prize;
+			  	$scope.$apply();
 			});
 
 		$scope.showEditor = false;
@@ -52,8 +57,8 @@ define(['angular'], function (angular) {
 			templates: 'bouncy-slide-down',
 			settings: 'bouncy-slide-down'
 		};
-		$scope.settings = {
-			oneAtATime: true,
+		$scope.accordion = {
+			closeOthers : true,
 			isFirstOpen: true
 		};
 
@@ -64,5 +69,5 @@ define(['angular'], function (angular) {
 			$scope.banner.badge.selected = index;
 		};
 
-    });
+    }]);
 });
