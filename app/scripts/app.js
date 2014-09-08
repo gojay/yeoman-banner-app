@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'filters/comatonewline', 'filters/splitintolines', 'services/banner', 'directives/bannercreator'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'filters/comatonewline', 'filters/splitintolines', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -16,13 +16,17 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.controllers.SplashCustomCtrl',
             'bannerAppApp.filters.Comatonewline',
             'bannerAppApp.filters.Splitintolines',
-            'bannerAppApp.services.Banner',
+            'bannerAppApp.directives.Uploadimage',
             'bannerAppApp.directives.Bannercreator',
-            /*angJSDeps*/
+            'bannerAppApp.services.AuthResource',
+            'bannerAppApp.services.Banner',
+            'bannerAppApp.services.Postermobile',
+/*angJSDeps*/
+            'ngRoute',
             'ngCookies',
             'ngResource',
+            'http-auth-interceptor',
             'ngSanitize',
-            'ngRoute',
             'angularFileUpload',
 
             'ngAnimate',
@@ -85,7 +89,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 })
                 /* splash/poster */
                 .when('/splash/mobile', {
-                  templateUrl: 'views/splash/mobile.html',
+                  templateUrl: 'views/mobile.html',
                   controller: 'SplashMobileCtrl'
                 })
                 .when('/splash/facebook', {

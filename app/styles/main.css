@@ -7,6 +7,7 @@
   padding-right: 0;
 }
 
+.margin-top { margin-top: 20px; }
 .margin-top-bottom {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -267,9 +268,9 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .spinkit {
-  position:absolute; 
+  position:fixed; 
   z-index:1;
-  top: 25%;
+  top: 30%;
 }
 .bg-loading {
   opacity: .3;
@@ -281,3 +282,11 @@ input[type="range"]::-webkit-slider-thumb {
   border-right: 1px solid #BCBFBF;
 }
 
+.err {
+  font-size: 12px;
+  color: #C53F00;
+  margin: 15px;
+  padding: 15px;
+  background-color: #F0F0F0;
+  border: 1px solid black;
+}

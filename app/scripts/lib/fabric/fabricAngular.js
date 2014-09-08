@@ -40,7 +40,7 @@ angular.module('common.fabric', [
 				selection: false
 			},
 
-			presetSize: {},
+			presetSize: null,
 			maxBounding: {
 				left: 0,
 				top: 0
@@ -233,8 +233,19 @@ angular.module('common.fabric', [
 		};
 		self.setActiveObject = function(object){
 			canvas.setActiveObject(object);
+		};
+		self.setActiveObjectByName = function(name){
+			self.deactivateAll();
 
-			console.log('Objects', self.getObjects())
+			var object = self.getObjectByName(name);
+			if( !object ) return;
+
+			self.setActiveObject(object);
+		};
+		self.getTextObjectByName = function(name){
+			var object = self.getObjectByName(name);
+			if( !object ) return;
+			return object.text;
 		};
 
 		//

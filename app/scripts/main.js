@@ -6,6 +6,7 @@ require.config({
         'angular-cookies': '../bower_components/angular-cookies/angular-cookies.min',
         'angular-sanitize': '../bower_components/angular-sanitize/angular-sanitize.min',
         'angular-resource': '../bower_components/angular-resource/angular-resource.min',
+        'angular-http-auth': '../bower_components/angular-http-auth/src/http-auth-interceptor',
         'angular-mocks': '../bower_components/angular-mocks/angular-mocks.min',
 
         'angular-animate': '../bower_components/angular-animate/angular-animate.min',
@@ -53,6 +54,7 @@ require.config({
         'angular-cookies': ['angular'],
         'angular-sanitize': ['angular'],
         'angular-resource': ['angular'],
+        'angular-http-auth': ['angular'],
         'angular-mocks': {
             deps: ['angular'],
             'exports': 'angular.mock'
@@ -103,6 +105,7 @@ require.config({
 
 //http://code.angularjs.org/1.2.1/docs/guide/bootstrap#overview_deferred-bootstrap
 window.name = 'NG_DEFER_BOOTSTRAP!';
+window.apiURL = 'http://dev.angularjs/_learn_/require-angular-banner-creator';
 
 require([
     'jquery',
@@ -111,6 +114,7 @@ require([
     'app',
     'angular-route',
     'angular-cookies',
+    'angular-http-auth',
     'angular-sanitize',
     'angular-resource',
     'angular-bootstrap',
