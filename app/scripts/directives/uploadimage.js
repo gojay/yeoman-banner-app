@@ -5,25 +5,28 @@ define(['angular', 'angular-file-upload'], function(angular) {
         .directive('uploadImage', function() {
             return {
                 scope: {
-                    text : '=uploadImageText',
-                    image: '=ngModel'
+                    image: '=ngModel',
+                    uploadOptions: '=uploadImageOptions'
                 },
                 template: '<div>' +
-                    '<button class="btn btn-sm" ng-click="click()">{{ text }}</button>' +
-                    '<input type="file" ng-file-select="onFileSelect($files)" onclick="this.value=null" multiple style="display:none" />' +
-                    '<div ng-show="selectedFiles != null">' +
-                        '<div ng-repeat="f in selectedFiles" style="margin-top:5px">' +
-                            '{{f.name}}'+
-                            '<a title="abort" style="cursor:pointer; color:#333" ng-if="hasUploader($index) && progress[$index] < 100" ng-click="abort($index)">'+
-                                '<i  class="fa fa-times"></i>'+
-                            '</a>'+
-                            '<i ng-if="progress[$index] == 100" class="fa fa-check"></i>'+
-                            '<div class="progress progress-striped actived" ng-show="progress[$index] >= 0" style="height:21px">' +
-                                '<div class="progress-bar progress-bar-info" style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>' +
-                            '</div>' +
-                            '<div class="err" ng-show="errorMsg != null">{{errorMsg}}</div>' +
-                        '</div>' +
-                    '</div>' +
+                    '<button class="btn btn-sm">'+
+                        '<span ng-show="loadingProgress > 0"><i class="fa fa-circle-o-notch fa-spin"></i> Uploading {{loadingProgress}}%</span>'+
+                        '<span ng-show="loadingProgress == 0">{{ text }}</span>'+
+                    '</button>' +
+                    '<input type="file" ng-file-select="onFileSelect($files)" onclick="this.value=null" style="display:none" />' +
+                    // '<div ng-show="selectedFiles != null">' +
+                    //     '<div ng-repeat="f in selectedFiles" style="margin-top:5px">' +
+                    //         '{{f.name}}'+
+                    //         '<a title="abort" style="cursor:pointer; color:#333" ng-if="hasUploader($index) && progress[$index] < 100" ng-click="abort($index)">'+
+                    //             '<i  class="fa fa-times"></i>'+
+                    //         '</a>'+
+                    //         '<i ng-if="progress[$index] == 100" class="fa fa-check"></i>'+
+                    //         '<div class="progress progress-striped actived" ng-show="progress[$index] >= 0" style="height:21px">' +
+                    //             '<div class="progress-bar progress-bar-info" style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>' +
+                    //         '</div>' +
+                    //         '<div class="err" ng-show="errorMsg != null">{{errorMsg}}</div>' +
+                    //     '</div>' +
+                    // '</div>' +
                 '</div>',
                 restrict: 'E',
                 replace: true,
@@ -32,9 +35,12 @@ define(['angular', 'angular-file-upload'], function(angular) {
 
                         var uploadURL = window.apiURL + '/api/upload-test';
 
+                        if( angular.isUndefined($scope.uploadOptions) ) $scope.uploadOptions = { headers:{}, data:{} };
+
                         $scope.howToSend = 1;
                         $scope.fileReaderSupported = window.FileReader != null;
-                        // $scope.uploadRightAway = true;
+                        $scope.uploadRightAway = true;
+                        $scope.loadingProgress = 0;
 
                         $scope.hasUploader = function(index) {
                             return $scope.upload[index] != null;
@@ -72,9 +78,9 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                     }(fileReader, i);
                                 }
                                 $scope.progress[i] = -1;
-                                // if ($scope.uploadRightAway) {
+                                if ($scope.uploadRightAway) {
                                     $scope.start(i);
-                                // }
+                                }
                             }
                         };
 
@@ -85,18 +91,21 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                 $scope.upload[index] = $upload.upload({
                                     url: uploadURL,
                                     method: 'POST',
-                                    // headers: {
-                                    //     'X-Auth-Token': 'my-auth-token'
-                                    // },
-                                    data: {
-                                        // myModel: $scope.myModel
-                                    },
+                                    headers: $scope.uploadOptions.headers,
+                                    data: $scope.uploadOptions.data,
                                     file: $scope.selectedFiles[index],
-                                    fileFormDataName: 'myFile'
+                                    fileFormDataName: 'file'
                                 }).then(function(response) {
+                                    console.log('response', response);
+
+                                    $scope.upload[index] = null;
+                                    $scope.loadingProgress = 0;
                                     $scope.uploadResult.push(response.data);
-                                    $scope.text  = 'Change Image'; 
-                                    $scope.image = response.data;
+                                    // $scope.text  = 'Change Image'; 
+                                    if( angular.isArray($scope.image) )
+                                        $scope.image.push(response.data.image);
+                                    else
+                                        $scope.image = response.data;
                                 }, function(response) {
                                     if (response.status > 0) {
                                         $scope.errorMsg = response.status + ': ' + JSON.stringify(response.data);
@@ -104,7 +113,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                     }
                                 }, function(evt) {
                                     // Math.min is to fix IE which reports 200% sometimes
-                                    $scope.progress[index] = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                                    $scope.progress[index] = $scope.loadingProgress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
                                 });
 
                                 // $scope.upload[index].xhr(function(xhr){
@@ -145,7 +154,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                     var multiple = ( angular.isDefined(attrs.multiple) && attrs.multiple === "true" );
                     input.prop('multiple', multiple);
 
-                    scope.click = function(){ input.click() };
+                    button.unbind('click').bind('click', function(){ input.trigger('click') });
                 }
             };
         });

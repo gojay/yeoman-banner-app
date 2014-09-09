@@ -39,22 +39,6 @@ define([
 				fontIsOpen: false
 			};
 
-			$scope.upload = {
-				app: {
-					text: 'Browse',
-					image: null
-				},
-				testimonial: {
-					text: 'Browse',
-					image: null
-				}
-			};
-			$scope.$watch('upload.app.image', function(value){
-				console.log('upload.app.image', value);
-			});
-			$scope.$watch('upload.testimonial.image', function(value){
-				console.log('upload.testimonial.image', value);
-			});
 
 			$scope.fabric = {};
 			$scope.FabricConstants = FabricConstants;
@@ -66,6 +50,9 @@ define([
 			//
             // Watchers
             // ================================================================
+			$scope.$watch('fabric.presetSize', function(size){
+				console.log('fabric.presetSize', size);
+			});
 			$scope.$watch('fabric.canvasScale', function(length){
 				$scope.fabric.setZoom();
 			});
@@ -107,8 +94,25 @@ define([
             });
             $scope.$watch('mobile.images.screenshot', function(image){
                 if( image == null ) return;
-                setObjectImage( 'app-screenshot', image);
+                console.log('mobile.images.screenshot', image);
+                setObjectImage( 'app-screenshot', image.dataURI);
             });
+            $scope.$watchCollection('mobile.dimensions.app', function(dimension){
+                console.log('mobile.dimensions.app', dimension);
+                if( !dimension ) return;
+                $scope.screenshotuUloadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
+                $scope.screenshotuUloadOptions.data.width = dimension.width;
+                $scope.screenshotuUloadOptions.data.height = dimension.height;
+            });
+
+            $scope.screenshotuUloadOptions = {
+            	headers: {},
+            	data   : {
+                	name  : 'mobile_screenshot',
+            		width : null,
+            		height: null
+            	}
+            };
 
 
 			//
@@ -178,8 +182,6 @@ define([
 			});
 
 			function onChangeCanvasSize( self ){
-
-				console.log('presetSize', self.presetSize);
 
 				var canvas  = self.canvas;
 				canvas.backgroundImage = null;
@@ -383,15 +385,28 @@ define([
             // Ui Bootstrap Modal
             // Set Photo
             // ================================================================
+
+            $scope.$watch('mobile.photos', function(photos){
+            	console.log('mobile.photos', photos);
+            });
+
             $scope.mobile.getPhoto = function(peopleIndex) {
-                var imageSize = $scope.mobile.dimensions.testimonial;
                 var modalInstance = $modal.open({
                     templateUrl: 'modalInsertPhoto.html',
                     controller: function($scope, $modalInstance, $timeout, data) {
-                        $scope.upload = data.upload;
                         $scope.mobile = data.mobile;
-                        $scope.photos = data.photos;
                         $scope.photoIndex = null;
+                        $scope.uploadOptions = {
+                        	headers: {},
+                        	data   : {
+	                        	name  : 'mobile_testimonial',
+	                    		width : $scope.mobile.dimensions.testimonial.width,
+	                    		height: $scope.mobile.dimensions.testimonial.height,
+	                    		unique: {
+	                    			key: 'mobile_testimonial'
+	                    		}
+                        	}
+                        };
                         $scope.selected = function($index) {
                             $scope.photoIndex = $index;
                             self.setPhoto($index, peopleIndex);
@@ -405,54 +420,9 @@ define([
                             $modalInstance.dismiss('cancel'); 
                         };
 
-                        $scope.insertPhoto = function(evt) {
-                            var $buttonFile = angular.element(evt.currentTarget),
-                                $inputFile  = $buttonFile.siblings('input[type="file"]');
-
-                            var handleFile = function(evt) {
-                                var file = evt.target.files[0];
-                                // imageReader.handleReadImage(file, {
-                                //     compile: function(buttonEl, changeEl, blob, image) {
-
-                                //         var filename = blob.name;
-                                //         filename = filename.substr(0, filename.lastIndexOf('.'));
-
-                                //         $buttonFile.html('<i class="icon-refresh icon-spin"></i> Uploading').attr('disabled', 'disabled');
-
-                                //         // upload image
-                                //         imageReader.uploadFile({
-                                //             file: blob,
-                                //             name: 'mobile_photo_' + filename,
-                                //             size: {
-                                //                 width : 428,
-                                //                 height: 428
-                                //             }
-                                //         }, function(response) {
-
-                                //             console.log(response)
-
-                                //             $scope.mobile.images.testimonials[peopleIndex] = response.dataURI;
-                                //             setObjectImage( 'testimoni-pic-'+peopleIndex, response.dataURI, function(){
-                                //                 angular.element(buttonEl).text('Change image').removeClass('btn-info').addClass('btn-success');
-                                //             });
-
-                                //             $scope.photos.push(response.image);
-                                //             $scope.photoIndex = $scope.photos.length - 1;
-                                //             $scope.$apply();
-
-                                //             $buttonFile.html('Change image').removeAttr('disabled');
-                                //         });
-                                //     }
-                                // });
-                            };
-
-                            $timeout(function() {
-                                $inputFile
-                                    .unbind('change')
-                                    .bind('change', handleFile)
-                                    .trigger('click');
-                            });
-                        };
+                        $scope.$watch('mobile.photos', function(photos){
+                        	console.log('mobile.photos', photos);
+                        });
                     },
                     size: null,
                     resolve: {
@@ -460,9 +430,7 @@ define([
                             console.log($scope.mobile);
                             if( $scope.mobile.photos.length ){
                                 return {
-                                    upload: $scope.upload,
-                                    mobile: $scope.mobile,
-                                    photos: $scope.mobile.photos
+                                    mobile: $scope.mobile
                                 };
                             } else {
                                 // get mobile photos from 'upload' directory with 'RecentMobilePhotos'
@@ -472,9 +440,7 @@ define([
                                     $rootScope.isLoading = false;
                                     $scope.mobile.photos = photos;
                                     return {
-                                    	upload: $scope.upload,
-                                        mobile: $scope.mobile,
-                                        photos: photos
+                                        mobile: $scope.mobile
                                     };
                                 })
                             }
@@ -503,9 +469,8 @@ define([
                     $scope.mobile.images.testimonials[index] = imgDataURI;
                     setObjectImage( 'testimoni-pic-'+index, imgDataURI );
                 };
-                img.src = "images/upload/" + $scope.mobile.photos[photoIndex];
-
-                console.log(img.src)
+				img.crossOrigin = "Anonymous";
+                img.src = window.apiURL + "/images/upload/" + $scope.mobile.photos[photoIndex];
             };
 
     }]);

@@ -99,8 +99,8 @@
 										<button type="button" class="btn btn-sm btn-block btn-primary">Upload Image</button>
 										<upload-image class="margin-top-bottom"
 											upload-image-class="btn-primary btn-block"
-											upload-image-text="upload.app.text"
-											ng-model="upload.app.image"></upload-image>
+											upload-image-options="screenshotuUloadOptions"
+											ng-model="mobile.images.screenshot"></upload-image>
 									</div>
 								</div>
 							</fieldset>
@@ -437,8 +437,24 @@
 
 			<div class="row margin-top-bottom" ng-if="fabric.getObjects().length > 0">
 			    <div class="col-md-9" id="objects">
-			 		<div class="field-top col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-repeat="object in fabric.getObjects()">
-				        <button class="btn btn-sm btn-block" ng-click="fabric.setActiveObject(object)" ng-class="{'btn-primary': object.active, 'btn-default': !object.active}">
+			 		<div class="field-top col-xs-4 col-sm-4 col-md-4 col-lg-4 prefix" ng-repeat="object in fabric.getObjects()">
+			 			<div class="col-md-12 btn-group">
+			 				<button type="button" class="col-md-3 btn btn-sm btn-default">
+	                         	<i ng-if="object.type == 'text' || object.type == 'i-text'" class="fa fa-font"></i>
+					            <i ng-if="object.type == 'image'" class="fa fa-image"></i>
+					            <i ng-if="object.type == 'group'" class="fa fa-group"></i>
+					            <i ng-if="object.type == 'path-group'" class="fa fa-star"></i>
+					            <i ng-if="object.type == 'circle'" class="fa fa-circle"></i>
+					            <i ng-if="object.type == 'rect'" class="fa fa-square"></i>
+				            </button>
+				 			<button type="button" class="col-md-9 btn btn-sm btn-primary" title="{{ object.name ? object.name : object.id }}">
+			            		{{ object.name ? object.name : object.id }}
+	                        </button>
+			 				<!-- <button type="button" class="col-md-3 btn btn-sm btn-default">
+			 					<i class="fa fa-refresh"></i>
+				            </button> -->
+			 			</div>
+				        <!-- <button class="btn btn-sm btn-block" ng-click="fabric.setActiveObject(object)" ng-class="{'btn-primary': object.active, 'btn-default': !object.active}">
 				            <i ng-if="object.type == 'text' || object.type == 'i-text'" class="fa fa-font"></i>
 				            <i ng-if="object.type == 'image'" class="fa fa-image"></i>
 				            <i ng-if="object.type == 'group'" class="fa fa-group"></i>
@@ -446,7 +462,7 @@
 				            <i ng-if="object.type == 'circle'" class="fa fa-circle"></i>
 				            <i ng-if="object.type == 'rect'" class="fa fa-square"></i>
 				            {{ object.name ? object.name : object.id }}
-				        </button>
+				        </button> -->
 			 		</div>
 			    </div>
 			    <div class="col-md-3" ng-show="fabric.selectedObject">
@@ -469,18 +485,19 @@
     </div>
     <div class="modal-body">
     	<div id="mobile-photos" class="row">
-			<div class="col-md-3 col-lg-3" ng-repeat="photo in photos">
-				<i ng-if="photoIndex == $index" class="fa fa-check-circle-o" style="position: absolute; top: 40%; left: 26%; color: #3685C6;"></i>
+			<div class="col-md-3 col-lg-3" ng-repeat="photo in mobile.photos">
+				<i ng-if="photoIndex == $index" class="fa fa-check-circle-o" style="position: absolute; top: 40%; left: 40%; color: #3685C6;"></i>
 				<img ng-src="http://dev.angularjs/_learn_/require-angular-banner-creator/images/upload/{{photo}}" width="90" height="90" class="img-circle" 
-					 ng-click="selected($index)">
+					style="opacity:{{ photoIndex == $index ? 0.5 : 1 }}"
+					ng-click="selected($index)">
 			</div>
 		</div>
 		<div class="row margin-top">
 			<div class="col-md-3">
 	      		<upload-image
 					upload-image-class="btn-primary btn-block"
-					upload-image-text="upload.testimonial.text"
-					ng-model="upload.testimonial.image"></upload-image>
+					upload-image-options="uploadOptions"
+					ng-model="mobile.photos"></upload-image>
 		  	</div>
       	</div>
     </div>
