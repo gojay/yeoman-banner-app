@@ -77,7 +77,7 @@ angular.module('common.fabric', [
 			if (object.setSelectionStyles && object.isEditing && object.getSelectedText() != '') {
 				var style = { };
 				style[styleName] = value;
-				console.log('ok', style)
+				// console.log('ok', style)
 				object.setSelectionStyles(style);
 			} else {
 				object[styleName] = value;
@@ -95,7 +95,7 @@ angular.module('common.fabric', [
 		function setActiveProp(name, value) {
 			var object = canvas.getActiveObject();
 			object.set(name, value);
-			console.log('SET', name, value, object);
+			// console.log('SET', name, value, object);
 			self.render();
 		}
 
@@ -140,7 +140,7 @@ angular.module('common.fabric', [
 			canvas.calcOffset();
 			canvas.renderAll();
 			self.renderCount++;
-			console.log('Render cycle:', self.renderCount);
+			// console.log('Render cycle:', self.renderCount);
 		};
 
 		self.setCanvas = function(newCanvas) {
@@ -216,7 +216,7 @@ angular.module('common.fabric', [
 			object.originalLeft = object.left;
 			object.originalTop = object.top;
 
-			console.log('object:type', object.type);
+			// console.log('object:type', object.type);
 
 			canvas.add(object);
 			self.setObjectZoom(object);
@@ -304,7 +304,7 @@ angular.module('common.fabric', [
 		self.toggleImage = function(){
 			var activeObject = canvas.getActiveObject();
 
-			console.log('activeObject', activeObject);
+			// console.log('activeObject', activeObject);
 
 			if (! activeObject ) {
 				return;
@@ -318,8 +318,8 @@ angular.module('common.fabric', [
 		self.toggleImageFrame = function(){
 			var activeObject = canvas.getActiveObject();
 
-			console.log('activeObject', activeObject);
-			console.log('activeObject:type', activeObject.type);
+			// console.log('activeObject', activeObject);
+			// console.log('activeObject:type', activeObject.type);
 
 			if (! activeObject ) {
 				return;
@@ -364,6 +364,13 @@ angular.module('common.fabric', [
 		//
 		// Text
 		// ==============================================================
+
+		self.isText = function() {
+			var object = canvas.getActiveObject();
+			if( !object ) return  false;
+			return object.type == 'text' || object.type == 'i-text';
+		};
+
 		self.addText = function(str, callback) {
 			str = str || 'New Text';
 			var object = new FabricWindow.Text(str, self.textDefaults);
@@ -396,8 +403,8 @@ angular.module('common.fabric', [
 		self.getSelectionStyle = function(){
 			var object = canvas.getActiveObject();
 			if( !object && !object.getSelectionStyles ) return;
-			console.log('getSelectedText', object.getSelectedText());
-			console.log('getSelectionStyles', object.getSelectionStyles());
+			// console.log('getSelectedText', object.getSelectedText());
+			// console.log('getSelectionStyles', object.getSelectionStyles());
 		}
 
 		self.setSelectionStyle = function(styleName, value){
@@ -429,7 +436,7 @@ angular.module('common.fabric', [
 		function setActiveProp(name, value) {
 			var object = canvas.getActiveObject();
 			object.set(name, value);
-			console.log('SET', name, value, object);
+			// console.log('SET', name, value, object);
 			self.render();
 		}
 
@@ -503,7 +510,7 @@ angular.module('common.fabric', [
 		}
 		self.updateRadiusCircle = function(){
 			if( !self.radius ) return;
-			console.log('radius', self.radius);
+			// console.log('radius', self.radius);
 			var circle = canvas.getActiveObject();
 			circle.setRadius(self.radius);
 			self.render();
@@ -518,7 +525,7 @@ angular.module('common.fabric', [
 			  	height: height,
 			  	fill  : "#"+((1<<24)*Math.random()|0).toString(16)
 			});
-			console.log('object', rect);
+			// console.log('object', rect);
 			self.addObjectToCanvas(rect);
 		};
 
@@ -527,7 +534,7 @@ angular.module('common.fabric', [
 		// ==============================================================
 		self.groupAll = function( index ){
 			var objs = canvas.getObjects().map(function(o) {
-				console.log('object:', o.type, o);
+				// console.log('object:', o.type, o);
 			  	return o.set('active', true);
 			});
 
@@ -876,7 +883,7 @@ angular.module('common.fabric', [
 		};
 
 		self.setCanvasZoom = function() {
-			console.log('setCanvasZoom', self.canvasScale);
+			// console.log('setCanvasZoom', self.canvasScale);
 
 			var width = self.canvasOriginalWidth;
 			var height = self.canvasOriginalHeight;
@@ -1045,12 +1052,6 @@ angular.module('common.fabric', [
 				multiplier: self.downloadMultipler
 			});
 
-			console.log('getCanvasData', {
-				width: canvas.getWidth(),
-				height: canvas.getHeight(),
-				multiplier: self.downloadMultipler
-			});
-
 			return data;
 		};
 
@@ -1167,7 +1168,7 @@ angular.module('common.fabric', [
 			self.maxBounding.left = self.canvasWidth - activeObject.getWidth();
 			self.maxBounding.top  = self.canvasHeight - activeObject.getHeight();
 
-			console.log('updateBounding', self.maxBounding);
+			// console.log('updateBounding', self.maxBounding);
 		};
 
 		self.updateControls = function(){
@@ -1179,7 +1180,7 @@ angular.module('common.fabric', [
 			self.controls.top   = activeObject.getTop();
 			self.controls.scale = activeObject.getScaleX();
 
-			console.log('controls', self.controls);
+			// console.log('controls', self.controls);
 		};
 
 		self.angleControl = function(){
@@ -1231,12 +1232,12 @@ angular.module('common.fabric', [
 			});
 
 			canvas.on('selection:created', function() {
-				console.info('selection:created');
+				// console.info('selection:created');
 				self.stopContinuousRendering();
 			});
 
 			canvas.on('selection:cleared', function() {
-				console.info('selection:cleared');
+				// console.info('selection:cleared');
 				$timeout(function() {
 					self.deselectActiveObject();
 				});
@@ -1248,7 +1249,7 @@ angular.module('common.fabric', [
 			});
 
 			canvas.on('object:modified', function() {
-				console.info('object:modified');
+				// console.info('object:modified');
 				self.stopContinuousRendering();
 				$timeout(function() {
 					self.updateActiveObjectOriginals();

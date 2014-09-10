@@ -148,6 +148,13 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
                 return menu.removeClass("spmenu-open");
             }
         },
+        isOpenById: function(id){
+            var menu = angular.element("#" + id);
+
+            if (!menu.length) return null;
+
+            return menu.hasClass("spmenu-open");
+        },
         pushById: function(id) {
             var body = angular.element("body"),
                 menu = angular.element("#" + id);

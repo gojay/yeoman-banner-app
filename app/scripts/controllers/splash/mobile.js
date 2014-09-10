@@ -17,6 +17,7 @@ define([
   		'common.fabric.constants'
   	])
     .controller('SplashMobileCtrl', [
+    	'$rootScope',
     	'$scope', 
     	'$http', 
     	'$timeout',
@@ -24,14 +25,15 @@ define([
     	'Postermobile',
     	'RecentMobilePhotos',
     	'$modal',
+    	'slidePush',
 
     	'Fabric', 
     	'FabricConstants', 
     	'Keypress',
-    	function ($scope, $http, $timeout, Postermobile, RecentMobilePhotos, $modal, Fabric, FabricConstants, Keypress) {
+    	function ($rootScope, $scope, $http, $timeout, Postermobile, RecentMobilePhotos, $modal, slidePush, Fabric, FabricConstants, Keypress) {
 
 			$scope.accordion = {
-				closeOthers : true,
+				closeOthers: true,
 				isFirstOpen: true
 			};
 			$scope.dropdown = {
@@ -39,13 +41,75 @@ define([
 				fontIsOpen: false
 			};
 
-
 			$scope.fabric = {};
 			$scope.FabricConstants = FabricConstants;
 
 			$scope.mobile = Postermobile.model;
 			$scope.FabricConstants.presetSizes = Postermobile.presetSizes;
 			$scope.FabricConstants.CustomAttributes = Postermobile.CustomAttributes;
+
+			$rootScope.menus.top = {
+                model   : $scope,
+                template: '<div ng-include src="\'views/splash-mobile-top-config.html\'"></div>'
+            };
+			$scope.toggleControls = function(){
+				var id = 'menu-top';
+				var scroll = 0;
+				if( slidePush.isOpenById(id) ) {
+					slidePush.pushForceCloseById(id);
+				} else {
+					slidePush.pushById(id);
+					// scroll = angular.element('.image-builder').offset().top;
+					scroll = 330;
+				}
+				// angular.element("body").animate({ scrollTop: scroll }, "slow");
+			};
+
+			$scope.resetControls = function(){
+				var fabric = $scope.fabric;
+				var object = fabric.selectedObject;
+				var size   = fabric.presetSize;
+
+				var controls = Postermobile.CustomAttributes[size.type][size.ppi];
+				var o;
+				switch( object.name ){
+					case 'app-name':
+						o = controls.text.app;
+						break;
+					case 'testimoni-text-left':
+						o = controls.text.people.left;
+						break;
+					case 'testimoni-text-right':
+						o = controls.text.people.right;
+						break;
+					case 'app-screenshot':
+						o = controls.ss;
+						break;
+					case 'qr-iphone':
+						o = controls.qr.iphone;
+						break;
+					case 'qr-android':
+						o = controls.qr.android;
+						break;
+					case 'testimoni-pic-left':
+						o = controls.people.left;
+						break;
+					case 'testimoni-pic-right':
+						o = controls.people.right;
+						break;
+				}
+				object.left = o.left * fabric.canvasScale;
+				object.top  = o.top * fabric.canvasScale;
+				fabric.render();
+			};
+
+			$scope.deselectObject = function(){
+				var id = 'menu-top';
+				$scope.fabric.deactivateAll();
+				if( slidePush.isOpenById(id) ) {
+					slidePush.pushForceCloseById(id);
+				}
+			}
 
 			//
             // Watchers
@@ -100,7 +164,7 @@ define([
             $scope.$watchCollection('mobile.dimensions.app', function(dimension){
                 console.log('mobile.dimensions.app', dimension);
                 if( !dimension ) return;
-                $scope.screenshotuUloadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
+                // $scope.screenshotuUloadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
                 $scope.screenshotuUloadOptions.data.width = dimension.width;
                 $scope.screenshotuUloadOptions.data.height = dimension.height;
             });
@@ -113,23 +177,6 @@ define([
             		height: null
             	}
             };
-
-
-			//
-			// Editing Canvas Size
-			// ================================================================
-			$scope.selectCanvas = function() {
-				$scope.canvasCopy = {
-					width: $scope.fabric.canvasOriginalWidth,
-					height: $scope.fabric.canvasOriginalHeight
-				};
-			};
-
-			$scope.setCanvasSize = function() {
-				$scope.fabric.setCanvasSize($scope.canvasCopy.width, $scope.canvasCopy.height);
-				$scope.fabric.setDirty(true);
-				delete $scope.canvasCopy;
-			};
 
 			//
 			// Init
@@ -472,6 +519,41 @@ define([
 				img.crossOrigin = "Anonymous";
                 img.src = window.apiURL + "/images/upload/" + $scope.mobile.photos[photoIndex];
             };
+
+            //
+            // DownloadPoster
+            // ================================================================
+            $scope.loading = false;
+            $scope.downloadPoster = function( id ){
+                var fabric = $scope.fabric;
+
+            	$scope.loading = true;
+                $timeout(function(){
+	                // Stops active object outline from showing in image
+	                fabric.deactivateAll();
+
+	                var initialCanvasScale = fabric.canvasScale;
+	                fabric.resetZoom();
+
+	                var name = 'poster-default';
+	                if( fabric.presetSize.type ){
+	                    name = $scope.mobile.text.app.replace(/\s/g, '-') + ' ' + fabric.presetSize.name;
+	                    name = name.replace(/\s/g, '_');
+	                }
+
+	                // get anchor link
+	                var anchor = document.getElementById(id);
+	                anchor.download = name + ".png";
+	                anchor.href = fabric.getCanvasBlob();
+
+            		$scope.loading = false;
+                	$scope.mobile.disable.generate = false;
+	                $scope.mobile.disable.download = false;
+
+	                fabric.canvasScale = initialCanvasScale;
+	                fabric.setZoom();
+                }, 3000);
+            }
 
     }]);
 });

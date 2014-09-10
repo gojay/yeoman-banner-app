@@ -21,7 +21,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.services.AuthResource',
             'bannerAppApp.services.Banner',
             'bannerAppApp.services.Postermobile',
-/*angJSDeps*/
+            /*angJSDeps*/
             'ngRoute',
             'ngCookies',
             'ngResource',
@@ -44,7 +44,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         .directive('bindUnsafeHtml', ['$compile',
             function($compile) {
                 return function(scope, element, attrs) {
-                    console.log('scope', scope)
                     scope.$watch(
                         function(scope) {
                             // watch the 'bindUnsafeHtml' expression for changes
@@ -186,6 +185,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 $rootScope.$on('$routeChangeStart', function(angularEvent, next) {
                     console.log("routeChangeStart:event", angularEvent);
                     console.log("routeChangeStart:next", next);
+                    
                     var isDownwards = true;
                     if (next && next.$$route) {
                         var newLocation = next.$$route.originalPath;

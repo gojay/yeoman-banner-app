@@ -290,3 +290,10 @@ input[type="range"]::-webkit-slider-thumb {
   background-color: #F0F0F0;
   border: 1px solid black;
 }
+
+/*.carousel-inner > .item > div {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  line-height: 1;
+}*/
