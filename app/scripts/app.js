@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'filters/comatonewline', 'filters/splitintolines', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -14,10 +14,15 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.controllers.SplashMobileCtrl',
             'bannerAppApp.controllers.SplashFacebookCtrl',
             'bannerAppApp.controllers.SplashCustomCtrl',
+            'bannerAppApp.controllers.LoginCtrl',
+
             'bannerAppApp.filters.Comatonewline',
             'bannerAppApp.filters.Splitintolines',
-            'bannerAppApp.directives.Uploadimage',
+
+            'bannerAppApp.directives.Authapplication',
             'bannerAppApp.directives.Bannercreator',
+            'bannerAppApp.directives.Uploadimage',
+
             'bannerAppApp.services.AuthResource',
             'bannerAppApp.services.Banner',
             'bannerAppApp.services.Postermobile',
@@ -128,6 +133,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                   templateUrl: 'views/upload.html',
                   controller: 'UploadCtrl'
                 })
+                .when('/login', {
+                  templateUrl: 'views/login.html',
+                  controller: 'LoginCtrl'
+                })
                 .otherwise({
                     redirectTo: '/'
                 });
@@ -138,6 +147,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         })
         .run(['$rootScope', '$window', '$timeout', /*'snapRemote',*/
             function($rootScope, $window, $timeout /*, snapRemote*/ ) {
+                $rootScope.user = null;
                 // sidemenu
                 $rootScope.menus = {
                     top: {
@@ -157,13 +167,12 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 $window.addEventListener('resize', function() {
                     $rootScope.$digest();
                 });
-
+                /*
                 $rootScope.$watch(
                     function() {
                         return window.innerWidth;
                     },
                     function(newVal) {
-                        /*
                         snapRemote.getSnapper().then(function(snapper) {
                             var val = parseInt(newVal * 80 / 100);
                             snapper.settings({
@@ -176,15 +185,19 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                                 });
                             }, 400)
                         });
-                        */
                     }
                 );
+                */
 
                 // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
                 var oldLocation = '';
                 $rootScope.$on('$routeChangeStart', function(angularEvent, next) {
                     console.log("routeChangeStart:event", angularEvent);
                     console.log("routeChangeStart:next", next);
+
+                    var isLogin = next.$$route.originalPath == '/login';
+                    $rootScope.isLogin = isLogin;
+                    if( !isLogin ) $rootScope.$broadcast('event:auth-ping');
                     
                     var isDownwards = true;
                     if (next && next.$$route) {
@@ -195,7 +208,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
 
                         oldLocation = newLocation;
                     }
-
                     $rootScope.isDownwards = isDownwards;
                 });
             }

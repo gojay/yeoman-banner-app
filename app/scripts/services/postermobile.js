@@ -236,13 +236,13 @@ define(['angular'], function (angular) {
 			}
 		}
 	})
-	.service('RecentMobilePhotos', ['AuthResource', '$q',
-		function(AuthResource, $q, $rootScope){
+	.service('RecentMobilePhotos', ['authResource', '$q',
+		function(authResource, $q, $rootScope){
 			return function(){
 
 				var deferred = $q.defer();
 
-				AuthResource.authentifiedRequest('GET', window.apiURL + '/api/splash/mobile', {}, function(data){
+				authResource.authentifiedRequest('GET', window.apiURL + '/api/splash/mobile', {}, function(data){
 					deferred.resolve(data);
 				}, function(err){
 					deferred.reject('Unable to fetch splash mobile photos ' + err);
