@@ -24,13 +24,16 @@ define([
 
     	'Postermobile',
     	'RecentMobilePhotos',
+    	'SaveMobile',
     	'$modal',
     	'slidePush',
 
     	'Fabric', 
     	'FabricConstants', 
     	'Keypress',
-    	function ($rootScope, $scope, $http, $timeout, Postermobile, RecentMobilePhotos, $modal, slidePush, Fabric, FabricConstants, Keypress) {
+    	function ($rootScope, $scope, $http, $timeout, Postermobile, RecentMobilePhotos, SaveMobile, $modal, slidePush, Fabric, FabricConstants, Keypress) {
+
+    		var self = this;
 
 			$scope.accordion = {
 				closeOthers: true,
@@ -48,9 +51,52 @@ define([
 			$scope.FabricConstants.presetSizes = Postermobile.presetSizes;
 			$scope.FabricConstants.CustomAttributes = Postermobile.CustomAttributes;
 
-			$rootScope.menus.top = {
-                model   : $scope,
-                template: '<div ng-include src="\'views/splash-mobile-top-config.html\'"></div>'
+			//
+            // Slide menus
+            // ================================================================
+			$rootScope.menus = {
+				top: {
+	                model   : $scope,
+	                template: '<div ng-include src="\'views/splash-mobile-top-config.html\'"></div>'
+				},
+				left: {
+					model : [{
+						name : 'App 1',
+						image: 'http://lorempixel.com/300/300/abstract/1'
+					},{
+						name : 'App 2',
+						image: 'http://lorempixel.com/300/300/abstract/2'
+					},{
+						name : 'App 3',
+						image: 'http://lorempixel.com/300/300/abstract/3'
+					},{
+						name : 'App 4',
+						image: 'http://lorempixel.com/300/300/abstract/4'
+					},{
+						name : 'App 5',
+						image: 'http://lorempixel.com/300/300/abstract/5'
+					},{
+						name : 'App 6',
+						image: 'http://lorempixel.com/300/300/abstract/6'
+					},{
+						name : 'App 7',
+						image: 'http://lorempixel.com/300/300/abstract/7'
+					}],
+	                template: '<div class="container" style="padding-top:70px">'+
+	                	'<div class="row">'+
+						  	'<div class="col-lg-3 col-md-3" ng-repeat="obj in menus.left.model">'+
+							    '<div class="thumbnail">'+
+							      '<img ng-src="{{ obj.image }}" alt="...">'+
+							      '<div class="caption">'+
+							        '<h3>{{ obj.name }}</h3>'+
+							        '<p><button class="btn btn-sm btn-primary">Button</button> '+ 
+							        	'<button class="btn btn-sm btn-default">Button</button></p>'+
+							      '</div>'+
+							    '</div>'+
+						  	'</div>'+
+						'</div>'+
+					'</div>'
+				}
             };
 			$scope.toggleControls = function(){
 				var id = 'menu-top';
@@ -258,18 +304,11 @@ define([
 					var callbackImage = function( object, name, type, index ){
 						var attributes = CustomAttributes[ppi][type][index];
 						object.name   = name;
-						if( type == 'people' ){
-							object.width  = attributes.width;
-							object.height = attributes.height;
-						}
+						object.width  = attributes.width;
+						object.height = attributes.height;
 						object.left   = attributes.left;
 						object.top    = attributes.top;
 						object.hasControls = false;
-						if( type == 'people'){
-							object.clipTo = function(ctx) {
-							    ctx.arc(0, 0, object.width / 2 , 0, 2*Math.PI, true);
-							};
-						}
 					}
 
                     // set model mobile dimension
@@ -294,6 +333,7 @@ define([
                     });
 
 					// add text name app
+					// =================================
 					$scope.fabric.addText($scope.mobile.text.app, function(object){
 						var attribute = textAttribute['app'];
 						object.set({
@@ -307,6 +347,7 @@ define([
 						});
 					});
 					// add qr images
+					// =================================
 					var qrIphone = qr['iphone'];
 					 $scope.fabric.addImage('images/'+ qrIphone.width +'x'+ qrIphone.height +'.jpg', function(object){
                         callbackImage( object, 'qr-iphone', 'qr', 'iphone' );
@@ -316,11 +357,12 @@ define([
                         callbackImage( object, 'qr-android', 'qr', 'android' );
                     });
 
-					// add testimoni pic n text Left
+					// add testimoni image-cirlcle & text Left
+					// =================================
                     var imgTestimonialLeft = $scope.mobile.images.testimonials.left ? 
                                         'images/upload/mobile_testimonial_left.jpg' :
                                         'images/'+ testimoniDimension.width +'x'+ testimoniDimension.height +'.jpg' ;
-                    $scope.fabric.addImage(imgTestimonialLeft, function(object){
+                    $scope.fabric.addImageCircle(imgTestimonialLeft, function(object){
                         callbackImage( object, 'testimoni-pic-left', 'people', 'left' );
                     });
                     $scope.fabric.addIText($scope.mobile.text.left, function(object){
@@ -335,11 +377,12 @@ define([
                             opacity: 0.5
                         });
                     });
-                    // add testimoni pic n text Right
+                    // add testimoni image-cirlcle & text Right
+					// =================================
                     var imgTestimonialRight = $scope.mobile.images.testimonials.right ? 
                                         'images/upload/mobile_testimonial_right.jpg' :
                                         'images/'+ testimoniDimension.width +'x'+ testimoniDimension.height +'.jpg' ;
-                    $scope.fabric.addImage(imgTestimonialRight, function(object){
+                    $scope.fabric.addImageCircle(imgTestimonialRight, function(object){
                         callbackImage( object, 'testimoni-pic-right', 'people', 'right' );
                     });
                     $scope.fabric.addIText($scope.mobile.text.right, function(object){
@@ -355,13 +398,13 @@ define([
                         });
                     });
 
-                    // set QR
+                    // generate QR
+					// =================================
                     mobileGenerateQR('iphone');
                     mobileGenerateQR('android');
 					
 				}
 			}
-
 			function setObjectImage( objectName, src, callback ){
                 var fabric = $scope.fabric;
 
@@ -430,12 +473,11 @@ define([
             };
 
             // Ui Bootstrap Modal
-            // Set Photo
             // ================================================================
 
-            $scope.$watch('mobile.photos', function(photos){
-            	console.log('mobile.photos', photos);
-            });
+            // $scope.$watch('mobile.photos', function(photos){
+            // 	console.log('mobile.photos', photos);
+            // });
 
             $scope.mobile.getPhoto = function(peopleIndex) {
                 var modalInstance = $modal.open({
@@ -520,11 +562,397 @@ define([
                 img.src = window.apiURL + "/images/upload/" + $scope.mobile.photos[photoIndex];
             };
 
+            $scope.mobile.save = function(){
+            	var modalInstance = $modal.open({
+                    templateUrl: 'modalSave.html',
+                    controller: function($scope, $rootScope, $modalInstance, $timeout, data) {
+                        $scope.loading = false;
+                        $scope.data = data;
+
+                        $scope.save = function() {
+                        	$scope.loading = true;
+                        	SaveMobile($scope.data).then(function(response){
+                        		console.log('save:response', response);
+                        		$scope.loading = false;
+
+                        		$rootScope.menus.left.model.push({
+                        			image: $scope.data.image,
+                        			name: $scope.data.name
+                        		});
+                        		// $rootScope.$apply();
+	                            // $modalInstance.close();
+	                        });
+                        };
+                        $scope.cancel = function() {
+                            $modalInstance.dismiss('cancel'); 
+                        };
+                    },
+                    size: null,
+                    resolve: {
+                    	data: function(){
+                    		return {
+	                        	name : $scope.mobile.text.app,
+	                        	image: $scope.fabric.canvas.toDataURL(),
+	                        	value: $scope.mobile.getJSON()
+	                        };
+                    	}
+                    }
+                });
+                modalInstance.result.then(function(){ });
+            };
+
             //
-            // DownloadPoster
+            // toJSON
+            // ================================================================
+            $scope.mobile.getJSON = function(){
+            	var jsonString = $scope.fabric.getJSON();
+            	return JSON.parse(jsonString);
+            };
+
+            $scope.fromJSON = {  
+				   "objects":[  
+				      {  
+				         "type":"text",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":964,
+				         "top":360,
+				         "width":554.46,
+				         "height":123.5,
+				         "fill":"#434343",
+				         "stroke":"#434343",
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":1,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":null,
+				         "backgroundColor":"",
+				         "text":"Name of App",
+				         "fontSize":95,
+				         "fontWeight":"normal",
+				         "fontFamily":"Arial",
+				         "fontStyle":"",
+				         "lineHeight":1.3,
+				         "textDecoration":"",
+				         "textAlign":"center",
+				         "path":null,
+				         "textBackgroundColor":"",
+				         "useNative":true,
+				         "name":"app-name"
+				      },
+				      {  
+				         "type":"i-text",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":621,
+				         "top":2537,
+				         "width":506.52,
+				         "height":273,
+				         "fill":"#313131",
+				         "stroke":"#313131",
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":0.5,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":null,
+				         "backgroundColor":"",
+				         "text":"Lorem ipsum dolor sit amet\nlorem ipsum dolor\namet consectetur\n\nYour Name",
+				         "fontSize":42,
+				         "fontWeight":"normal",
+				         "fontFamily":"Arial",
+				         "fontStyle":"",
+				         "lineHeight":1.3,
+				         "textDecoration":"",
+				         "textAlign":"left",
+				         "path":null,
+				         "textBackgroundColor":"",
+				         "useNative":true,
+				         "styles":{  
+
+				         },
+				         "name":"testimoni-text-left"
+				      },
+				      {  
+				         "type":"i-text",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":1761,
+				         "top":2537,
+				         "width":506.52,
+				         "height":273,
+				         "fill":"#313131",
+				         "stroke":"#313131",
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":0.5,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":null,
+				         "backgroundColor":"",
+				         "text":"Lorem ipsum dolor sit amet\nlorem ipsum dolor\namet consectetur\n\nYour Name",
+				         "fontSize":42,
+				         "fontWeight":"normal",
+				         "fontFamily":"arial",
+				         "fontStyle":"",
+				         "lineHeight":1.3,
+				         "textDecoration":"",
+				         "textAlign":"left",
+				         "path":null,
+				         "textBackgroundColor":"",
+				         "useNative":true,
+				         "styles":{  
+
+				         },
+				         "name":"testimoni-text-right"
+				      },
+				      {  
+				         "type":"image",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":1316,
+				         "top":1852,
+				         "width":280,
+				         "height":280,
+				         "fill":"rgb(0,0,0)",
+				         "stroke":null,
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":1,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":null,
+				         "backgroundColor":"",
+				         "src":"http://127.0.0.1:9000/images/280x280.jpg",
+				         "filters":[  
+				            {  
+				               "type":"Tint",
+				               "color":"#ffffff",
+				               "opacity":0
+				            }
+				         ],
+				         "crossOrigin":"anonymous",
+				         "name":"qr-iphone"
+				      },
+				      {  
+				         "type":"image",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":1914,
+				         "top":1852,
+				         "width":280,
+				         "height":280,
+				         "fill":"rgb(0,0,0)",
+				         "stroke":null,
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":1,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":null,
+				         "backgroundColor":"",
+				         "src":"http://127.0.0.1:9000/images/280x280.jpg",
+				         "filters":[  
+				            {  
+				               "type":"Tint",
+				               "color":"#ffffff",
+				               "opacity":0
+				            }
+				         ],
+				         "crossOrigin":"anonymous",
+				         "name":"qr-android"
+				      },
+				      {  
+				         "type":"image",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":324,
+				         "top":842,
+				         "width":640,
+				         "height":1138,
+				         "fill":"rgb(0,0,0)",
+				         "stroke":null,
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":1,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":null,
+				         "backgroundColor":"",
+				         "src":"http://127.0.0.1:9000/images/640x1138.jpg",
+				         "filters":[  
+				            {  
+				               "type":"Tint",
+				               "color":"#ffffff",
+				               "opacity":0
+				            }
+				         ],
+				         "crossOrigin":"anonymous",
+				         "name":"app-screenshot"
+				      },
+				      {  
+				         "type":"image",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":1290,
+				         "top":2479,
+				         "width":428,
+				         "height":428,
+				         "fill":"rgb(0,0,0)",
+				         "stroke":null,
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":1,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":"function (ctx) {\n\t\t    ctx.arc(0, 0, this.width / 2 , 0, 2*Math.PI, true);\n\t\t}",
+				         "backgroundColor":"",
+				         "src":"http://127.0.0.1:9000/images/428x428.jpg",
+				         "filters":[  
+
+				         ],
+				         "crossOrigin":"anonymous",
+				         "name":"testimoni-pic-right"
+				      },
+				      {  
+				         "type":"image",
+				         "originX":"left",
+				         "originY":"top",
+				         "left":151,
+				         "top":2479,
+				         "width":428,
+				         "height":428,
+				         "fill":"rgb(0,0,0)",
+				         "stroke":null,
+				         "strokeWidth":1,
+				         "strokeDashArray":null,
+				         "strokeLineCap":"butt",
+				         "strokeLineJoin":"miter",
+				         "strokeMiterLimit":10,
+				         "scaleX":1,
+				         "scaleY":1,
+				         "angle":0,
+				         "flipX":false,
+				         "flipY":false,
+				         "opacity":1,
+				         "shadow":null,
+				         "visible":true,
+				         "clipTo":"function (ctx) {\n\t\t    ctx.arc(0, 0, this.width / 2 , 0, 2*Math.PI, true);\n\t\t}",
+				         "backgroundColor":"",
+				         "src":"http://127.0.0.1:9000/images/428x428.jpg",
+				         "filters":[  
+
+				         ],
+				         "crossOrigin":"anonymous",
+				         "name":"testimoni-pic-left"
+				      }
+				   ],
+				   "background":"#ffffff",
+				   "backgroundImage":{  
+				      "type":"image",
+				      "originX":"left",
+				      "originY":"top",
+				      "left":0,
+				      "top":0,
+				      "width":2480,
+				      "height":3508,
+				      "fill":"rgb(0,0,0)",
+				      "stroke":null,
+				      "strokeWidth":1,
+				      "strokeDashArray":null,
+				      "strokeLineCap":"butt",
+				      "strokeLineJoin":"miter",
+				      "strokeMiterLimit":10,
+				      "scaleX":1,
+				      "scaleY":1,
+				      "angle":0,
+				      "flipX":false,
+				      "flipY":false,
+				      "opacity":1,
+				      "shadow":null,
+				      "visible":true,
+				      "clipTo":null,
+				      "backgroundColor":"",
+				      "src":"http://127.0.0.1:9000/images/stiker_a4_2480x3508.jpg",
+				      "filters":[  
+
+				      ],
+				      "crossOrigin":""
+				   },
+				   "height":3508,
+				   "width":2480,
+				   "originalHeight":3508,
+				   "originalWidth":2480
+			};
+            $scope.mobile.loadJSON = function(){
+            	$scope.fabric.canvasOriginalWidth = 2480;
+            	$scope.fabric.canvasOriginalHeight = 3508;
+            	$scope.fabric.canvasScale = 0.3;
+            	$scope.fabric.loadJSON($scope.fromJSON);
+            };
+
+            //
+            // Generate Poster
             // ================================================================
             $scope.loading = false;
-            $scope.downloadPoster = function( id ){
+            $scope.generatePoster = function( id ){
                 var fabric = $scope.fabric;
 
             	$scope.loading = true;

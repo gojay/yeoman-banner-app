@@ -1,7 +1,8 @@
 /* General styles for all menus */
 .spmenu {
   /*background: #149C82;*/
-  position: fixed; }
+  position: fixed;
+  overflow: auto; }
   .spmenu.spmenu-top.spmenu-open {
     -moz-box-shadow: -20px 0px 30px black;
     -webkit-box-shadow: -20px 0px 30px black;

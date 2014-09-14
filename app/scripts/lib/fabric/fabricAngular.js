@@ -252,7 +252,7 @@ angular.module('common.fabric', [
 		// Image
 		// ==============================================================
 		self.addImage = function(imageURL, callback) {
-			fabric.Image.fromURL(imageURL, function(object) {
+			fabric.NamedImage.fromURL(imageURL, function(object) {
 				object.id   = self.createId();
 				object.name = "image"+object.id;
 
@@ -282,6 +282,17 @@ angular.module('common.fabric', [
 				// photo.on('image:loaded', canvas.renderAll.bind(canvas));
 				// photo.drawBorders = photo.drawCorners = function() { return this };
 				// self.addObjectToCanvas(photo);
+
+			}, { crossOrigin: 'anonymous' });
+		};
+		self.addImageCircle = function(imageURL, callback) {
+			fabric.ImageCircle.fromURL(imageURL, function(object) {
+				object.id   = self.createId();
+				object.name = "image"+object.id;
+
+				if( callback ) callback( object );
+
+				self.addObjectToCanvas(object, true);
 
 			}, { crossOrigin: 'anonymous' });
 		};
@@ -373,7 +384,7 @@ angular.module('common.fabric', [
 
 		self.addText = function(str, callback) {
 			str = str || 'New Text';
-			var object = new FabricWindow.Text(str, self.textDefaults);
+			var object = new FabricWindow.NamedText(str, self.textDefaults);
 			object.id = self.createId();
 
 			if( callback ) callback(object);
@@ -383,7 +394,7 @@ angular.module('common.fabric', [
 		self.addIText = function(str, callback) {
 			str = str || 'New Text';
 
-			var object = new fabric.IText(str, self.textDefaults);
+			var object = new fabric.NamedIText(str, self.textDefaults);
 
 			if( callback ) callback(object);
 
@@ -961,6 +972,8 @@ angular.module('common.fabric', [
 			if (! activeObject ) {
 				return;
 			}
+
+			console.log('selectActiveObject', activeObject);
 
 			self.selectedObject = activeObject;
 			self.selectedObject.text = self.getText();

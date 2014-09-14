@@ -237,7 +237,7 @@ define(['angular'], function (angular) {
 		}
 	})
 	.service('RecentMobilePhotos', ['authResource', '$q',
-		function(authResource, $q, $rootScope){
+		function(authResource, $q){
 			return function(){
 
 				var deferred = $q.defer();
@@ -246,6 +246,22 @@ define(['angular'], function (angular) {
 					deferred.resolve(data);
 				}, function(err){
 					deferred.reject('Unable to fetch splash mobile photos ' + err);
+				})
+				return deferred.promise;
+			};
+		}
+	])
+	.service('SaveMobile', ['authResource', '$q',
+		function(authResource, $q){
+			return function( data ){
+
+				console.log('SaveMobile:data', data);
+
+				var deferred = $q.defer();
+				authResource.authentifiedRequest('POST', window.apiURL + '/api/splash/mobile', data, function(response){
+					deferred.resolve(response);
+				}, function(err){
+					deferred.reject(err);
 				})
 				return deferred.promise;
 			};

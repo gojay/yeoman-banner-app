@@ -87,6 +87,24 @@
 	                </div>
 				</div>
 
+				<div class="form-group" ng-init="isCollapsed = true">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 margin-bottom">
+						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 prefix">
+							<button class="btn btn-sm btn-default" ng-click="isCollapsed = !isCollapsed">{{ isCollapsed ? 'Show' : 'Hide' }} JSON</button>
+						</div>
+						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+	                		<button class="btn btn-sm" ng-click="mobile.loadJSON()">Load From JSON</button>
+						</div>
+					</div>
+	                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div collapse="isCollapsed">
+							<div style="max-height:350px; overflow-y:auto">
+							<pre>{{ fromJSON | json }}</pre>
+							</div>
+						</div>
+	                </div>
+				</div>
+
 				<div ng-hide="!fabric.presetSize" class="well">
 					<fieldset>
 						<legend>Screenshot</legend>
@@ -187,10 +205,14 @@
 
 					<div class="form-group">
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<a class="btn btn-sm btn-default btn-block"
+								ng-click="mobile.save()">
+								<i class="fa fa-save"></i> Save
+							</a>
 							<a class="btn btn-sm btn-block"
 								ng-class="mobile.disable.generate ? 'btn-info' : 'btn-success'"
 								ng-disabled="loading"
-								ng-click="downloadPoster('download-mobile')">
+								ng-click="generatePoster('download-mobile')">
 								<i class="fa fa-gear"></i> Generate
 							</a>
 							<a id="download-mobile" class="btn btn-sm btn-block btn-success"
@@ -626,6 +648,32 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
+<script type="text/ng-template" id="modalSave.html">
+    <div class="modal-header">
+        <h3 class="modal-title"><i class="fa fa-cog"></i> Save Configuration</h3>
+    </div>
+    <div class="modal-body">
+    	<form>
+    		<div class="form-group">
+    			<label for="name">Name</label>
+    			<input type="text" class="form-control" id="name" placeholder="Name" ng-model="data.name">
+    		</div>
+    		<div class="form-group">
+    			<label for=""></label>
+    			<img ng-src="{{data.image}}" width="200" />
+    		</div>
+    		<div class="form-group">
+    			<label>JSON</label>
+    			<textarea class="form-control" rows="5" disabled>{{ data.value | json }}</textarea>
+    		</div>
+    	</form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="save()" ng-disabled="loading">
+        	<i class="fa fa-circle-o-notch fa-spin" ng-show="loading"></i> Save</button>
         <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </div>
 </script>
