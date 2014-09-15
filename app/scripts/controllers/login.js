@@ -15,7 +15,7 @@ define(['angular'], function (angular) {
             }
         };
         $scope.auth.login = function(){
-            authResource.authentifiedRequest('POST', window.apiURL + '/api/login', $scope.auth.credentials, function(data, status){
+            authResource.authentifiedRequest('POST', '/api/login', $scope.auth.credentials, function(data, status){
                 console.log('auth:login', data, status);
 
                 if (status < 200 || status >= 300) return;

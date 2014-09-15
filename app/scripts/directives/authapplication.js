@@ -18,7 +18,7 @@ define(['angular'], function(angular) {
                     });
                     $scope.$on('event:auth-ping', function() {
                         console.log('event:auth-ping');
-                        authResource.authentifiedRequest('GET', window.apiURL + '/api/ping', {}, function(){
+                        authResource.authentifiedRequest('GET', '/api/ping', {}, function(){
                             authService.loginConfirmed();
                         });
                     });

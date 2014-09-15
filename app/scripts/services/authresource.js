@@ -2,7 +2,7 @@ define(['angular', 'angular-resource'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.services.AuthResource', ['ngResource'])
-	.service('authResource', ['$http', '$resource', '$cookieStore', function authResource($http, $resource, $cookieStore) {
+	.service('authResource', ['$http', '$resource', '$cookieStore', 'BASEURL', function authResource($http, $resource, $cookieStore, BASEURL) {
 		// AngularJS will instantiate a singleton by calling "new" on this function
 		this.url = null;
 		return {
@@ -16,7 +16,7 @@ define(['angular', 'angular-resource'], function (angular) {
 
 	            $http({
 	                method : method,
-	                url    : url,
+	                url    : BASEURL + url,
 	                data   : data,
 	                headers: headers
 	            }).success(okCallback).error(errCallback);

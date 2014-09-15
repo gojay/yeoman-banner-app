@@ -105,7 +105,6 @@ require.config({
 
 //http://code.angularjs.org/1.2.1/docs/guide/bootstrap#overview_deferred-bootstrap
 window.name = 'NG_DEFER_BOOTSTRAP!';
-window.apiURL = 'http://dev.angularjs/_learn_/require-angular-banner-creator';
 
 require([
     'jquery',
@@ -114,9 +113,9 @@ require([
     'app',
     'angular-route',
     'angular-cookies',
-    'angular-http-auth',
     'angular-sanitize',
     'angular-resource',
+    'angular-http-auth',
     'angular-bootstrap',
     'angular-ui-utils',
     'angular-animate',

@@ -30,8 +30,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'ngRoute',
             'ngCookies',
             'ngResource',
-            'http-auth-interceptor',
             'ngSanitize',
+            'http-auth-interceptor',
             'angularFileUpload',
 
             'ngAnimate',
@@ -46,6 +46,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         .constant('jdFontselectConfig', {
             googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         })
+        .constant('BASEURL', 'http://dev.angularjs/_learn_/require-angular-banner-creator')
         .directive('bindUnsafeHtml', ['$compile',
             function($compile) {
                 return function(scope, element, attrs) {
@@ -69,82 +70,85 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 }
             }
         ])
-        .config(function($routeProvider, $locationProvider) {
-            // compile sanitazion
-            // $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file):/);
-            // route
-            $routeProvider
-                .when('/', {
-                    templateUrl: 'views/main.html',
-                    controller: 'MainCtrl'
-                })
-                .when('/bootstrap', {
-                    templateUrl: 'views/bootstrap.html',
-                    controller: 'BootstrapCtrl'
-                })
-                /* facebook */
-                .when('/facebook/banner', {
-                    templateUrl: 'views/banner.html',
-                    controller: 'BannerCtrl'
-                })
-                .when('/facebook/conversation', {
-                    templateUrl: 'views/conversation.html',
-                    controller: 'ConversationCtrl'
-                })
-                /* splash/poster */
-                .when('/splash/mobile', {
-                  templateUrl: 'views/mobile.html',
-                  controller: 'SplashMobileCtrl'
-                })
-                .when('/splash/facebook', {
-                  templateUrl: 'views/splash/facebook.html',
-                  controller: 'SplashFacebookCtrl'
-                })
-                .when('/splash/custom', {
-                  templateUrl: 'views/splash/custom.html',
-                  controller: 'SplashCustomCtrl'
-                })
-                .when('/svg/raphael', {
-                    templateUrl: 'views/raphael.html',
-                    controller: 'RaphaelCtrl',
-                    resolve: {
-                        delay: function($q, $timeout, $rootScope) {
-                            console.log('delay');
-                            
-                            $rootScope.isLoading = true;
-                            var delay = $q.defer();
-                            $timeout(function() {
-                                $rootScope.isLoading = false;
-                                delay.resolve();
-                            }, 1000);
-                            return delay.promise;
+        .config(['$compileProvider', '$routeProvider', '$locationProvider',
+            function($compileProvider, $routeProvider, $locationProvider) {
+                // compile sanitazion
+                $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|blob):/);
+                $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob):|data:image\//);
+                // route
+                $routeProvider
+                    .when('/', {
+                        templateUrl: 'views/main.html',
+                        controller: 'MainCtrl'
+                    })
+                    .when('/bootstrap', {
+                        templateUrl: 'views/bootstrap.html',
+                        controller: 'BootstrapCtrl'
+                    })
+                    /* facebook */
+                    .when('/facebook/banner', {
+                        templateUrl: 'views/banner.html',
+                        controller: 'BannerCtrl'
+                    })
+                    .when('/facebook/conversation', {
+                        templateUrl: 'views/conversation.html',
+                        controller: 'ConversationCtrl'
+                    })
+                    /* splash/poster */
+                    .when('/splash/mobile', {
+                      templateUrl: 'views/mobile.html',
+                      controller: 'SplashMobileCtrl'
+                    })
+                    .when('/splash/facebook', {
+                      templateUrl: 'views/splash/facebook.html',
+                      controller: 'SplashFacebookCtrl'
+                    })
+                    .when('/splash/custom', {
+                      templateUrl: 'views/splash/custom.html',
+                      controller: 'SplashCustomCtrl'
+                    })
+                    .when('/svg/raphael', {
+                        templateUrl: 'views/raphael.html',
+                        controller: 'RaphaelCtrl',
+                        resolve: {
+                            delay: function($q, $timeout, $rootScope) {
+                                console.log('delay');
+                                
+                                $rootScope.isLoading = true;
+                                var delay = $q.defer();
+                                $timeout(function() {
+                                    $rootScope.isLoading = false;
+                                    delay.resolve();
+                                }, 1000);
+                                return delay.promise;
+                            }
                         }
-                    }
-                })
-                .when('/svg/fabric', {
-                    templateUrl: 'views/fabric.html',
-                    controller: 'FabricCtrl'
-                })
-                .when('/svg/fabric2', {
-                  templateUrl: 'views/fabric2.html',
-                  controller: 'Fabric2Ctrl'
-                })
-                .when('/module/ng-file-upload', {
-                  templateUrl: 'views/upload.html',
-                  controller: 'UploadCtrl'
-                })
-                .when('/login', {
-                  templateUrl: 'views/login.html',
-                  controller: 'LoginCtrl'
-                })
-                .otherwise({
-                    redirectTo: '/'
-                });
+                    })
+                    .when('/svg/fabric', {
+                        templateUrl: 'views/fabric.html',
+                        controller: 'FabricCtrl'
+                    })
+                    .when('/svg/fabric2', {
+                      templateUrl: 'views/fabric2.html',
+                      controller: 'Fabric2Ctrl'
+                    })
+                    .when('/module/ng-file-upload', {
+                      templateUrl: 'views/upload.html',
+                      controller: 'UploadCtrl'
+                    })
+                    .when('/login', {
+                      templateUrl: 'views/login.html',
+                      controller: 'LoginCtrl'
+                    })
+                    .otherwise({
+                        redirectTo: '/'
+                    });
 
-            // $locationProvider
-            //     .html5Mode(false)
-            //     .hashPrefix('!');
-        })
+                // $locationProvider
+                //     .html5Mode(false)
+                //     .hashPrefix('!');
+            }
+        ])
         .run(['$rootScope', '$window', '$timeout', /*'snapRemote',*/
             function($rootScope, $window, $timeout /*, snapRemote*/ ) {
                 $rootScope.user = null;
