@@ -87,13 +87,13 @@
 	                </div>
 				</div>
 
-				<div class="form-group" ng-init="isCollapsed = true" ng-show="!fabric.presetSize">
+				<!-- <div class="form-group" ng-init="isCollapsed = true" ng-show="!fabric.presetSize">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 margin-bottom">
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 prefix">
 							<button class="btn btn-sm btn-default" ng-click="isCollapsed = !isCollapsed">{{ isCollapsed ? 'Show' : 'Hide' }} JSON</button>
 						</div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-	                		<button class="btn btn-sm" ng-click="mobile.loadJSON()">Load From JSON</button>
+	                		<button class="btn btn-sm" ng-click="loadJSON()">Load From JSON</button>
 						</div>
 					</div>
 	                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -103,7 +103,7 @@
 							</div>
 						</div>
 	                </div>
-				</div>
+				</div> -->
 
 				<div ng-hide="!fabric.presetSize" class="well">
 					<fieldset>
@@ -113,7 +113,7 @@
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 field-top">
 								<upload-image
 									upload-image-class="btn-primary btn-block"
-									upload-image-options="screenshotuUloadOptions"
+									upload-image-options="screenshotUploadOptions"
 									ng-model="mobile.images.screenshot"></upload-image>
 							</div>
 						</div>
@@ -140,9 +140,9 @@
 								<input type="url" name="iphone" class="input-sm form-control"
 									ng-model="mobile.qr.iphone.url" 
 								   	ui-event="{ 
-								   		focus: 'mobile.onFocusQR($event)', 
-									   	keyup: 'mobile.onKeyUpQR($event)',
-								   		blur : 'mobile.onBlurQR($event)' 
+								   		focus: 'onFocusQR($event)', 
+									   	keyup: 'onKeyUpQR($event)',
+								   		blur : 'onBlurQR($event)' 
 								   	}"
 								   	ng-disabled="mobile.qr.iphone.loading" />
 								   	<wave-spinner ng-show="mobile.qr.iphone.loading"></wave-spinner>
@@ -157,9 +157,9 @@
 								<input type="url" name="android" class="input-sm form-control"
 									ng-model="mobile.qr.android.url" 
 								   	ui-event="{ 
-								   		focus: 'mobile.onFocusQR($event)', 
-									   	keyup: 'mobile.onKeyUpQR($event)',
-								   		blur : 'mobile.onBlurQR($event)' 
+								   		focus: 'onFocusQR($event)', 
+									   	keyup: 'onKeyUpQR($event)',
+								   		blur : 'onBlurQR($event)' 
 								   	}"
 								   	ng-disabled="mobile.qr.android.loading" />
 								   	<wave-spinner ng-show="mobile.qr.android.loading"></wave-spinner>
@@ -171,7 +171,7 @@
 						<div class="form-group">
 							<label for="testimoni-left" class="col-md-6 control-label">Photo Left</label>
 							<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-								<button class="btn btn-sm btn-default" ng-click="mobile.getPhoto('left')">Select photo</button>
+								<button class="btn btn-sm btn-default" ng-click="getPhoto('left')">Select photo</button>
 							</div>
 						</div>
 						<div class="form-group">
@@ -188,7 +188,7 @@
 						<div class="form-group">
 							<label for="testimoni-left" class="col-md-6 control-label">Photo Right</label>
 							<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-								<button class="btn btn-sm btn-default" ng-click="mobile.getPhoto('right')">Select photo</button>
+								<button class="btn btn-sm btn-default" ng-click="getPhoto('right')">Select photo</button>
 							</div>
 						</div>
 						<div class="form-group">
@@ -206,7 +206,7 @@
 					<div class="form-group">
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 							<a class="btn btn-sm btn-default btn-block"
-								ng-click="mobile.save()">
+								ng-click="save()">
 								<i class="fa fa-save"></i> Save
 							</a>
 							<a class="btn btn-sm btn-block"
@@ -257,7 +257,7 @@
 										<button type="button" class="btn btn-sm btn-block btn-primary">Upload Image</button>
 										<upload-image class="margin-top-bottom"
 											upload-image-class="btn-primary btn-block"
-											upload-image-options="screenshotuUloadOptions"
+											upload-image-options="screenshotUploadOptions"
 											ng-model="mobile.images.screenshot"></upload-image>
 									</div>
 								</div>
@@ -659,10 +659,14 @@
         <h3 class="modal-title"><i class="fa fa-cog"></i> Save Configuration</h3>
     </div>
     <div class="modal-body">
-    	<form>
+    	<div ng-show="loading.load" style="position: absolute;top: 40%;left: 40%;">
+    		<wave-spinner></wave-spinner>
+    		<label style="padding-top:25px">{{ loading.message }}</label>
+    	</div>
+    	<form style="opacity: {{ loading.load ? 0.5 : 1 }}">
     		<div class="form-group">
-    			<label for="name">Name</label>
-    			<input type="text" class="form-control" id="name" placeholder="Name" ng-model="data.name">
+    			<label for="title">Name</label>
+    			<input type="text" class="form-control" id="name" placeholder="Name of app" ng-model="data.title">
     		</div>
     		<div class="form-group">
     			<label for=""></label>
@@ -671,8 +675,8 @@
     	</form>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="save()" ng-disabled="loading">
-        	<i class="fa fa-circle-o-notch fa-spin" ng-hide="!loading"></i> Save
+        <button class="btn btn-primary" ng-click="save()" ng-disabled="loading.load">
+        	<i class="fa fa-circle-o-notch fa-spin" ng-show="loading.load"></i> Save
         </button>
         <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
     </div>

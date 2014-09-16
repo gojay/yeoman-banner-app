@@ -33,7 +33,15 @@ define([
     	'Fabric', 
     	'FabricConstants', 
     	'Keypress',
-    	function ($rootScope, $scope, $http, $log, $timeout, BASEURL, Postermobile, RecentMobilePhotos, SaveMobile, $modal, slidePush, Fabric, FabricConstants, Keypress) {
+
+    	'mobile',
+    	function (
+    		$rootScope, $scope, $http, $log, $timeout, 
+    		BASEURL, Postermobile, RecentMobilePhotos, SaveMobile, $modal, slidePush, 
+    		Fabric, FabricConstants, Keypress, mobile) {
+
+    		$log.debug('mobile', mobile);
+    		$scope.mobiles = mobile.all;
 
     		var self = this;
 
@@ -49,7 +57,9 @@ define([
 			$scope.fabric = {};
 			$scope.FabricConstants = FabricConstants;
 
-			$scope.mobile = Postermobile.model;
+			$scope.mobile   = mobile.detail ? mobile.detail.mobile : Postermobile.model;
+            $scope.fromJSON = mobile.detail ? mobile.detail.config : null;
+
 			$scope.FabricConstants.presetSizes = Postermobile.presetSizes;
 			$scope.FabricConstants.CustomAttributes = Postermobile.CustomAttributes;
 
@@ -62,42 +72,9 @@ define([
 	                template: '<div ng-include src="\'views/splash-mobile-top-config.html\'"></div>'
 				},
 				left: {
-					model : [{
-						name : 'App 1',
-						image: 'http://lorempixel.com/300/600/abstract/1'
-					},{
-						name : 'App 2',
-						image: 'http://lorempixel.com/300/600/abstract/2'
-					},{
-						name : 'App 3',
-						image: 'http://lorempixel.com/300/600/abstract/3'
-					},{
-						name : 'App 4',
-						image: 'http://lorempixel.com/300/600/abstract/4'
-					},{
-						name : 'App 5',
-						image: 'http://lorempixel.com/300/600/abstract/5'
-					},{
-						name : 'App 6',
-						image: 'http://lorempixel.com/300/600/abstract/6'
-					},{
-						name : 'App 7',
-						image: 'http://lorempixel.com/300/600/abstract/7'
-					}],
-	                template: '<div class="container" style="padding-top:70px">'+
-	                	'<div class="row">'+
-						  	'<div class="col-lg-3 col-md-3" ng-repeat="obj in menus.left.model">'+
-							    '<div class="thumbnail">'+
-							      '<img ng-src="{{ obj.image }}" alt="...">'+
-							      '<div class="caption">'+
-							        '<h3>{{ obj.name }}</h3>'+
-							        '<p><button class="btn btn-sm btn-primary">Button</button> '+ 
-							        	'<button class="btn btn-sm btn-default">Button</button></p>'+
-							      '</div>'+
-							    '</div>'+
-						  	'</div>'+
-						'</div>'+
-					'</div>'
+					model : $scope.mobiles,
+	                template: '<div ng-include src="\'views/splash-mobile-left-config.html\'"></div>'
+
 				}
             };
 			$scope.toggleControls = function(){
@@ -112,7 +89,6 @@ define([
 				}
 				// angular.element("body").animate({ scrollTop: scroll }, "slow");
 			};
-
 			$scope.resetControls = function(){
 				var fabric = $scope.fabric;
 				var object = fabric.selectedObject;
@@ -150,7 +126,6 @@ define([
 				object.top  = o.top * fabric.canvasScale;
 				fabric.render();
 			};
-
 			$scope.deselectObject = function(){
 				var id = 'menu-top';
 				$scope.fabric.deactivateAll();
@@ -212,12 +187,12 @@ define([
             $scope.$watchCollection('mobile.dimensions.app', function(dimension){
                 console.log('mobile.dimensions.app', dimension);
                 if( !dimension ) return;
-                // $scope.screenshotuUloadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
-                $scope.screenshotuUloadOptions.data.width = dimension.width;
-                $scope.screenshotuUloadOptions.data.height = dimension.height;
+                // $scope.screenshotUploadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
+                $scope.screenshotUploadOptions.data.width = dimension.width;
+                $scope.screenshotUploadOptions.data.height = dimension.height;
             });
 
-            $scope.screenshotuUloadOptions = {
+            $scope.screenshotUploadOptions = {
             	headers: {},
             	data   : {
                 	name  : 'mobile_screenshot',
@@ -238,13 +213,19 @@ define([
 					CustomAttributes: FabricConstants.CustomAttributes,
 					onChangeCanvasSize: onChangeCanvasSize
 				});
+
+	            if( $scope.fromJSON ){
+	            	$scope.fabric.presetSize = Postermobile.presetSizes[1];
+	            	$scope.loadJSON();
+
+	            	mobileGenerateQR('iphone');
+                    mobileGenerateQR('android');
+	            }
 			};
 
 			$scope.$on('canvas:created', $scope.init);
 
-			Keypress.onSave(function() {
-				$scope.updatePage();
-			});
+			Keypress.onSave(function(){  $scope.save() });
 			Keypress.onControls({
 				up: function(){
 					if( $scope.fabric.selectedObject ) {
@@ -283,6 +264,7 @@ define([
 				self.clearCanvas();
 
 				if( self.presetSize && self.presetSize.hasOwnProperty('type') ){
+
 					// if is paper a4 / a5, set canvas scale
 					var initialCanvasScale = self.canvasScale = 0.3;
 
@@ -454,15 +436,15 @@ define([
             var qrcode = angular.element('#qrcode');
 
             var currentQRURL = null;
-            $scope.mobile.onFocusQR = function(e){
+            $scope.onFocusQR = function(e){
                 currentQRURL = e.target.value;
             };
-            $scope.mobile.onKeyUpQR = function(e){
+            $scope.onKeyUpQR = function(e){
                 var name  = e.target.name;
                 var valid = e.target.validity.valid;
                 $scope.mobile.qr[name].valid = e.target.validity.valid;
             };
-            $scope.mobile.onBlurQR = function(e){
+            $scope.onBlurQR = function(e){
                 var name = e.target.name;
                 var url  = e.target.value;
 
@@ -481,7 +463,7 @@ define([
             // 	console.log('mobile.photos', photos);
             // });
 
-            $scope.mobile.getPhoto = function(peopleIndex) {
+            $scope.getPhoto = function(peopleIndex) {
                 var modalInstance = $modal.open({
                     templateUrl: 'modalInsertPhoto.html',
                     controller: function($scope, $modalInstance, $timeout, data) {
@@ -564,26 +546,78 @@ define([
                 img.src = BASEURL + "/images/upload/" + $scope.mobile.photos[photoIndex];
             };
 
-            $scope.mobile.save = function(){
+            $scope.save = function(){
             	var modalInstance = $modal.open({
                     templateUrl: 'modalSave.html',
-                    controller: function($scope, $rootScope, $modalInstance, $timeout, $log, data) {
-                        $scope.loading = false;
-                        $scope.data = data;
+                    controller: function($scope, $rootScope, $modalInstance, $timeout, $log, $upload, BASEURL, data) {
+
+                    	$log.debug('data', data);
+
+                        $scope.loading = data.loading;
+                        $scope.mobile  = data.mobile;
+                        $scope.fabric  = data.fabric;
+
+                        $scope.data = {
+                        	title : $scope.mobile.text.app,
+                        	image : $scope.fabric.canvas.toDataURL(),
+                        };
+
+                        function slugify(Text) {
+						    return Text
+							        .toLowerCase()
+							        .replace(/[^\w ]+/g,'')
+							        .replace(/ +/g,'-');
+						};
 
                         $scope.save = function() {
-                        	$scope.loading = true;
-                        	SaveMobile($scope.data).then(function(response){
-                        		console.log('save:response', response);
+                        	$scope.loading.load = true;
+                        	$scope.loading.message = 'Generating image...';
 
-                        		$rootScope.menus.left.model.push({
-                        			image: $scope.data.image,
-                        			name : $scope.data.name
-                        		});
-                        		$scope.loading = false;
-                        		// $rootScope.$apply();
-	                            // $modalInstance.close();
-	                        });
+                        	// create blob image file
+							var file = $scope.fabric.getCanvasBlobFile('image/jpeg');
+							file.name = slugify($scope.data.title);
+                        	// upload screenshot
+							$upload.upload({
+                                url    : BASEURL + '/api/upload-test',
+                                method : 'POST',
+                                data   : {
+                                	width: 'original',
+                                	height: 'original'
+                                },
+                                file: file,
+                                fileFormDataName: 'file'
+                            }).then(function(response) {
+                                $log.debug('response', response);
+                        		$scope.loading.message = 'Saving configuration...';
+
+                        		$scope.data.image = BASEURL + '/' + response.data.url;
+	                        	$scope.data['meta'] = {
+	                        		'mobile' : $scope.mobile,
+	                        		'config' : $scope.fabric.getJSON( true )
+	                    		};
+                        		// save configuration
+                                SaveMobile($scope.data).then(function(response){
+	                        		console.log('save:response', response);
+
+	                        		$rootScope.safeApply(function(){
+	                        			$rootScope.menus.left.model.push({
+		                        			image: $scope.data.image,
+		                        			title: $scope.data.title
+		                        		});
+	                        		});
+	                        		$scope.loading.load = false;
+                        			$scope.loading.message = 'Please wait';
+
+		                            $modalInstance.close();
+		                        });
+
+                            }, function(response) {
+                                $log.error('response', response);
+                            }, function(evt) {
+                                // Math.min is to fix IE which reports 200% sometimes
+                                var Progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                                $log.info('response', Progress);
+                            });
                         };
                         $scope.cancel = function() {
                             $modalInstance.dismiss('cancel'); 
@@ -593,9 +627,12 @@ define([
                     resolve: {
                     	data: function(){
                     		return {
-	                        	name : $scope.mobile.text.app,
-	                        	image: $scope.fabric.canvas.getCanvasBlob(),
-	                        	value: $scope.mobile.getJSON()
+                    			loading: {
+		                        	load: false,
+		                        	message: 'Please wait'
+		                        },
+                    			mobile: $scope.mobile,
+                    			fabric: $scope.fabric
 	                        };
                     	}
                     }
@@ -606,13 +643,12 @@ define([
             //
             // toJSON
             // ================================================================
-            $scope.mobile.getJSON = function(){
+            $scope.getJSON = function(){
             	var jsonString = $scope.fabric.getJSON();
             	return JSON.parse(jsonString);
             };
 
-            $scope.fromJSON = Postermobile.JSONExample;
-            $scope.mobile.loadJSON = function(){
+            $scope.loadJSON = function(){
             	$scope.fabric.canvasOriginalWidth = 2480;
             	$scope.fabric.canvasOriginalHeight = 3508;
             	$scope.fabric.canvasScale = 0.3;
@@ -622,7 +658,6 @@ define([
             //
             // Generate Poster
             // ================================================================
-            $scope.mobile.poster = null;
             $scope.loading = false;
             $scope.generatePoster = function( id ){
                 var fabric = $scope.fabric;
@@ -645,7 +680,7 @@ define([
 	                var blob = $scope.mobile.poster = fabric.getCanvasBlob();
 	                var anchor = document.getElementById(id);
 	                anchor.download = name + ".png";
-	                anchor.href = $scope.mobile.poster = blob;
+	                anchor.href = blob;
 
             		$scope.loading = false;
                 	$scope.mobile.disable.generate = false;

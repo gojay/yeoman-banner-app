@@ -1027,7 +1027,7 @@ angular.module('common.fabric', [
 		//
 		// JSON
 		// ==============================================================
-		self.getJSON = function() {
+		self.getJSON = function( isObject ) {
 			var initialCanvasScale = self.canvasScale;
 			self.canvasScale = 1;
 			self.resetZoom();
@@ -1037,7 +1037,7 @@ angular.module('common.fabric', [
 			self.canvasScale = initialCanvasScale;
 			self.setZoom();
 
-			return json;
+			return angular.isDefined(isObject) && isObject ? JSON.parse(json) : json ;
 		};
 
 		self.loadJSON = function(json) {
@@ -1075,6 +1075,19 @@ angular.module('common.fabric', [
 			var blobUrl = URL.createObjectURL(blob);
 
 			return blobUrl;
+		};
+
+		self.dataURItoBlob = function(dataURI, type) {
+		    var binary = atob(dataURI.split(',')[1]);
+		    var array = [];
+		    for(var i = 0; i < binary.length; i++) {
+		        array.push(binary.charCodeAt(i));
+		    }
+		    return new Blob([new Uint8Array(array)], {type: type});
+		}
+		self.getCanvasBlobFile = function( type ) {
+			var base64Data = canvas.toDataURL( type );
+			return self.dataURItoBlob(base64Data, type);
 		};
 
 		self.download = function(name) {
@@ -1236,6 +1249,7 @@ angular.module('common.fabric', [
 		self.startCanvasListeners = function() {
 			canvas.on('object:selected', function() {
 				self.stopContinuousRendering();
+				console.info('object:selected');
 				$timeout(function() {
 					self.selectActiveObject();
 					self.updateBounding();

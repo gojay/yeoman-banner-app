@@ -36,7 +36,6 @@ angular.module('common.fabric.utilities', [])
 			} 
 		});
 	};
-
 	self.onControls = function(cb){
 		$(document).keydown(function(event) {
 			switch( event.which ){

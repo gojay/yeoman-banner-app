@@ -1,0 +1,18 @@
+<div class="container" style="padding-top:70px">
+	<div class="row">
+	  	<div class="col-lg-3 col-md-3" ng-repeat="obj in menus.left.model">
+		    <div class="thumbnail">
+		      <img ng-src="{{ obj.preview }}" alt="...">
+		      <div class="caption">
+		        <h3>{{ obj.title }}</h3>
+		        <p>{{ obj.description }}</p>
+		        <p>
+		        	<button click-link="/splash/mobile/{{ obj.ID }}" class="btn btn-sm btn-primary">View</button>  
+		        	<button class="btn btn-sm btn-danger">Delete</button>
+		        	<button class="btn btn-sm btn-success">Download</button>
+		        </p>
+		      </div>
+		    </div>
+	  	</div>
+	</div>
+</div>

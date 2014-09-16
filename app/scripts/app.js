@@ -70,6 +70,17 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 }
             }
         ])
+        .directive('clickLink', ['$location', function($location) {
+            return {
+                link: function(scope, element, attrs) {
+                    element.on('click', function() {
+                        scope.$apply(function() {
+                            $location.path(attrs.clickLink);
+                        });
+                    });
+                }
+            }
+        }])
         .config(['$compileProvider', '$routeProvider', '$locationProvider',
             function($compileProvider, $routeProvider, $locationProvider) {
                 // compile sanitazion
@@ -96,8 +107,38 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     })
                     /* splash/poster */
                     .when('/splash/mobile', {
-                      templateUrl: 'views/mobile.html',
-                      controller: 'SplashMobileCtrl'
+                        templateUrl: 'views/mobile.html',
+                        controller: 'SplashMobileCtrl',
+                        resolve: {
+                            mobile: function($rootScope, RecentMobiles){
+                                $rootScope.isLoading = true;
+                                return RecentMobiles().then(function(data){
+                                    $rootScope.isLoading = false;
+                                    return {
+                                        all: data,
+                                        detail: null
+                                    }
+                                });
+                            }
+                        }
+                    })
+                    .when('/splash/mobile/:mobileId', {
+                        templateUrl: 'views/mobile.html',
+                        controller: 'SplashMobileCtrl',
+                        resolve: {
+                            mobile: function($rootScope, RecentMobiles, DetailMobile){
+                                $rootScope.isLoading = true;
+                                return RecentMobiles().then(function(all){
+                                    return DetailMobile().then(function(detail){
+                                        $rootScope.isLoading = false;
+                                        return {
+                                            all   : all,
+                                            detail: detail
+                                        };
+                                    });
+                                });
+                            }
+                        }
                     })
                     .when('/splash/facebook', {
                       templateUrl: 'views/splash/facebook.html',
@@ -151,6 +192,16 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         ])
         .run(['$rootScope', '$window', '$timeout', /*'snapRemote',*/
             function($rootScope, $window, $timeout /*, snapRemote*/ ) {
+                $rootScope.safeApply = function(fn) {
+                    var phase = this.$root.$$phase;
+                    if(phase == '$apply' || phase == '$digest') {
+                        if(fn && (typeof(fn) === 'function')) {
+                        fn();
+                        }
+                    } else {
+                        this.$apply(fn);
+                    }
+                };
                 $rootScope.user = null;
                 // sidemenu
                 $rootScope.menus = {

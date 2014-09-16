@@ -4,7 +4,6 @@ define(['angular', 'angular-resource'], function (angular) {
   angular.module('bannerAppApp.services.AuthResource', ['ngResource'])
 	.service('authResource', ['$http', '$resource', '$cookieStore', 'BASEURL', function authResource($http, $resource, $cookieStore, BASEURL) {
 		// AngularJS will instantiate a singleton by calling "new" on this function
-		this.url = null;
 		return {
 			authentifiedRequest: function(method, url, data, okCallback, errCallback){
 				var headers = {'X-Auth-Token' : $cookieStore.get('token')};
@@ -38,6 +37,18 @@ define(['angular', 'angular-resource'], function (angular) {
 					}
 				});
 			}
+		}
+	}])
+	.service('creatorID', ['authResource', '$q', function creatorID(authResource, $q) {
+		// AngularJS will instantiate a singleton by calling "new" on this function
+		return function(){
+			var deferred = $q.defer();
+			authResource.authentifiedRequest('GET', '/api/ID', {}, function(data){
+				deferred.resolve(data);
+			}, function(err){
+				deferred.reject('Unable to get creator ID : ' + err);
+			})
+			return deferred.promise;
 		}
 	}]);
 });
