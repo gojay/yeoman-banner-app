@@ -41,7 +41,13 @@ define([
     		Fabric, FabricConstants, Keypress, mobile) {
 
     		$log.debug('mobile', mobile);
-    		$scope.mobiles = mobile.all;
+    		$scope.mobiles = {};
+    		$scope.mobiles.data = mobile.all;
+    		$scope.mobiles.delete = function($index){
+    			if(confirm('Are you sure ?')) {
+    				delete $scope.mobiles.data[$index];
+    			}
+    		};
 
     		var self = this;
 

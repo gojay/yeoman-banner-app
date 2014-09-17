@@ -54,8 +54,8 @@ define(['angular'], function (angular) {
 
 		$scope.showEditor = false;
 		$scope.animation = {
-			templates: 'bouncy-slide-down',
-			settings: 'bouncy-slide-down'
+			templates: 'bouncy-slide-right',
+			settings : 'bouncy-slide-left'
 		};
 		$scope.accordion = {
 			closeOthers : true,

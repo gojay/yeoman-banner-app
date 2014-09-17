@@ -43,7 +43,9 @@ require.config({
         'fabricDirective': 'lib/fabric/fabricDirective',
         'fabricDirtyStatus': 'lib/fabric/fabricDirtyStatus',
         'fabricUtilities': 'lib/fabric/fabricUtilities',
-        'fabricWindow': 'lib/fabric/fabricWindow'
+        'fabricWindow': 'lib/fabric/fabricWindow',
+
+        'pusher': 'http://js.pusher.com/2.2/pusher.min'
     },
     shim: {
         'angular': {
@@ -96,7 +98,9 @@ require.config({
         'fabricDirective': ['fabric'],
         'fabricDirtyStatus': ['fabric'],
         'fabricUtilities': ['fabric'],
-        'fabricWindow': ['fabric']
+        'fabricWindow': ['fabric'],
+
+        // 'pusher': { exports: 'Pusher' }
     },
     priority: [
         'angular'

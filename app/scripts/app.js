@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -15,6 +15,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.controllers.SplashFacebookCtrl',
             'bannerAppApp.controllers.SplashCustomCtrl',
             'bannerAppApp.controllers.LoginCtrl',
+            'bannerAppApp.controllers.PusherCtrl',
 
             'bannerAppApp.filters.Comatonewline',
             'bannerAppApp.filters.Splitintolines',
@@ -26,7 +27,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.services.AuthResource',
             'bannerAppApp.services.Banner',
             'bannerAppApp.services.Postermobile',
-            /*angJSDeps*/
+/*angJSDeps*/
             'ngRoute',
             'ngCookies',
             'ngResource',
@@ -47,6 +48,11 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         })
         .constant('BASEURL', 'http://dev.angularjs/_learn_/require-angular-banner-creator')
+        .constant('PusherConfig', {
+            apiID: '89723',
+            apiKey: '43fd3eef0863aaee13db',
+            apiSecret: 'fb0125d8a8073f280f4e'
+        })
         .directive('bindUnsafeHtml', ['$compile',
             function($compile) {
                 return function(scope, element, attrs) {
@@ -180,6 +186,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     .when('/login', {
                       templateUrl: 'views/login.html',
                       controller: 'LoginCtrl'
+                    })
+                    .when('/pusher', {
+                      templateUrl: 'views/pusher.html',
+                      controller: 'PusherCtrl'
                     })
                     .otherwise({
                         redirectTo: '/'
