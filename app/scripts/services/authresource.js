@@ -55,7 +55,7 @@ define(['angular', 'angular-resource'], function (angular) {
 		// AngularJS will instantiate a singleton by calling "new" on this function
 		return function( data ){
 			var deferred = $q.defer();
-			authResource.authentifiedRequest('POST', '/api/message', data, function(response){
+			authResource.authentifiedRequest('POST', '/api/pusher/message', data, function(response){
 				deferred.resolve(response);
 			}, function(err){
 				deferred.reject('Unable to send message : ' + err);
