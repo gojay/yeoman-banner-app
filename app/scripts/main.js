@@ -45,7 +45,8 @@ require.config({
         'fabricUtilities': 'lib/fabric/fabricUtilities',
         'fabricWindow': 'lib/fabric/fabricWindow',
 
-        'pusher': 'http://js.pusher.com/2.2/pusher.min'
+        'pusher': 'http://js.pusher.com/2.2/pusher.min',
+        'moment': '../bower_components/moment/moment'
     },
     shim: {
         'angular': {

@@ -24,11 +24,12 @@ define(['angular'], function(angular) {
                     });
                     $scope.$on('event:auth-loginConfirmed', function(event, data) {
                         console.log('event:auth-loginConfirmed', event, data);
+                        if( !data ) return;
                         // set user n token cookie
-                        // $rootScope.user = data.user;
-                        // $cookieStore.put('token', data.token);
-                        // // redirect to previous route
-                        // $location.path( nextRoute );
+                        $rootScope.user = data.user;
+                        $cookieStore.put('X-Auth-Token', data.token);
+                        // redirect to previous route
+                        $location.path( nextRoute );
                     });
                     $scope.$on('event:auth-loginRequired', function(event, data) {
                         console.log('event:auth-loginRequired', event, data);

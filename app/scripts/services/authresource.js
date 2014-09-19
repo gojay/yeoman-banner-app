@@ -6,7 +6,7 @@ define(['angular', 'angular-resource'], function (angular) {
 		// AngularJS will instantiate a singleton by calling "new" on this function
 		return {
 			authentifiedRequest: function(method, url, data, okCallback, errCallback){
-				var headers = {'X-Auth-Token' : $cookieStore.get('token')};
+				var headers = {'X-Auth-Token' : $cookieStore.get('X-Auth-Token')};
 				// var headers = {'X-Auth-Token': 'basic ' + btoa('admin:admin')};
 
 				if($.inArray(angular.uppercase(method), ['POST', 'PUT']) >= 0){

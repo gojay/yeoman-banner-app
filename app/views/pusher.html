@@ -154,9 +154,12 @@ img {
 		<p>Simple Chat</p>
 
 		<ul class="list-group">
-			<li class="list-group-item bouncy-slide-down" ng-repeat="message in messages">{{ message.username }} : {{ message.text }}</li>
+			<li class="list-group-item bouncy-slide-down" ng-repeat="message in messages">
+				{{ message.username }} : {{ message.text }}
+				<span class="text-muted pull-right"> {{ getMoment($index) }}</span>
+			</li>
 		</ul>
-		<label ng-show="userEvent"><small>{{ userEvent }}</small></label>
+		<label ng-show="userEvent" class="text-muted"><small>{{ userEvent }}</small></label>
 		<div class="input-group">
 			<input type="text" class="form-control" placeholder="{{data.username}}" 
 				ui-event="{ keydown:'keyDown($event)', keyup:'keyUp($event)', blur:'blur($event)' }"
@@ -174,17 +177,17 @@ img {
 		<h3>Who's Online</h3>
 		<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 			<div class="col-xs-6 col-md-3">
-			    <a href="#" class="thumbnail">
+			    <a href="#" class="thumbnail" style="border:none;">
 			      <img src="http://api.randomuser.me/portraits/men/1.jpg" class="img-circle">
 			    </a>
 			</div>
 			<div class="col-xs-6 col-md-3">
-			    <a href="#" class="thumbnail">
+			    <a href="#" class="thumbnail" style="border:none;">
 			      <img src="http://api.randomuser.me/portraits/women/13.jpg" class="img-circle">
 			    </a>
 			</div>
 			<div class="col-xs-6 col-md-3">
-			    <a href="#" class="thumbnail">
+			    <a href="#" class="thumbnail" style="border:none;">
 			      <img src="http://api.randomuser.me/portraits/men/55.jpg" class="img-circle">
 			    </a>
 			</div>

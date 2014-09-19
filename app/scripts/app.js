@@ -48,10 +48,16 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         })
         .constant('BASEURL', 'http://dev.angularjs/_learn_/require-angular-banner-creator')
-        .constant('PusherConfig', {
-            apiID: '89723',
-            apiKey: '43fd3eef0863aaee13db',
-            apiSecret: 'fb0125d8a8073f280f4e'
+        .constant('PUSHER', {
+            config: {
+                appID: '89723',
+                appKey: '43fd3eef0863aaee13db',
+                appSecret: 'fb0125d8a8073f280f4e',
+            },
+            channel: {
+                private : 'private-messages',
+                presence: 'presence-messages'
+            }
         })
         .directive('bindUnsafeHtml', ['$compile',
             function($compile) {

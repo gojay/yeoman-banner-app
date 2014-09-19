@@ -1,9 +1,9 @@
-define(['angular', 'pusher'], function (angular) {
+define(['angular', 'pusher', 'moment'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.PusherCtrl', [])
-    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', 'BASEURL', 'PusherConfig', 'pushMessage', 
-    	function ($scope, $log, $timeout, $location, $http, BASEURL, PusherConfig, pushMessage) {
+    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', 'BASEURL', 'PUSHER', 'pushMessage', 
+    	function ($scope, $log, $timeout, $location, $http, BASEURL, PUSHER, pushMessage) {
         	$scope.connectionStatus = null;
     		$scope.sending = false;
 
@@ -20,6 +20,30 @@ define(['angular', 'pusher'], function (angular) {
         	$scope.userEvent = null;
         	$scope.messages = [];
 
+ 			// moment.js
+        	$scope.getMoment = function( $index ){
+        		var published = $scope.messages[$index].published;
+
+        		if( !published ) return;
+        		$log.info('published', published);
+        		return moment.utc(published).fromNow();
+        	};
+
+       //  	$timeout(function(){
+       //  		$log.info('get pusher login');
+       //  		$http({
+			    //     method: 'GET',
+			    //     url: BASEURL + '/api/pusher/test',
+			    //     withCredentials: true
+			    //  }).success(function(data){
+			    //     // With the data succesfully returned, call our callback
+			    //     // callbackFunc(data);
+			    //     $log.debug('pusher login', data);
+			    // }).error(function(error){
+			    //     $log.error('pusher login', error);
+			    // });
+       //  	}, 5000);
+
         	// Pusher
     	  	// =======================================
 
@@ -28,7 +52,7 @@ define(['angular', 'pusher'], function (angular) {
           	// pusher authentication
   			Pusher.channel_auth_endpoint = BASEURL + '/api/pusher/auth/socket';
     		  
-    		var pusher = new Pusher(PusherConfig.apiKey);
+    		var pusher = new Pusher(PUSHER.config.appKey);
     		// Receiving connection
     		pusher.connection.bind('state_change', function( change ) {
     			// $log.debug('state_change', change);
@@ -36,7 +60,7 @@ define(['angular', 'pusher'], function (angular) {
     		    $scope.$apply();
     	  	});
     		// Receiving message 
-    	  	var channel = pusher.subscribe('private-messages');
+    	  	var channel = pusher.subscribe(PUSHER.channel.private);
     	  	channel.bind('new_message', function(data){
     	  		if( data.username == $scope.data.username ) return;
     	  		$scope.messages.push(data);
@@ -63,7 +87,8 @@ define(['angular', 'pusher'], function (angular) {
     	  		// $scope.sending = true;
     	  		$scope.messages.push({
     	  			username: data.username,
-    	  			text: data.text
+    	  			text: data.text,
+    	  			published: moment.utc().format()
     	  		});
     	  		pushMessage(data).then(function(response){
     	  			// $log.debug('send:response', response);
@@ -73,7 +98,7 @@ define(['angular', 'pusher'], function (angular) {
     	  	}
 
     	  	function sendTypingEvents( typing, enteredText ){
-    	  		$log.info('sendTypingEvents');
+    	  		// $log.info('sendTypingEvents');
 	    	  	channel.trigger('client-typing', {
                     username   : $scope.data.username,
                     typing     : typing,
@@ -87,8 +112,6 @@ define(['angular', 'pusher'], function (angular) {
     	  	var timeout = null;
     	  	$scope.keyUp = function($event){
     	  		var value = $event.target.value;
-
-    	  		$log.info($.trim(value).length);
 
     	  		if( !timeout ){
     	  			var enteredText = value ? true : false ;

@@ -42,6 +42,9 @@ define(['angular'], function(angular) {
                 }, {
                     title: 'ng-file-upload',
                     link: 'module/ng-file-upload'
+                }, {
+                    title: 'PUSHER',
+                    link: 'pusher'
                 }]
             };
 
