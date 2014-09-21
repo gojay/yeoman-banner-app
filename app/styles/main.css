@@ -314,3 +314,9 @@ input[type="range"]::-webkit-slider-thumb {
   background-color: #F0F0F0;
   border: 1px solid black;
 }
+
+.navbar-image {
+  position: absolute;
+  top: 17px;
+  left: -20px;
+}

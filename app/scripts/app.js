@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -16,6 +16,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.controllers.SplashCustomCtrl',
             'bannerAppApp.controllers.LoginCtrl',
             'bannerAppApp.controllers.PusherCtrl',
+            'bannerAppApp.controllers.TestCtrl',
+            'bannerAppApp.controllers.Test2Ctrl',
 
             'bannerAppApp.filters.Comatonewline',
             'bannerAppApp.filters.Splitintolines',
@@ -34,6 +36,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'ngSanitize',
             'http-auth-interceptor',
             'angularFileUpload',
+            'angularjs-gravatardirective',
 
             'ngAnimate',
 
@@ -93,8 +96,11 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 }
             }
         }])
-        .config(['$compileProvider', '$routeProvider', '$locationProvider',
-            function($compileProvider, $routeProvider, $locationProvider) {
+        .config(['$compileProvider', '$routeProvider', '$locationProvider', '$logProvider',
+            function($compileProvider, $routeProvider, $locationProvider, $logProvider) {
+
+                $logProvider.debugEnabled(true);
+
                 // compile sanitazion
                 $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|blob):/);
                 $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob):|data:image\//);
@@ -197,6 +203,14 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                       templateUrl: 'views/pusher.html',
                       controller: 'PusherCtrl'
                     })
+                    .when('/test', {
+                      templateUrl: 'views/test.html',
+                      controller: 'TestCtrl'
+                    })
+                    .when('/test2', {
+                      templateUrl: 'views/test2.html',
+                      controller: 'Test2Ctrl'
+                    })
                     .otherwise({
                         redirectTo: '/'
                     });
@@ -206,8 +220,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 //     .hashPrefix('!');
             }
         ])
-        .run(['$rootScope', '$window', '$timeout', /*'snapRemote',*/
-            function($rootScope, $window, $timeout /*, snapRemote*/ ) {
+        .run(['$rootScope', '$cookieStore', '$window', '$timeout', /*'snapRemote',*/
+            function($rootScope, $cookieStore, $window, $timeout /*, snapRemote*/ ) {
                 $rootScope.safeApply = function(fn) {
                     var phase = this.$root.$$phase;
                     if(phase == '$apply' || phase == '$digest') {
@@ -218,7 +232,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         this.$apply(fn);
                     }
                 };
-                $rootScope.user = null;
+
+                $rootScope.auth = $cookieStore.get('user');
                 // sidemenu
                 $rootScope.menus = {
                     top: {
@@ -238,37 +253,17 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 $window.addEventListener('resize', function() {
                     $rootScope.$digest();
                 });
-                /*
-                $rootScope.$watch(
-                    function() {
-                        return window.innerWidth;
-                    },
-                    function(newVal) {
-                        snapRemote.getSnapper().then(function(snapper) {
-                            var val = parseInt(newVal * 80 / 100);
-                            snapper.settings({
-                                maxPosition: val,
-                                minPosition: -val
-                            });
-                            $timeout(function() {
-                                $('.snap-drawer').css({
-                                    'width': val + 'px'
-                                });
-                            }, 400)
-                        });
-                    }
-                );
-                */
 
                 // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
                 var oldLocation = '';
-                $rootScope.$on('$routeChangeStart', function(angularEvent, next) {
-                    console.log("routeChangeStart:event", angularEvent);
-                    console.log("routeChangeStart:next", next);
+                $rootScope.$on('$routeChangeStart', function(event, next) {
+                    // console.log("routeChangeStart:event", event);
+                    // console.log("routeChangeStart:next", next);
 
-                    var isLogin = next.$$route.originalPath == '/login';
-                    $rootScope.isLogin = isLogin;
-                    if( !isLogin ) $rootScope.$broadcast('event:auth-ping');
+                    // $rootScope.isLogin = next.$$route.originalPath == '/login';
+                    $rootScope.isLogin = false;
+                    if( angular.isDefined(next.$$route.controller) && next.$$route.controller != 'LoginCtrl' ) 
+                        $rootScope.$broadcast('event:auth-ping');
                     
                     var isDownwards = true;
                     if (next && next.$$route) {
@@ -276,7 +271,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         if (oldLocation !== newLocation && oldLocation.indexOf(newLocation) !== -1) {
                             isDownwards = false;
                         }
-
                         oldLocation = newLocation;
                     }
                     $rootScope.isDownwards = isDownwards;

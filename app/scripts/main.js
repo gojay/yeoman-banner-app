@@ -15,6 +15,7 @@ require.config({
         'angular-spinkit': '../bower_components/angular-spinkit/build/angular-spinkit.min',
         'angular-file-upload': '../bower_components/ng-file-upload/angular-file-upload',
         'angular-file-upload-shim': '../bower_components/ng-file-upload-shim/angular-file-upload-shim',
+        'angular-gravatar': '../bower_components/angularjs-gravatar/dist/angularjs-gravatardirective.min',
         // 'angular-snap': '../bower_components/angular-snap/angular-snap',
 
         'angular-slide-push': 'lib/slide-push/slide.and.push',
@@ -26,6 +27,7 @@ require.config({
         'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
         // 'snap': 'lib/snap.min',
         'qrcode': 'lib/jquery.qrcode.min',
+        'jquery-cookie': 'lib/jquery.cookie',
 
         'raphael': 'lib/raphael/raphael',
         'raphael-group': 'lib/raphael/raphael.group',
@@ -67,6 +69,7 @@ require.config({
         'angular-ui-utils': ['angular'],
         'angular-spinkit': ['angular'],
         'angular-file-upload': ['angular'],
+        'angular-gravatar': ['angular'],
         // 'angular-file-upload-shim': ['angular'],
         // 'angular-snap': ['angular', 'snap'],
 
@@ -82,6 +85,7 @@ require.config({
 
         'bootstrap': ['jquery'],
         'qrcode': ['jquery'],
+        'jquery-cookie': ['jquery'],
 
         'raphael': ['jquery'],
         'raphael-group': ['raphael'],
@@ -100,8 +104,6 @@ require.config({
         'fabricDirtyStatus': ['fabric'],
         'fabricUtilities': ['fabric'],
         'fabricWindow': ['fabric'],
-
-        // 'pusher': { exports: 'Pusher' }
     },
     priority: [
         'angular'
@@ -125,11 +127,13 @@ require([
     'angular-ui-utils',
     'angular-animate',
     'angular-spinkit',
+    'angular-gravatar',
     // 'snap',
     // 'angular-snap',
     // 'angular-font-select',
     'angular-slide-push',
-    'bootstrap'
+    'bootstrap',
+    'jquery-cookie'
 ], function(jquery, angularFileUploadShim, angular, app) {
     'use strict';
     /* jshint ignore:start */

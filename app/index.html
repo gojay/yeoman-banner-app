@@ -45,6 +45,9 @@
         <a class="navbar-brand" href="#">Banner Creator</a>
         <a class="navbar-brand pull-right" ng-push-menu="menu-right"><i class="fa fa-chevron-right"></i></a>
         <a id="button-menu-top" class="navbar-brand pull-right" ng-push-menu="menu-top"><i class="fa fa-gear"></i></a>
+        <span ng-show="$root.auth" class="navbar-brand pull-right" style="position:relative">
+          <gravatar-image data-gravatar-email="$root.auth.user.email" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="img-circle navbar-image"></gravatar-image>
+        </span>
       </div>
     </nav>
 

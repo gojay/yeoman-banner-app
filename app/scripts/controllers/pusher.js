@@ -2,15 +2,19 @@ define(['angular', 'pusher', 'moment'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.PusherCtrl', [])
-    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', 'BASEURL', 'PUSHER', 'pushMessage', 
-    	function ($scope, $log, $timeout, $location, $http, BASEURL, PUSHER, pushMessage) {
+    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', 'BASEURL', 'PUSHER', 'pushMessage', 
+    	function ($scope, $log, $timeout, $location, $http, $cookieStore, BASEURL, PUSHER, pushMessage) {
         	$scope.connectionStatus = null;
     		$scope.sending = false;
 
+            var user  = $cookieStore.get('user');
+            var token = user ? user.token : null;
+
     		// get username from query 
-    		// ?username=noeb
-    		var username = $location.search()['username'];
-    		if( !username ) username = 'guest_' + (Math.floor(Math.random()*9000) + 1000);
+    		// ?username=noob
+            var username = user.user.username;
+    		// var username = $location.search()['username'];
+    		// if( !username ) username = 'guest_' + (Math.floor(Math.random()*9000) + 1000);
     		// your data
         	$scope.data = {
         		username: username,
@@ -23,36 +27,40 @@ define(['angular', 'pusher', 'moment'], function (angular) {
  			// moment.js
         	$scope.getMoment = function( $index ){
         		var published = $scope.messages[$index].published;
-
         		if( !published ) return;
-        		$log.info('published', published);
         		return moment.utc(published).fromNow();
         	};
-
-       //  	$timeout(function(){
-       //  		$log.info('get pusher login');
-       //  		$http({
-			    //     method: 'GET',
-			    //     url: BASEURL + '/api/pusher/test',
-			    //     withCredentials: true
-			    //  }).success(function(data){
-			    //     // With the data succesfully returned, call our callback
-			    //     // callbackFunc(data);
-			    //     $log.debug('pusher login', data);
-			    // }).error(function(error){
-			    //     $log.error('pusher login', error);
-			    // });
-       //  	}, 5000);
-
+/*
+        	$timeout(function(){
+        		$log.info('get pusher user');
+        		$http({
+			        method: 'GET',
+			        url: BASEURL + '/api/pusher/user',
+                    headers: {'X-Auth-Token' : token},
+			        withCredentials: true
+			     }).success(function(data){
+			        $log.debug('pusher user', data);
+			    }).error(function(error){
+			        $log.error('pusher user', error);
+			    });
+        	}, 5000);
+*/
         	// Pusher
     	  	// =======================================
 
     	  	// pusher logs
           	Pusher.log = function( msg ) { $log.log('Pusher.log', msg); };
-          	// pusher authentication
+          	// pusher authentication endpoint
   			Pusher.channel_auth_endpoint = BASEURL + '/api/pusher/auth/socket';
     		  
-    		var pusher = new Pusher(PUSHER.config.appKey);
+    		var pusher = new Pusher(PUSHER.config.appKey, {
+                auth: {
+                    headers: {
+                      'X-Auth-Token': token
+                    },
+                    withCredentials: true
+                }
+            });
     		// Receiving connection
     		pusher.connection.bind('state_change', function( change ) {
     			// $log.debug('state_change', change);
@@ -90,11 +98,24 @@ define(['angular', 'pusher', 'moment'], function (angular) {
     	  			text: data.text,
     	  			published: moment.utc().format()
     	  		});
+
     	  		pushMessage(data).then(function(response){
     	  			// $log.debug('send:response', response);
     	  			// $scope.sending = false;
     	  			$scope.data.text = null;
     	  		});
+
+                // $http({
+                //     method: 'POST',
+                //     url: BASEURL + '/api/pusher/message',
+                //     headers: { 'X-Auth-Token':token },
+                //     withCredentials: true
+                //  }).success(function(data){
+                //     $log.debug('pusher message', data);
+                //     $scope.data.text = null;
+                // }).error(function(error){
+                //     $log.error('pusher message', error);
+                // });
     	  	}
 
     	  	function sendTypingEvents( typing, enteredText ){

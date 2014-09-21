@@ -5,26 +5,28 @@ define(['angular'], function (angular) {
     .controller('LoginCtrl', ['$scope', '$rootScope', 'authResource', 'authService', function ($scope, $rootScope, authResource, authService) {
 
       	$rootScope.$on('event:auth-message', function(event, message){
-      		$scope.alert = message;
+      		  $scope.alert = message;
       	});
 
-        $scope.auth = {
-            credentials: {
-                username : null,
-                password : null
-            }
+        $scope.user = {
+            email : 'dani.gojay@gmail.com',
+            password : 'admin'
         };
-        $scope.auth.login = function(){
-            authResource.authentifiedRequest('POST', '/api/login', $scope.auth.credentials, function(data, status){
+        $scope.user.login = function(){
+            authResource.authentifiedRequest('POST', '/api/login', $scope.user, function(data, status){
                 console.log('auth:login', data, status);
 
                 if (status < 200 || status >= 300) return;
 
-                $scope.auth.credentials.username = null;
-                $scope.auth.credentials.password = null;
+                $scope.user.email = null;
+                $scope.user.password = null;
                 
                 // login confirmed
-                authService.loginConfirmed(data);
+                // send data, then update config headers token
+                authService.loginConfirmed(data, function(config){
+                    config.headers["X-Auth-Token"] = data.token;
+                    return config;
+                });
             })
         };
     }]);

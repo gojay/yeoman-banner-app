@@ -40,15 +40,15 @@
 	  border-top-right-radius: 0;
 	}
 </style>
-<form class="form-signin" role="form" ng-submit="auth.login()">
+<form class="form-signin" role="form" ng-submit="user.login()">
 	<div ng-if="alert" class="alert alert-dismissable alert-warning">
 	  <button type="button" class="close" data-dismiss="alert">×</button>
 	  <h4>{{ alert.status }}</h4>
 	  <p bind-unsafe-html="alert.description"></p>
 	</div>
     <h2 class="form-signin-heading">Please sign in</h2>
-    <input type="text" class="form-control" placeholder="Username" required="" ng-model="auth.credentials.username">
-    <input type="password" class="form-control" placeholder="Password" required="" ng-model="auth.credentials.password">
+    <input type="email" class="form-control" placeholder="Email" ng-model="user.email" required>
+    <input type="password" class="form-control" placeholder="Password" ng-model="user.password" required>
     <!-- <label class="checkbox">
       <input type="checkbox" value="remember-me"> Remember me
     </label> -->
