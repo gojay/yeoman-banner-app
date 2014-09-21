@@ -1,8 +1,11 @@
 <!doctype html>
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" id="ng-app" ng-app=""> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9" id="ng-app" ng-app=""> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" ng-app> <!--<![endif]-->
-  <head>
+<!--[if gt IE 8]><!-->
+<html class="no-js" ng-app>
+<!--<![endif]-->
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title></title>
@@ -25,8 +28,9 @@
     <link rel="stylesheet" href="scripts/lib/slide-push/slide.and.push.css" />
 
     <!-- endbuild -->
-  </head>
-  <body ng-app="bannerAppApp" class="auth-application" style="padding-top: 70px;">
+</head>
+
+<body ng-app="bannerAppApp" class="auth-application" style="padding-top: 70px;">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -40,25 +44,26 @@
         <div bind-unsafe-html="$root.menus.right.template"></div>
     </ng-slide-push-menu>
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-hide="$root.isLogin">
-      <div class="container">
-        <a class="navbar-brand" ng-push-menu="menu-left"><i class="fa fa-bars"></i></a>
-        <a class="navbar-brand" href="#">Banner Creator</a>
-        <a class="navbar-brand pull-right" ng-push-menu="menu-right"><i class="fa fa-chevron-right"></i></a>
-        <a id="button-menu-top" class="navbar-brand pull-right" ng-push-menu="menu-top"><i class="fa fa-gear"></i></a>
-        <span ng-show="$root.auth" class="navbar-brand pull-right" style="position:relative">
-          <gravatar-image data-gravatar-email="$root.auth.user.email" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="img-circle navbar-image"></gravatar-image>
-        </span>
-      </div>
+        <div class="container">
+            <a class="navbar-brand" ng-push-menu="menu-left"><i class="fa fa-bars"></i></a>
+            <a class="navbar-brand" href="#">Banner Creator</a>
+            <a class="navbar-brand pull-right" ng-push-menu="menu-right"><i class="fa fa-chevron-right"></i></a>
+            <a id="button-menu-top" class="navbar-brand pull-right" ng-push-menu="menu-top"><i class="fa fa-gear"></i></a>
+            <span ng-show="$root.user" class="navbar-brand pull-right" style="position:relative">
+                <gravatar-image data-gravatar-email="$root.user.email" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="img-circle navbar-image"></gravatar-image>
+            </span>
+        </div>
     </nav>
 
     <!-- transition http://angular-transitions.mgechev.com/ -->
     <double-bounce-spinner class="spinkit" style="width:100%" ng-if="$root.isLoading"></double-bounce-spinner>
-    <div class="container at-view-slide-in-left at-view-slide-out-right" 
-         ng-class="{ 
-         'bg-loading': $root.isLoading,
-         'at-view-slide-in-left at-view-slide-out-right': !$root.isDownwards,
-         'at-view-slide-in-left at-view-slide-out-left' : $root.isDownwards,
-         }" ng-view></div> 
+    <div class="container" 
+        ng-class="{ 
+            'bg-loading': $root.isLoading,
+            'at-view-slide-in-right at-view-slide-out-right': !$root.isLogin && !$root.isDownwards,
+            'at-view-slide-in-left at-view-slide-out-left'  : !$root.isLogin && $root.isDownwards
+        }" 
+        ng-view></div>
     <div class="overlay"></div>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID
@@ -78,5 +83,6 @@
     <![endif]-->
 
     <script src="bower_components/requirejs/require.js" data-main="scripts/main.js"></script>
-  </body>
+</body>
+
 </html>

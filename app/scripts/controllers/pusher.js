@@ -12,7 +12,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
 
     		// get username from query 
     		// ?username=noob
-            var username = user.user.username;
+            var username = user.username;
     		// var username = $location.search()['username'];
     		// if( !username ) username = 'guest_' + (Math.floor(Math.random()*9000) + 1000);
     		// your data

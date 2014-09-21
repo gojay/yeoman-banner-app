@@ -28,7 +28,7 @@ define(['angular'], function(angular) {
                         $log.debug('event:auth-loginConfirmed', event, data);
 
                         // set user n token cookie
-                        $rootScope.auth = data;
+                        $rootScope.user = data;
                         $cookieStore.put('user', data);
                         
                         // redirect to previous route
@@ -39,7 +39,7 @@ define(['angular'], function(angular) {
                         $log.debug('event:auth-loginRequired', data.data);
                         // remove token n user
                         $cookieStore.remove('user');
-                        $rootScope.auth = null;
+                        $rootScope.user = null;
                         // send message
                         $scope.$emit('event:auth-message', {
                             status: data.status + ' ' + data.statusText,

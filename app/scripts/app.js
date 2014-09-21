@@ -98,12 +98,13 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         }])
         .config(['$compileProvider', '$routeProvider', '$locationProvider', '$logProvider',
             function($compileProvider, $routeProvider, $locationProvider, $logProvider) {
-
+                // $log debug enable/disable
                 $logProvider.debugEnabled(true);
 
                 // compile sanitazion
                 $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|blob):/);
                 $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob):|data:image\//);
+                
                 // route
                 $routeProvider
                     .when('/', {
@@ -222,6 +223,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         ])
         .run(['$rootScope', '$cookieStore', '$window', '$timeout', /*'snapRemote',*/
             function($rootScope, $cookieStore, $window, $timeout /*, snapRemote*/ ) {
+                
                 $rootScope.safeApply = function(fn) {
                     var phase = this.$root.$$phase;
                     if(phase == '$apply' || phase == '$digest') {
@@ -233,7 +235,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                 };
 
-                $rootScope.auth = $cookieStore.get('user');
+                // user info authenticated
+                $rootScope.user = $cookieStore.get('user');
                 // sidemenu
                 $rootScope.menus = {
                     top: {
@@ -254,16 +257,18 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     $rootScope.$digest();
                 });
 
-                // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
                 var oldLocation = '';
-                $rootScope.$on('$routeChangeStart', function(event, next) {
-                    // console.log("routeChangeStart:event", event);
-                    // console.log("routeChangeStart:next", next);
-
-                    // $rootScope.isLogin = next.$$route.originalPath == '/login';
-                    $rootScope.isLogin = false;
-                    if( angular.isDefined(next.$$route.controller) && next.$$route.controller != 'LoginCtrl' ) 
+                $rootScope.$on('$locationChangeStart', function(event, next, current) {
+                    $rootScope.isLogin = ( next.indexOf('login') !== -1 );
+                    if( next.indexOf('#') !== -1 && next.indexOf('login') == -1 ) 
                         $rootScope.$broadcast('event:auth-ping');
+                });
+                // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
+                $rootScope.$on('$routeChangeStart', function(event, next) {
+                    // $rootScope.isLogin = next.$$route.originalPath == '/login';
+                    // $rootScope.isLogin = false;
+                    // if( angular.isDefined(next.$$route.controller) && next.$$route.controller != 'LoginCtrl' ) 
+                    //     $rootScope.$broadcast('event:auth-ping');
                     
                     var isDownwards = true;
                     if (next && next.$$route) {

@@ -317,6 +317,6 @@ input[type="range"]::-webkit-slider-thumb {
 
 .navbar-image {
   position: absolute;
-  top: 17px;
+  top: 10px;
   left: -20px;
 }
