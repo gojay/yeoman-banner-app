@@ -2,19 +2,22 @@ define(['angular', 'pusher', 'moment'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.PusherCtrl', [])
-    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', 'BASEURL', 'PUSHER', 'pushMessage', 
-    	function ($scope, $log, $timeout, $location, $http, $cookieStore, BASEURL, PUSHER, pushMessage) {
+    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', '$filter', 'BASEURL', 'PUSHER', 'pushMessage', 
+    	function ($scope, $log, $timeout, $location, $http, $cookieStore, $filter, BASEURL, PUSHER, pushMessage) {
         	$scope.connectionStatus = null;
     		$scope.sending = false;
+
+    		// var pusher_channel = 'private';
+    		var pusher_channel = 'presence';
 
             var user  = $cookieStore.get('user');
             var token = user ? user.token : null;
 
     		// get username from query 
     		// ?username=noob
-            var username = user.username;
-    		// var username = $location.search()['username'];
-    		// if( !username ) username = 'guest_' + (Math.floor(Math.random()*9000) + 1000);
+    		var _username = $location.search()['username'];
+    		if( !_username ) _username = 'guest_' + (Math.floor(Math.random()*9000) + 1000);
+            var username = user ? user.username : _username ;
     		// your data
         	$scope.data = {
         		username: username,
@@ -51,8 +54,11 @@ define(['angular', 'pusher', 'moment'], function (angular) {
     	  	// pusher logs
           	Pusher.log = function( msg ) { $log.log('Pusher.log', msg); };
           	// pusher authentication endpoint
-  			Pusher.channel_auth_endpoint = BASEURL + '/api/pusher/auth/socket';
-    		  
+  			Pusher.channel_auth_endpoint = BASEURL + (( pusher_channel == 'private' ) ? 
+  						  												'/api/pusher/auth/socket' :
+  						  												'/api/pusher/auth/presence?username='+user.username+'&email='+user.email);
+    		
+    		// Connect Pusher
     		var pusher = new Pusher(PUSHER.config.appKey, {
                 auth: {
                     headers: {
@@ -68,7 +74,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
     		    $scope.$apply();
     	  	});
     		// Receiving message 
-    	  	var channel = pusher.subscribe(PUSHER.channel.private);
+    	  	var channel = pusher.subscribe(PUSHER.channel[pusher_channel]);
     	  	channel.bind('new_message', function(data){
     	  		if( data.username == $scope.data.username ) return;
     	  		$scope.messages.push(data);
@@ -87,6 +93,45 @@ define(['angular', 'pusher', 'moment'], function (angular) {
 	  			$scope.userEvent = eventMessage;
     	  		$scope.$apply();
     	  	});
+
+    	  	$scope.members = [];
+
+	  		channel.bind('pusher:subscription_succeeded', getOnlineUsers);
+	  		channel.bind('pusher:member_added', memberAdd);
+	  		channel.bind('pusher:member_removed', memberRemoved);
+
+    	  	function getOnlineUsers( users ){
+    	  		$log.debug('[members:online]', users);
+
+    	  		var members = [];
+    	  		users.each( function(member){
+    	  			members.push(member);
+    	  		});
+    	  		$scope.members = members;
+    	  		$scope.$apply();
+    	  	}
+
+    	  	function memberAdd( user ){
+    	  		$log.debug('[member:add]', user);
+
+    	  		$scope.members.push(user);
+    	  		$scope.$apply();
+    	  	}
+
+    	  	function memberRemoved( user ){
+    	  		$log.debug('[member:removed]', user);
+
+    	  		var memberIndex = null;
+				angular.forEach($scope.members, function(member, index) {
+					console.log(index, member.info.email, user.info.email);
+				  	if (member.info.email == user.info.email) {
+				     	memberIndex = index;
+				  	}
+				});
+
+				$scope.members.splice(memberIndex, 1);
+				$scope.$apply();
+    	  	}
     
     	  	$scope.send = sendMessage;
 

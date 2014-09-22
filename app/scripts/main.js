@@ -27,7 +27,7 @@ require.config({
         'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
         // 'snap': 'lib/snap.min',
         'qrcode': 'lib/jquery.qrcode.min',
-        'jquery-cookie': 'lib/jquery.cookie',
+        // 'jquery-cookie': 'lib/jquery.cookie',
 
         'raphael': 'lib/raphael/raphael',
         'raphael-group': 'lib/raphael/raphael.group',
@@ -133,7 +133,7 @@ require([
     // 'angular-font-select',
     'angular-slide-push',
     'bootstrap',
-    'jquery-cookie'
+    // 'jquery-cookie'
 ], function(jquery, angularFileUploadShim, angular, app) {
     'use strict';
     /* jshint ignore:start */

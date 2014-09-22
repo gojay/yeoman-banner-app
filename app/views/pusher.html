@@ -173,22 +173,12 @@ img {
 	</div>
 </div>
 <div class="container">
-	<div class="row">
+	<div class="row" ng-show="members">
 		<h3>Who's Online</h3>
 		<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-			<div class="col-xs-6 col-md-3">
+			<div class="col-xs-6 col-md-2" ng-repeat="member in members">
 			    <a href="#" class="thumbnail" style="border:none;">
-			      <img src="http://api.randomuser.me/portraits/men/1.jpg" class="img-circle">
-			    </a>
-			</div>
-			<div class="col-xs-6 col-md-3">
-			    <a href="#" class="thumbnail" style="border:none;">
-			      <img src="http://api.randomuser.me/portraits/women/13.jpg" class="img-circle">
-			    </a>
-			</div>
-			<div class="col-xs-6 col-md-3">
-			    <a href="#" class="thumbnail" style="border:none;">
-			      <img src="http://api.randomuser.me/portraits/men/55.jpg" class="img-circle">
+			      	<gravatar-image data-gravatar-email="member.info.email" data-gravatar-size="80" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="img-circle"></gravatar-image>
 			    </a>
 			</div>
 		</div>
