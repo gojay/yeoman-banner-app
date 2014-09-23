@@ -4,15 +4,18 @@ define(['angular'], function (angular) {
   angular.module('bannerAppApp.controllers.LoginCtrl', [])
     .controller('LoginCtrl', ['$scope', '$rootScope', 'authResource', 'authService', function ($scope, $rootScope, authResource, authService) {
 
-      	$rootScope.$on('event:auth-message', function(event, message){
-      		  $scope.alert = message;
+      	$scope.$on('event:auth-error', function(event, message){
+            console.log('event:auth-error', message);
+      		$scope.alert = message;
       	});
 
+        $scope.loading = false;
         $scope.user = {
             email : 'dani.gojay@gmail.com',
             password : 'admin'
         };
         $scope.user.login = function(){
+            $scope.loading = true;
             authResource.authentifiedRequest('POST', '/api/login', $scope.user, function(data, status){
                 console.log('auth:login', data, status);
 
@@ -21,6 +24,8 @@ define(['angular'], function (angular) {
                 $scope.user.email = null;
                 $scope.user.password = null;
                 
+                $scope.loading = false;
+
                 // login confirmed
                 // send data, then update config headers token
                 authService.loginConfirmed(data, function(config){

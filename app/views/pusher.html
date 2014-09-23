@@ -1,173 +1,223 @@
 <style>
 	.connection-status {
-	  position: absolute;
-	  display: block;
+	  /*position: absolute;
 	  right: 0;
-	  top: 0;
+	  top: 0;*/
+	  display: block;
 	  background-color: red;
 	  width: 40px;
 	  height: 40px;
+	  margin-right: 10px;
 	  
 	  -webkit-border-radius: 20px;
 	  -moz-border-radius: 20px;
 	  border-radius: 20px;
 	}
 
-	.connection-status.connecting {
-	  background-color: orange;
+	.disconnected {
+	  /*background-color: red;*/
+	  color: red;
+	}
+	.connecting {
+	  /*background-color: orange;*/
+	  color: orange;
+	}
+	.connected {
+	  /*background-color: green;*/
+	  color: green;
+	}
+	.message-status {
+		position: absolute;
+		right: 10px;
+		top: -10px;
+		color: #B4BCC2;
+	}
+	#chat .img-circle {
+		width: 40px;
+		display: inline-block;
 	}
 
-	.connection-status.connected {
-	  background-color: green;
+
+	.navbar { min-height: 45px }
+
+	.col-md-2, .col-md-10{
+	    padding:0;
+	}
+	.panel{
+	    margin-bottom: 0px;
+	}
+	.chat-window{
+	    bottom:0;
+	    position:fixed;
+	    width: 260px;
+	    /*float:right;*/
+	    /*margin-left:10px;*/
+	}
+	.chat-window:first-child{ right:0; }
+	.chat-window:nth-child(2){ right:260px; }
+
+	.chat-window > .panel{
+	    /*border-radius: 5px 5px 0 0;*/
+	    border-radius: 0;
+	  -webkit-border-radius: 0;
+	  -moz-border-radius: 0;
+	}
+	.icon_minim{
+	    padding:2px 10px;
+	}
+	.msg_container_base{
+	  background: #e5e5e5;
+	  margin: 0;
+	  padding: 0 10px 10px;
+	  max-height:300px;
+	  overflow-x:hidden;
+	}
+	.top-bar {
+	  background: #666;
+	  color: white;
+	  padding: 10px;
+	  position: relative;
+	  overflow: hidden;
+
+	    border-radius: 0;
+	  -webkit-border-radius: 0;
+	  -moz-border-radius: 0;
+	}
+	.msg_receive{
+	    padding-left:0;
+	    margin-left:0;
+	}
+	.msg_sent{
+	    padding-bottom:20px !important;
+	    margin-right:0;
+	}
+	.messages {
+	  background: white;
+	  padding: 10px;
+	  /*border-radius: 2px;*/
+	  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	  max-width:100%;
+	}
+	.messages > p {
+	    font-size: 13px;
+	    margin: 0 0 0.2rem 0;
+	  }
+	.messages > time {
+	    font-size: 11px;
+	    color: #ccc;
+	}
+	.msg_container {
+	    padding: 10px;
+	    overflow: hidden;
+	    display: flex;
+	}
+	img {
+	    display: block;
+	    width: 100%;
+	}
+	.avatar {
+	    position: relative;
+	}
+	.base_receive .avatar:after {
+	    content: "";
+	    position: absolute;
+	    top: 0;
+	    right: 0;
+	    width: 0;
+	    height: 0;
+	    border: 5px solid #FFF;
+	    border-left-color: rgba(0, 0, 0, 0);
+	    border-bottom-color: rgba(0, 0, 0, 0);
 	}
 
-.col-md-2, .col-md-10{
-    padding:0;
-}
-.panel{
-    margin-bottom: 0px;
-}
-.chat-window{
-    bottom:0;
-    position:fixed;
-    float:right;
-    margin-left:10px;
-}
-.chat-window > div > .panel{
-    border-radius: 5px 5px 0 0;
-}
-.icon_minim{
-    padding:2px 10px;
-}
-.msg_container_base{
-  background: #e5e5e5;
-  margin: 0;
-  padding: 0 10px 10px;
-  max-height:300px;
-  overflow-x:hidden;
-}
-.top-bar {
-  background: #666;
-  color: white;
-  padding: 10px;
-  position: relative;
-  overflow: hidden;
-}
-.msg_receive{
-    padding-left:0;
-    margin-left:0;
-}
-.msg_sent{
-    padding-bottom:20px !important;
-    margin-right:0;
-}
-.messages {
-  background: white;
-  padding: 10px;
-  border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  max-width:100%;
-}
-.messages > p {
-    font-size: 13px;
-    margin: 0 0 0.2rem 0;
-  }
-.messages > time {
-    font-size: 11px;
-    color: #ccc;
-}
-.msg_container {
-    padding: 10px;
-    overflow: hidden;
-    display: flex;
-}
-img {
-    display: block;
-    width: 100%;
-}
-.avatar {
-    position: relative;
-}
-.base_receive > .avatar:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 0;
-    height: 0;
-    border: 5px solid #FFF;
-    border-left-color: rgba(0, 0, 0, 0);
-    border-bottom-color: rgba(0, 0, 0, 0);
-}
+	.base_sent {
+	  justify-content: flex-end;
+	  align-items: flex-end;
+	}
+	.base_sent .avatar:after {
+	    content: "";
+	    position: absolute;
+	    bottom: 0;
+	    left: 0;
+	    width: 0;
+	    height: 0;
+	    border: 5px solid white;
+	    border-right-color: transparent;
+	    border-top-color: transparent;
+	    box-shadow: 1px 1px 2px rgba(black, 0.2); // not quite perfect but close
+	}
 
-.base_sent {
-  justify-content: flex-end;
-  align-items: flex-end;
-}
-.base_sent > .avatar:after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 0;
-    border: 5px solid white;
-    border-right-color: transparent;
-    border-top-color: transparent;
-    box-shadow: 1px 1px 2px rgba(black, 0.2); // not quite perfect but close
-}
+	.msg_sent time{
+	    float: right;
+	}
 
-.msg_sent > time{
-    float: right;
-}
+	.msg_container_base::-webkit-scrollbar-track
+	{
+	    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	    background-color: #F5F5F5;
+	}
 
+	.msg_container_base::-webkit-scrollbar
+	{
+	    width: 12px;
+	    background-color: #F5F5F5;
+	}
 
+	.msg_container_base::-webkit-scrollbar-thumb
+	{
+	    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	    background-color: #555;
+	}
 
-.msg_container_base::-webkit-scrollbar-track
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    background-color: #F5F5F5;
-}
-
-.msg_container_base::-webkit-scrollbar
-{
-    width: 12px;
-    background-color: #F5F5F5;
-}
-
-.msg_container_base::-webkit-scrollbar-thumb
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #555;
-}
-
-.btn-group.dropup{
-    position:fixed;
-    left:0px;
-    bottom:0;
-}
+	.btn-group.dropup{
+	    position:fixed;
+	    left:0px;
+	    bottom:0;
+	}
 </style>
 <div class="jumbotron">
 	<div class="container" style="position:relative;">
-		<span class="connection-status {{connectionStatus}}"></span>
-		<h1>Hello, {{ data.username }}!</h1>
-		<p>Simple Chat</p>
-
-		<ul class="list-group">
-			<li class="list-group-item bouncy-slide-down" ng-repeat="message in messages">
-				{{ message.username }} : {{ message.text }}
-				<span class="text-muted pull-right"> {{ getMoment($index) }}</span>
-			</li>
-		</ul>
-		<label ng-show="userEvent" class="text-muted"><small>{{ userEvent }}</small></label>
-		<div class="input-group">
-			<input type="text" class="form-control" placeholder="{{data.username}}" 
-				ui-event="{ keydown:'keyDown($event)', keyup:'keyUp($event)', blur:'blur($event)' }"
-				ng-model="data.text"
-				ng-disabled="sending">
-			<div class="input-group-btn">
-				<button class="btn btn-default" ng-click="send()" ng-disabled="sending">
-				<i class="fa fa-circle-o-notch fa-spin hide" ng-show="sending"></i> Send</button>
+		<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+			<h1>Hello, {{ data.username }}!</h1>
+			<p>Simple Chat</p>
+		</div>
+		<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+			<div class="pull-right">
+				<i class="fa fa-circle {{connectionStatus}}"></i>
+				<button class="btn" 
+					ng-class="{'btn-danger': connected, 'btn-success': !connected}"
+					ng-click="userConnectOrDisconnect()">
+					<i class="fa"
+						ng-class="{'fa-sign-out': connected, 'fa-sign-in': !connected}"></i> {{ connected ? 'Disconnect' : 'Login'}}
+				</button>
+			</div>
+		</div>
+		
+		<div id="chat" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<ul class="list-group">
+				<li class="list-group-item bouncy-slide-down" ng-repeat="message in messages">
+					<span class="message-status" ng-if="message.sending != undefined">
+						<i class="fa" ng-class="{
+						'fa-check': !message.sending,
+						'fa-circle-o-notch fa-spin': message.sending
+						}"></i>
+					</span>
+					<span>
+						<gravatar-image data-gravatar-email="message.email" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="img-circle"></gravatar-image> {{ message.text }}
+					</span>
+					<span class="text-muted pull-right"> {{ getMoment($index) }}</span>
+				</li>
+			</ul>
+			<label ng-show="userEvent" class="text-muted"><small>{{ userEvent }}</small></label>
+			<div class="input-group">
+				<input type="text" class="form-control" placeholder="{{data.username}}" 
+					ui-event="{ keydown:'keyDown($event)', keyup:'keyUp($event)', blur:'blur($event)' }"
+					ng-model="data.text"
+					ng-disabled="sending">
+				<div class="input-group-btn">
+					<button class="btn btn-default" ng-click="send()" ng-disabled="sending">
+					<i class="fa fa-circle-o-notch fa-spin hide" ng-show="sending"></i> Send</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -184,116 +234,111 @@ img {
 		</div>
 	</div>
 </div>
-<!--
-<div class="container">
-	<div class="row chat-window col-xs-5 col-md-3" id="chat_window_1" style="margin-left:10px;">
-        <div class="col-xs-12 col-md-12" ng-init="collapsed = false">
-        	<div class="panel panel-primary">
-                <div class="panel-heading top-bar">
-                    <div class="col-md-8 col-xs-8">
-                        <h3 class="panel-title"><i class="fa fa-comment"></i> Chat - Miguel</h3>
-                    </div>
-                    <div class="col-md-4 col-xs-4" style="text-align: right;">
-                        <a ng-click="collapsed = !collapsed" ><i class="fa" ng-class="{ 'fa-chevron-down' : !collapsed,'fa-chevron-up' : collapsed }"></i></a>
-                        <a href="#"><i class="fa fa-times"></i></a>
-                    </div>
-                </div>
-                <div class="panel-body msg_container_base toggle" ng-hide="collapsed">
-                    <div class="row msg_container base_receive">
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+
+
+<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+    <div class="container">
+        <div class="row" ng-init="collapsed = []">
+        	<div class="chat-window" ng-init="collapsed[1] = true">
+                <div class="panel panel-primary">
+                    <div class="panel-heading top-bar">
+                        <div class="col-md-8 col-xs-8">
+                            <h3 class="panel-title"><i class="fa fa-comment"></i> Chat - Miguel</h3>
                         </div>
-                        <div class="col-md-10 col-xs-10">
-                            <div class="messages msg_receive">
-                                <p>Typing..</p>
-                                <time datetime="2009-11-13T20:00"></time>
+                        <div class="col-md-4 col-xs-4" style="text-align: right;">
+                            <a ng-click="collapsed[1] = !collapsed[1]" ><i class="fa" ng-class="{ 'fa-chevron-down' : !collapsed[1],'fa-chevron-up' : collapsed[1] }"></i></a>
+                            <a href="#"><i class="fa fa-times"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body msg_container_base" ng-hide="collapsed[1]">
+
+                        <div class="row msg_container base_receive">
+                            <div class="col-md-2 col-xs-2 avatar">
+                                <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                            </div>
+                            <div class="col-md-10 col-xs-10">
+                                <div class="messages msg_receive">
+                                    <p>that mongodb thing looks good, huh?
+                                    tiny master db, and huge document store</p>
+                                    <time datetime="2009-11-13T20:00"></time>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row msg_container base_sent">
-                        <div class="col-md-10 col-xs-10">
-                            <div class="messages msg_sent">
-                                <p>that mongodb thing looks good, huh?
-                                tiny master db, and huge document store</p>
-                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                        <div class="row msg_container base_sent">
+                            <div class="col-md-10 col-xs-10">
+                                <div class="messages msg_sent">
+                                    <p>that mongodb thing looks good, huh?
+                                    tiny master db, and huge document store</p>
+                                    <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-xs-2 avatar">
+                                <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
                             </div>
                         </div>
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                        </div>
+
                     </div>
-                    <div class="row msg_container base_receive">
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                        </div>
-                        <div class="col-md-10 col-xs-10">
-                            <div class="messages msg_receive">
-                                <p>that mongodb thing looks good, huh?
-                                tiny master db, and huge document store</p>
-                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row msg_container base_receive">
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                        </div>
-                        <div class="col-xs-10 col-md-10">
-                            <div class="messages msg_receive">
-                                <p>that mongodb thing looks good, huh?
-                                tiny master db, and huge document store</p>
-                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row msg_container base_sent">
-                        <div class="col-xs-10 col-md-10">
-                            <div class="messages msg_sent">
-                                <p>that mongodb thing looks good, huh?
-                                tiny master db, and huge document store</p>
-                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                        </div>
-                    </div>
-                    <div class="row msg_container base_receive">
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
-                        </div>
-                        <div class="col-xs-10 col-md-10">
-                            <div class="messages msg_receive">
-                                <p>that mongodb thing looks good, huh?
-                                tiny master db, and huge document store</p>
-                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row msg_container base_sent">
-                        <div class="col-md-10 col-xs-10 ">
-                            <div class="messages msg_sent">
-                                <p>that mongodb thing looks good, huh?
-                                tiny master db, and huge document store</p>
-                                <time datetime="2009-11-13T20:00">Timothy • 51 min</time>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-xs-2 avatar">
-                            <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+                    <div class="panel-footer" ng-hide="collapsed[1]">
+                        <div class="input-group">
+                            <input id="btn-input" type="text" class="form-control input-sm chat_input"
+                            ui-event="{ keyup:'keyUp($event)' }" ng-model="data.message" placeholder="Write your message here..." />
+                            <span class="input-group-btn">
+                            <button class="btn btn-primary btn-sm" id="btn-chat">Send</button>
+                            </span>
                         </div>
                     </div>
                 </div>
-                <div class="panel-footer">
-                    <div class="input-group">
-                        <input id="btn-input" type="text" class="form-control input-sm chat_input"
-                        ui-event="{ keyup:'keyUp($event)' }" ng-model="data.message" placeholder="Write your message here..." />
-                        <span class="input-group-btn">
-                        <button class="btn btn-primary btn-sm" id="btn-chat">Send</button>
-                        </span>
+            </div>
+
+        	<div class="chat-window" ng-init="collapsed[2] = true">
+                <div class="panel panel-primary">
+                    <div class="panel-heading top-bar">
+                        <div class="col-md-8 col-xs-8">
+                            <h3 class="panel-title"><i class="fa fa-comment"></i> Chat - Jose</h3>
+                        </div>
+                        <div class="col-md-4 col-xs-4" style="text-align: right;">
+                            <a ng-click="collapsed[2] = !collapsed[2]" ><i class="fa" ng-class="{ 'fa-chevron-down' : !collapsed[2],'fa-chevron-up' : collapsed[2] }"></i></a>
+                            <a href="#"><i class="fa fa-times"></i></a>
+                        </div>
+                    </div>
+                    <div class="panel-body msg_container_base" ng-hide="collapsed[2]">
+
+                        <div class="row msg_container" 
+                        	ng-repeat="chat in chats"
+                        	ng-class-odd="'base_sent'" ng-class-even="'base_receive'">
+
+	                            <div class="col-md-2 col-xs-2 avatar" ng-if="$odd">
+	                                <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+	                            </div>
+                        		<div class="col-md-10 col-xs-10" ng-if="$odd">
+	                                <div class="messages msg_receive">
+	                                    <p>{{chat.text}}</p>
+	                                    <time datetime="2009-11-13T20:00">{{chat.name}} • 51 min</time>
+	                                </div>
+	                            </div>
+
+	                            <div class="col-md-10 col-xs-10" ng-if="$even">
+	                                <div class="messages msg_sent">
+	                                    <p>{{chat.text}}</p>
+	                                    <time datetime="2009-11-13T20:00">{{chat.name}} • 51 min</time>
+	                                </div>
+	                            </div>
+	                            <div class="col-md-2 col-xs-2 avatar" ng-if="$even">
+	                                <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+	                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer" ng-hide="collapsed[2]">
+                        <div class="input-group">
+                            <input id="btn-input" type="text" class="form-control input-sm chat_input"
+                            ui-event="{ keyup:'keyUp($event)' }" ng-model="data.message" placeholder="Write your message here..." />
+                            <span class="input-group-btn">
+                            <button class="btn btn-primary btn-sm" id="btn-chat">Send</button>
+                            </span>
+                        </div>
                     </div>
                 </div>
-    		</div>
+            </div>
         </div>
     </div>
-</div>
--->
+</nav>

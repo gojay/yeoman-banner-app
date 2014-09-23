@@ -109,7 +109,14 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 $routeProvider
                     .when('/', {
                         templateUrl: 'views/main.html',
-                        controller: 'MainCtrl'
+                        controller: 'MainCtrl',
+                        // resolve: {
+                        //     delay: function($q, $timeout, $rootScope, authResource) {
+                        //         var deferred = $q.defer();
+                        //         $rootScope.$broadcast('event:auth-ping', deferred);
+                        //         return deferred.promise;
+                        //     }
+                        // }
                     })
                     .when('/bootstrap', {
                         templateUrl: 'views/bootstrap.html',
@@ -201,8 +208,15 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                       controller: 'LoginCtrl'
                     })
                     .when('/pusher', {
-                      templateUrl: 'views/pusher.html',
-                      controller: 'PusherCtrl'
+                        templateUrl: 'views/pusher.html',
+                        controller: 'PusherCtrl',
+                        resolve: {
+                            delay: function($q, $timeout, $rootScope, authResource) {
+                                var deferred = $q.defer();
+                                $rootScope.$broadcast('event:auth-ping', deferred);
+                                return deferred.promise;
+                            }
+                        }
                     })
                     .when('/test', {
                       templateUrl: 'views/test.html',
@@ -258,11 +272,11 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 });
 
                 var oldLocation = '';
-                $rootScope.$on('$locationChangeStart', function(event, next, current) {
-                    $rootScope.isLogin = ( next.indexOf('login') !== -1 );
-                    if( next.indexOf('#') !== -1 && next.indexOf('login') == -1 ) 
-                        $rootScope.$broadcast('event:auth-ping');
-                });
+                // $rootScope.$on('$locationChangeStart', function(event, next, current) {
+                //     $rootScope.isLogin = ( next.indexOf('login') !== -1 );
+                //     if( next.indexOf('#') !== -1 && next.indexOf('login') == -1 ) 
+                //         $rootScope.$broadcast('event:auth-ping', next);
+                // });
                 // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
                 $rootScope.$on('$routeChangeStart', function(event, next) {
                     // $rootScope.isLogin = next.$$route.originalPath == '/login';

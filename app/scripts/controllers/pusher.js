@@ -4,8 +4,9 @@ define(['angular', 'pusher', 'moment'], function (angular) {
   angular.module('bannerAppApp.controllers.PusherCtrl', [])
     .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', '$filter', 'BASEURL', 'PUSHER', 'pushMessage', 
     	function ($scope, $log, $timeout, $location, $http, $cookieStore, $filter, BASEURL, PUSHER, pushMessage) {
-        	$scope.connectionStatus = null;
-    		$scope.sending = false;
+        	$scope.connectionStatus = 'disconnected';
+        	$scope.connected = false;
+    		// $scope.sending = false;
 
     		// var pusher_channel = 'private';
     		var pusher_channel = 'presence';
@@ -21,6 +22,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
     		// your data
         	$scope.data = {
         		username: username,
+        		email: user.email,
         		text : null
         	};
         	// your friend
@@ -33,6 +35,8 @@ define(['angular', 'pusher', 'moment'], function (angular) {
         		if( !published ) return;
         		return moment.utc(published).fromNow();
         	};
+
+    	  	$scope.send = sendMessage;
 /*
         	$timeout(function(){
         		$log.info('get pusher user');
@@ -67,16 +71,45 @@ define(['angular', 'pusher', 'moment'], function (angular) {
                     withCredentials: true
                 }
             });
-    		// Receiving connection
+            pusher.connection.bind('error', function( err ) {
+		    	$log.debug('[pusher:error]', err); 
+			  	if( err.data.code === 4004 ) {
+			    	$log.error('>>> detected limit error');
+			  	}
+			});
+    		// Receiving state change
     		pusher.connection.bind('state_change', function( change ) {
-    			// $log.debug('state_change', change);
+    			$log.debug('state_change', change);
     		    $scope.connectionStatus = change.current;
-    		    $scope.$apply();
     	  	});
+    	  	pusher.connection.bind('connected', function() {
+			  	$scope.connected = true;
+			});
+
+			$scope.userConnectOrDisconnect = function(){
+				var action = $scope.connected ? 'disconnect' : 'connect';
+				$log.info('user ' + action );
+
+				if( $scope.connected )
+					pusher.disconnect();
+				else
+					pusher.connect();
+
+			  	$scope.connected = !$scope.connected;
+			}
+
     		// Receiving message 
     	  	var channel = pusher.subscribe(PUSHER.channel[pusher_channel]);
     	  	channel.bind('new_message', function(data){
-    	  		if( data.username == $scope.data.username ) return;
+    	  		$log.log('new_message', data)
+    	  		// me
+    	  		if( data.username == $scope.data.username ) {
+    	  			var index = data.index;
+    	  			// set complete sending message
+    	  			$scope.messages[index].sending = false;
+    	  			return;
+    	  		}
+
     	  		$scope.messages.push(data);
     		    $scope.$apply();
     	  	});
@@ -102,10 +135,12 @@ define(['angular', 'pusher', 'moment'], function (angular) {
 
     	  	function getOnlineUsers( users ){
     	  		$log.debug('[members:online]', users);
-
+    	  		var me = users.me;
     	  		var members = [];
     	  		users.each( function(member){
-    	  			members.push(member);
+    	  			if( me.info.email != member.info.email ) {
+    	  				members.push(member);
+    	  			}
     	  		});
     	  		$scope.members = members;
     	  		$scope.$apply();
@@ -133,21 +168,26 @@ define(['angular', 'pusher', 'moment'], function (angular) {
 				$scope.$apply();
     	  	}
     
-    	  	$scope.send = sendMessage;
-
     	  	function sendMessage(){
-    	  		var data = $scope.data;
-    	  		// $scope.sending = true;
-    	  		$scope.messages.push({
+    	  		var messages = $scope.messages,
+    	  			data = $scope.data;
+    	  		// set message index
+    	  		data['index'] = messages.length;
+
+    	  		// push message
+    	  		messages.push({
     	  			username: data.username,
-    	  			text: data.text,
-    	  			published: moment.utc().format()
+    	  			email: data.email,
+    	  			text : data.text,
+    	  			published: moment.utc().format(),
+    	  			sending: true
     	  		});
 
     	  		pushMessage(data).then(function(response){
     	  			// $log.debug('send:response', response);
     	  			// $scope.sending = false;
-    	  			$scope.data.text = null;
+	    	  		// empty text
+		  			$scope.data.text = null;
     	  		});
 
                 // $http({
@@ -208,6 +248,33 @@ define(['angular', 'pusher', 'moment'], function (angular) {
     	  			timeout = null;
     	  		}, 1000);
     	  	};
+
+    	  	$scope.chats = [{
+    	  		name: 'Dani',
+    	  		email: 'dani.gojay@gmail.com',
+    	  		text: 'that mongodb thing looks good, huh? tiny master db, and huge document store',
+    	  		time: '2009-11-13T20:00'
+    	  	},{
+    	  		name: 'Gojay',
+    	  		email: 'gojay_rocks@yahoo.com',
+    	  		text: 'that mongodb thing looks good, huh? tiny master db, and huge document store',
+    	  		time: '2009-11-13T20:00'
+    	  	},{
+    	  		name: 'Dani',
+    	  		email: 'dani.gojay@gmail.com',
+    	  		text: 'that mongodb thing looks good, huh? tiny master db, and huge document store',
+    	  		time: '2009-11-13T20:00'
+    	  	},{
+    	  		name: 'Gojay',
+    	  		email: 'gojay_rocks@yahoo.com',
+    	  		text: 'that mongodb thing looks good, huh? tiny master db, and huge document store',
+    	  		time: '2009-11-13T20:00'
+    	  	},{
+    	  		name: 'Dani',
+    	  		email: 'dani.gojay@gmail.com',
+    	  		text: 'that mongodb thing looks good, huh? tiny master db, and huge document store',
+    	  		time: '2009-11-13T20:00'
+    	  	}];
 
         }]);
 });

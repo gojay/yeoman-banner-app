@@ -8,23 +8,27 @@ define(['angular'], function(angular) {
                 restrict: 'C',
                 link: function postLink($scope, $element, $attrs) {
 
-                    var nextRoute = null;
-                    
+                    $scope.nextRoute = '/';
+                    $scope.deferred = null;
+
                     // get next route
                     $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
-                        nextRoute = previous ? previous.$$route.originalPath : '/';
+                        $scope.nextRoute = previous ? previous.$$route.originalPath : '/';
                     });
                     // authorization ping
-                    $scope.$on('event:auth-ping', function() {
-                        $log.debug('event:auth-ping', nextRoute);
+                    $scope.$on('event:auth-ping', function(event, deferred) {
+                        $log.debug('event:auth-ping', deferred, $scope.nextRoute);
+
+                        $scope.deferred = deferred;
+
                         authResource.authentifiedRequest('GET', '/api/ping', {}, function(){
-                            authService.loginConfirmed();
+                            // authService.loginConfirmed();
+                            $log.info('User Authenticaed go to next route ' + $scope.nextRoute);
+                            $scope.deferred.resolve();
                         });
                     });
                     // authorization login successfull
                     $scope.$on('event:auth-loginConfirmed', function(event, data) {
-                        if( !data ) return;
-
                         $log.debug('event:auth-loginConfirmed', event, data);
 
                         // set user n token cookie
@@ -32,17 +36,17 @@ define(['angular'], function(angular) {
                         $cookieStore.put('user', data);
                         
                         // redirect to previous route
-                        $location.path( nextRoute );
+                        $location.path( $scope.nextRoute );
                     });
                     // authorization login required
                     $scope.$on('event:auth-loginRequired', function(event, data) {
-                        $log.debug('event:auth-loginRequired', data.data);
+                        $log.debug('event:auth-loginRequired', data, $scope.deferred);
                         // remove token n user
                         $cookieStore.remove('user');
                         $rootScope.user = null;
                         // send message
-                        $scope.$emit('event:auth-message', {
-                            status: data.status + ' ' + data.statusText,
+                        $rootScope.$broadcast('event:auth-error', {
+                            status     : data.status + ' ' + data.statusText,
                             description: data.data.message
                         });
                         // redirect to login

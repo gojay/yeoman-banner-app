@@ -52,5 +52,5 @@
     <!-- <label class="checkbox">
       <input type="checkbox" value="remember-me"> Remember me
     </label> -->
-    <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+    <button class="btn btn-primary btn-block" type="submit" ng-class="{'disabled':loading}"><i class="fa fa-circle-o-notch fa-spin" ng-if="loading"></i> Sign in</button>
 </form>
