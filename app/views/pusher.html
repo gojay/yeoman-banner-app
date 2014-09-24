@@ -37,7 +37,6 @@
 		display: inline-block;
 	}
 
-
 	.navbar { min-height: 45px }
 
 	.col-md-2, .col-md-10{
@@ -55,6 +54,7 @@
 	}
 	.chat-window:first-child{ right:0; }
 	.chat-window:nth-child(2){ right:260px; }
+	.chat-window:nth-child(3){ right:520px; }
 
 	.chat-window > .panel{
 	    /*border-radius: 5px 5px 0 0;*/
@@ -174,6 +174,91 @@
 	    left:0px;
 	    bottom:0;
 	}
+
+
+.c-search > .form-control {
+   border-radius: 0px;
+   border-width: 0px;
+   border-bottom-width: 1px;
+   font-size: 1.3em;
+   padding: 12px 12px;
+   height: 44px;
+   outline: none !important;
+}
+.c-search > .form-control:focus {
+    outline:0px !important;
+    -webkit-appearance:none;
+    box-shadow: none;
+}
+.c-search > .input-group-btn .btn {
+   border-radius: 0px;
+   border-width: 0px;
+   border-left-width: 1px;
+   border-bottom-width: 1px;
+   height: 44px;
+}
+
+
+.c-list {
+    padding: 0px;
+    min-height: 44px;
+}
+.title {
+    display: inline-block;
+    font-size: 1.7em;
+    font-weight: bold;
+    padding: 5px 15px;
+}
+ul.c-controls {
+    list-style: none;
+    margin: 0px;
+    min-height: 44px;
+}
+
+ul.c-controls li {
+    margin-top: 8px;
+    float: left;
+}
+
+ul.c-controls li a {
+    font-size: 1.7em;
+    padding: 11px 10px 6px;   
+}
+ul.c-controls li a i {
+    min-width: 24px;
+    text-align: center;
+}
+
+ul.c-controls li a:hover {
+    background-color: rgba(51, 51, 51, 0.2);
+}
+
+.c-toggle {
+    font-size: 1.7em;
+}
+
+.name {
+    font-size: 1.7em;
+    font-weight: 700;
+}
+
+.c-info {
+    padding: 5px 10px;
+    font-size: 1.25em;
+}
+.panel-info > .panel-footer {
+	color: #ffffff;
+    background-color: #3498db;
+    border-color: #3498db;
+    min-height: 44px;
+    border-radius: 0;
+}
+.ctc_container_base {
+	margin: 0;
+	padding: 0;
+	max-height: 300px;
+	overflow-x: hidden;
+}
 </style>
 <div class="jumbotron">
 	<div class="container" style="position:relative;">
@@ -239,11 +324,106 @@
 <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
     <div class="container">
         <div class="row" ng-init="collapsed = []">
+
+            <div class="chat-window" ng-init="collapsed[3] = true" ng-init="showSearch = false">
+		        <div class="panel panel-info">
+		            <div class="panel-heading top-bar">
+                        <div class="col-md-8 col-xs-8">
+                            <h3 class="panel-title"><i class="fa fa-comments"></i> Contacts</h3>
+                        </div>
+                        <div class="col-md-4 col-xs-4" style="text-align: right;">
+                            <a ng-click="collapsed[3] = !collapsed[3]" ><i class="fa fa-minus" ></i></a>
+                            <a ng-show="!collapsed[3]" ng-click="showSearch = !showSearch"><i class="fa fa-ellipsis-v"></i></a>
+                        </div>
+                    </div>
+		            <div class="panel-body ctc_container_base" ng-hide="collapsed[3]">
+			            <div class="row" ng-show="showSearch">
+			                <div class="col-xs-12">
+			                    <div class="input-group c-search">
+			                        <input type="text" class="form-control" id="contact-list-search">
+			                        <span class="input-group-btn">
+			                            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search text-muted"></span></button>
+			                        </span>
+			                    </div>
+			                </div>
+			            </div>
+			            <ul class="list-group" id="contact-list">
+			                <li class="list-group-item">
+			                    <div class="col-sm-4 col-md-4">
+			                        <img src="http://api.randomuser.me/portraits/men/49.jpg" alt="Scott Stevens" class="img-responsive img-circle" />
+			                    </div>
+			                    <div class="col-sm-8 col-md-8">
+			                        <span>Scott Stevens</span>
+			                    </div>
+			                    <div class="clearfix"></div>
+			                </li>
+			                <li class="list-group-item">
+			                    <div class="col-sm-4 col-md-4">
+			                        <img src="http://api.randomuser.me/portraits/men/97.jpg" alt="Seth Frazier" class="img-responsive img-circle" />
+			                    </div>
+			                    <div class="col-sm-8 col-md-8">
+			                        <span>Seth Frazier</span>
+			                    </div>
+			                    <div class="clearfix"></div>
+			                </li>
+			                <li class="list-group-item">
+			                    <div class="col-sm-4 col-md-4">
+			                        <img src="http://api.randomuser.me/portraits/women/90.jpg" alt="Jean Myers" class="img-responsive img-circle" />
+			                    </div>
+			                    <div class="col-sm-8 col-md-8">
+			                        <span>Jean Myers</span>
+			                    </div>
+			                    <div class="clearfix"></div>
+			                </li>
+			                <li class="list-group-item">
+			                    <div class="col-sm-4 col-md-4">
+			                        <img src="http://api.randomuser.me/portraits/men/24.jpg" alt="Todd Shelton" class="img-responsive img-circle" />
+			                    </div>
+			                    <div class="col-sm-8 col-md-8">
+			                        <span>Todd Shelton</span>
+			                    </div>
+			                    <div class="clearfix"></div>
+			                </li>
+			                <li class="list-group-item">
+			                    <div class="col-sm-4 col-md-4">
+			                        <img src="http://api.randomuser.me/portraits/women/34.jpg" alt="Rosemary Porter" class="img-responsive img-circle" />
+			                    </div>
+			                    <div class="col-sm-8 col-md-8">
+			                        <span>Rosemary Porter</span>
+			                    </div>
+			                    <div class="clearfix"></div>
+			                </li>
+			                <li class="list-group-item">
+			                    <div class="col-sm-4 col-md-4">
+			                        <img src="http://api.randomuser.me/portraits/women/56.jpg" alt="Debbie Schmidt" class="img-responsive img-circle" />
+			                    </div>
+			                    <div class="col-sm-8 col-md-8">
+			                        <span>Debbie Schmidt</span>
+			                    </div>
+			                    <div class="clearfix"></div>
+			                </li>
+			                <li class="list-group-item">
+			                    <div class="col-sm-4 col-md-4">
+			                        <img src="http://api.randomuser.me/portraits/women/76.jpg" alt="Glenda Patterson" class="img-responsive img-circle" />
+			                    </div>
+			                    <div class="col-sm-8 col-md-8">
+			                        <span>Glenda Patterson</span>
+			                    </div>
+			                    <div class="clearfix"></div>
+			                </li>
+			            </ul>
+		            </div>
+                    <div class="panel-footer" ng-hide="collapsed[3]">
+                        
+                    </div>
+		        </div>
+		    </div>
+
         	<div class="chat-window" ng-init="collapsed[1] = true">
                 <div class="panel panel-primary">
                     <div class="panel-heading top-bar">
                         <div class="col-md-8 col-xs-8">
-                            <h3 class="panel-title"><i class="fa fa-comment"></i> Chat - Miguel</h3>
+                            <h3 class="panel-title"><i class="fa fa-comment-o"></i> Chat - Miguel</h3>
                         </div>
                         <div class="col-md-4 col-xs-4" style="text-align: right;">
                             <a ng-click="collapsed[1] = !collapsed[1]" ><i class="fa" ng-class="{ 'fa-chevron-down' : !collapsed[1],'fa-chevron-up' : collapsed[1] }"></i></a>
@@ -251,7 +431,6 @@
                         </div>
                     </div>
                     <div class="panel-body msg_container_base" ng-hide="collapsed[1]">
-
                         <div class="row msg_container base_receive">
                             <div class="col-md-2 col-xs-2 avatar">
                                 <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
@@ -276,7 +455,6 @@
                                 <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
                             </div>
                         </div>
-
                     </div>
                     <div class="panel-footer" ng-hide="collapsed[1]">
                         <div class="input-group">
@@ -292,9 +470,9 @@
 
         	<div class="chat-window" ng-init="collapsed[2] = true">
                 <div class="panel panel-primary">
-                    <div class="panel-heading top-bar">
+                    <div class="panel-heading top-bar" ng-click="collapsed[2] = !collapsed[2]">
                         <div class="col-md-8 col-xs-8">
-                            <h3 class="panel-title"><i class="fa fa-comment"></i> Chat - Jose</h3>
+                            <h3 class="panel-title"><i class="fa fa-comment"></i> Chat - Gojay</h3>
                         </div>
                         <div class="col-md-4 col-xs-4" style="text-align: right;">
                             <a ng-click="collapsed[2] = !collapsed[2]" ><i class="fa" ng-class="{ 'fa-chevron-down' : !collapsed[2],'fa-chevron-up' : collapsed[2] }"></i></a>
@@ -302,13 +480,12 @@
                         </div>
                     </div>
                     <div class="panel-body msg_container_base" ng-hide="collapsed[2]">
-
                         <div class="row msg_container" 
                         	ng-repeat="chat in chats"
                         	ng-class-odd="'base_sent'" ng-class-even="'base_receive'">
-
+								
 	                            <div class="col-md-2 col-xs-2 avatar" ng-if="$odd">
-	                                <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+									<gravatar-image data-gravatar-email="chat.email" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="img-responsive"></gravatar-image>
 	                            </div>
                         		<div class="col-md-10 col-xs-10" ng-if="$odd">
 	                                <div class="messages msg_receive">
@@ -324,7 +501,7 @@
 	                                </div>
 	                            </div>
 	                            <div class="col-md-2 col-xs-2 avatar" ng-if="$even">
-	                                <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive ">
+									<gravatar-image data-gravatar-email="chat.email" data-gravatar-rating="pg" data-gravatar-default="identicon" data-gravatar-secure="true" data-gravatar-css-class="img-responsive"></gravatar-image>
 	                            </div>
                         </div>
                     </div>
