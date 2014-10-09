@@ -45,12 +45,14 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'angularSpinkit',
             // 'snap',
             // 'jdFontselect',
-            'slidePushMenu'
+            'slidePushMenu',
+
+            'chieffancypants.loadingBar'
         ])
         .constant('jdFontselectConfig', {
             googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         })
-        .constant('BASEURL', 'http://dev.angularjs/_learn_/require-angular-banner-creator')
+        .constant('BASEURL', 'http://angularjs.local/require-angular-banner-creator')
         .constant('PUSHER', {
             config: {
                 appID: '89723',
@@ -96,10 +98,12 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 }
             }
         }])
-        .config(['$compileProvider', '$routeProvider', '$locationProvider', '$logProvider',
-            function($compileProvider, $routeProvider, $locationProvider, $logProvider) {
+        .config(['$compileProvider', '$routeProvider', '$locationProvider', '$logProvider', 'cfpLoadingBarProvider',
+            function($compileProvider, $routeProvider, $locationProvider, $logProvider, cfpLoadingBarProvider) {
                 // $log debug enable/disable
                 $logProvider.debugEnabled(true);
+
+                cfpLoadingBarProvider.includeSpinner = true;
 
                 // compile sanitazion
                 $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|blob):/);
@@ -113,7 +117,9 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         // resolve: {
                         //     delay: function($q, $timeout, $rootScope, authResource) {
                         //         var deferred = $q.defer();
-                        //         $rootScope.$broadcast('event:auth-ping', deferred);
+                        //         $rootScope.$broadcast('event:auth-ping', function(){
+                        //             deferred.resolve();
+                        //         });
                         //         return deferred.promise;
                         //     }
                         // }
@@ -136,15 +142,30 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         templateUrl: 'views/mobile.html',
                         controller: 'SplashMobileCtrl',
                         resolve: {
-                            mobile: function($rootScope, RecentMobiles){
-                                $rootScope.isLoading = true;
-                                return RecentMobiles().then(function(data){
-                                    $rootScope.isLoading = false;
-                                    return {
-                                        all: data,
-                                        detail: null
-                                    }
-                                });
+                            mobile: function($rootScope, $q, $log, RecentMobiles) {
+                                var deferred = $q.defer();
+
+                                var getMobileData = function(){
+                                    $rootScope.isLoading = true;    
+
+                                    $log.info('user auhtenticated...');
+                                    $log.info('user get recent mobiles..');
+
+                                    RecentMobiles().then(function(data){
+                                        $rootScope.isLoading = false;
+
+                                        $log.debug('reolve recent mobiles', data);
+
+                                        deferred.resolve({
+                                            all: data,
+                                            detail: null
+                                        });
+                                    });
+                                };
+
+                                $rootScope.$broadcast('event:auth-ping', getMobileData);
+
+                                return deferred.promise;
                             }
                         }
                     })
@@ -211,7 +232,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         templateUrl: 'views/pusher.html',
                         controller: 'PusherCtrl',
                         resolve: {
-                            delay: function($q, $timeout, $rootScope, authResource) {
+                            delay: function($q, $timeout, $rootScope) {
                                 var deferred = $q.defer();
                                 $rootScope.$broadcast('event:auth-ping', deferred);
                                 return deferred.promise;
@@ -238,6 +259,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         .run(['$rootScope', '$cookieStore', '$window', '$timeout', /*'snapRemote',*/
             function($rootScope, $cookieStore, $window, $timeout /*, snapRemote*/ ) {
                 
+                // safe applying scope
                 $rootScope.safeApply = function(fn) {
                     var phase = this.$root.$$phase;
                     if(phase == '$apply' || phase == '$digest') {
@@ -248,6 +270,53 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         this.$apply(fn);
                     }
                 };
+
+                // parse Link Headers
+                $rootScope.parseLinkHeader = function (value) {
+
+                    if(!value) return;
+
+                    var linkexp = /<[^>]*>\s*(\s*;\s*[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*")))*(,|$)/g;
+                    var paramexp = /[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*"))/g;
+
+                    var unquote = function(value) {
+                        if (value.charAt(0) === '"' && value.charAt(value.length - 1) === '"') {
+                            return value.substring(1, value.length - 1);
+                        }
+                        return value;
+                    }
+
+                    var matches = value.match(linkexp);
+                    var rels = {},
+                        titles = {};
+                    for (var i = 0; i < matches.length; i++) {
+                        var split = matches[i].split('>');
+                        var href = split[0].substring(1);
+                        var ps = split[1];
+
+                        var link = {};
+                        link.href = href;
+                        var s = ps.match(paramexp);
+                        for (var j = 0; j < s.length; j++) {
+                            var p = s[j];
+                            var paramsplit = p.split('=');
+                            var name = paramsplit[0];
+                            link[name] = unquote(paramsplit[1]);
+                        }
+
+                        if (link.rel !== undefined) {
+                            rels[link.rel] = link;
+                        }
+                        if (link.title !== undefined) {
+                            titles[link.title] = link;
+                        }
+                    }
+
+                    var linkheader = {};
+                    linkheader.rels = rels;
+                    linkheader.titles = titles;
+                    return linkheader;
+                }
 
                 // user info authenticated
                 $rootScope.user = $cookieStore.get('user');

@@ -2,7 +2,7 @@ define(['angular'], function(angular) {
     'use strict';
 
     angular.module('bannerAppApp.controllers.MainCtrl', [])
-        .controller('MainCtrl', function($scope, $modal) {
+        .controller('MainCtrl', function($scope, $modal, $timeout, cfpLoadingBar) {
             // $scope.$navigate = $navigate;
             $scope.menus = {
                 'Facebook': [{
@@ -78,14 +78,14 @@ define(['angular'], function(angular) {
                         $scope.icons = icons;
 
                         /*
-			  $scope.selected = {
-			    item: $scope.items[0]
-			  };
+            			  $scope.selected = {
+            			    item: $scope.items[0]
+            			  };
 
-			  $scope.ok = function () {
-			    $modalInstance.close($scope.selected.item);
-			  };
-			*/
+            			  $scope.ok = function () {
+            			    $modalInstance.close($scope.selected.item);
+            			  };
+			             */
 
                         $scope.close = function() {
                             $modalInstance.dismiss('cancel');
@@ -106,5 +106,19 @@ define(['angular'], function(angular) {
                 // });
             };
 
+            $scope.start = function() {
+              cfpLoadingBar.start();
+            };
+
+            $scope.complete = function () {
+              cfpLoadingBar.complete();
+            }
+
+
+            // fake the initial load so first time users can see it right away:
+            $scope.start();
+            $timeout(function() {
+              $scope.complete();
+            }, 10000);
         });
 });

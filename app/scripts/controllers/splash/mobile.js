@@ -75,20 +75,26 @@ define([
 			$rootScope.menus = {
 				top: {
 	                model   : $scope,
-	                template: '<div ng-include src="\'views/splash-mobile-top-config.html\'"></div>'
+	                template: '<div ng-include src="\'views/splash/mobile-menu-top.html\'"></div>'
 				},
 				left: {
 					model : $scope.mobiles,
-	                template: '<div ng-include src="\'views/splash-mobile-left-config.html\'"></div>'
+	                template: '<div ng-include src="\'views/splash/mobile-menu-left.html\'"></div>'
 
 				}
             };
+
+			//
+            // Controls
+            // ================================================================
 			$scope.toggleControls = function(){
 				var id = 'menu-top';
 				var scroll = 0;
 				if( slidePush.isOpenById(id) ) {
 					slidePush.pushForceCloseById(id);
 				} else {
+					if( !$scope.fabric.selectedObject ) return;
+
 					slidePush.pushById(id);
 					// scroll = angular.element('.image-builder').offset().top;
 					scroll = 330;
@@ -147,23 +153,33 @@ define([
 				console.log('fabric.presetSize', size);
 			});
 			$scope.$watch('fabric.canvasScale', function(length){
-				$scope.fabric.setZoom();
+				$timeout(function(){
+					$scope.fabric.setZoom();
+				}, 1000);
 			});
 			$scope.$watch('fabric.controls.angle', function(value){
-				$scope.fabric.angleControl();
+				$timeout(function(){
+					$scope.fabric.angleControl();
+				}, 1000);
 			});
 			$scope.$watch('fabric.controls.left', function(value){
 				// if( value < 0) $scope.fabric.controls.left = 0;
 				// else if ( value > $scope.fabric.maxBounding.left) $scope.fabric.controls.left = $scope.fabric.maxBounding.left;
-				$scope.fabric.leftControl();
+				$timeout(function(){
+					$scope.fabric.leftControl();
+				}, 1000);
 			});
 			$scope.$watch('fabric.controls.top', function(value){
 				// if( value < 0) $scope.fabric.controls.top = 0;
 				// else if ( value > $scope.fabric.maxBounding.top) $scope.fabric.controls.top = $scope.fabric.maxBounding.top;
-				$scope.fabric.topControl();
+				$timeout(function(){
+					$scope.fabric.topControl();
+				}, 1000);
 			});
 			$scope.$watch('fabric.controls.scale', function(value){
-				$scope.fabric.scaleControl();
+				$timeout(function(){
+					$scope.fabric.scaleControl();
+				}, 1000);
 			});
 
             $scope.$watch('mobile.text.app', function(newVal){
@@ -471,7 +487,8 @@ define([
 
             $scope.getPhoto = function(peopleIndex) {
                 var modalInstance = $modal.open({
-                    templateUrl: 'modalInsertPhoto.html',
+                    // templateUrl: 'modalInsertPhoto.html',
+                    templateUrl: 'views/splash/mobile-modal-photo.html',
                     controller: function($scope, $modalInstance, $timeout, data) {
                         $scope.mobile = data.mobile;
                         $scope.photoIndex = null;
@@ -554,7 +571,8 @@ define([
 
             $scope.save = function(){
             	var modalInstance = $modal.open({
-                    templateUrl: 'modalSave.html',
+                    // templateUrl: 'modalSave.html',
+                    templateUrl: 'views/splash/mobile-modal-save.html',
                     controller: function($scope, $rootScope, $modalInstance, $timeout, $log, $upload, BASEURL, data) {
 
                     	$log.debug('data', data);
@@ -587,7 +605,7 @@ define([
                                 url    : BASEURL + '/api/upload-test',
                                 method : 'POST',
                                 data   : {
-                                	width: 'original',
+                                	width : 'original',
                                 	height: 'original'
                                 },
                                 file: file,

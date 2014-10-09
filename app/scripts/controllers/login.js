@@ -4,12 +4,13 @@ define(['angular'], function (angular) {
   angular.module('bannerAppApp.controllers.LoginCtrl', [])
     .controller('LoginCtrl', ['$scope', '$rootScope', 'authResource', 'authService', function ($scope, $rootScope, authResource, authService) {
 
+        
       	$scope.$on('event:auth-error', function(event, message){
             console.log('event:auth-error', message);
       		$scope.alert = message;
       	});
 
-        $scope.loading = false;
+        $scope.loading = $rootScope.isLoading = false;
         $scope.user = {
             email : 'dani.gojay@gmail.com',
             password : 'admin'

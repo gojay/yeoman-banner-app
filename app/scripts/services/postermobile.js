@@ -570,7 +570,7 @@ define(['angular'], function (angular) {
 		}
 	})
 	.service('RecentMobilePhotos', ['authResource', '$q',
-		function(authResource, $q){
+		function RecentMobilePhotos(authResource, $q){
 			return function(){
 
 				var deferred = $q.defer();
@@ -585,7 +585,7 @@ define(['angular'], function (angular) {
 		}
 	])
 	.service('RecentMobiles', ['authResource', '$q',
-		function(authResource, $q){
+		function RecentMobiles(authResource, $q){
 			return function(){
 
 				var deferred = $q.defer();
@@ -600,7 +600,7 @@ define(['angular'], function (angular) {
 		}
 	])
 	.service('DetailMobile', ['authResource', '$q', '$route',
-		function(authResource, $q, $route){
+		function DetailMobile(authResource, $q, $route){
 			return function(){
 
 				var deferred = $q.defer();
@@ -615,7 +615,7 @@ define(['angular'], function (angular) {
 		}
 	])
 	.service('SaveMobile', ['authResource', '$q',
-		function(authResource, $q){
+		function SaveMobile(authResource, $q){
 			return function( data ){
 
 				console.log('SaveMobile:data', data);

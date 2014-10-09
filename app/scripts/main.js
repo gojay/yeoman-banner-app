@@ -17,6 +17,7 @@ require.config({
         'angular-file-upload-shim': '../bower_components/ng-file-upload-shim/angular-file-upload-shim',
         'angular-gravatar': '../bower_components/angularjs-gravatar/dist/angularjs-gravatardirective.min',
         // 'angular-snap': '../bower_components/angular-snap/angular-snap',
+        'angular-loading-bar': '../bower_components/angular-loading-bar/src/loading-bar',
 
         'angular-slide-push': 'lib/slide-push/slide.and.push',
 
@@ -72,6 +73,7 @@ require.config({
         'angular-gravatar': ['angular'],
         // 'angular-file-upload-shim': ['angular'],
         // 'angular-snap': ['angular', 'snap'],
+        'angular-loading-bar': ['angular'],
 
         'angular-font-select': ['angular', 'webfontloader'],
         'angular-slide-push': ['angular'],
@@ -128,6 +130,7 @@ require([
     'angular-animate',
     'angular-spinkit',
     'angular-gravatar',
+    'angular-loading-bar',
     // 'snap',
     // 'angular-snap',
     // 'angular-font-select',

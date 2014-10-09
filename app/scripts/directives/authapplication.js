@@ -9,22 +9,42 @@ define(['angular'], function(angular) {
                 link: function postLink($scope, $element, $attrs) {
 
                     $scope.nextRoute = '/';
-                    $scope.deferred = null;
+                    $scope.callback = null;
+
+                    // $rootScope.$on('cfpLoadingBar:started', function(data, a){
+                    //     $log.info('cfpLoadingBar:started',data, a);
+                    // });
+                    // $rootScope.$on('cfpLoadingBar:completed', function(data, a){
+                    //     $log.info('cfpLoadingBar:completed',data, a);
+                    // });
+                    // $rootScope.$on('cfpLoadingBar:loading', function(data, a){
+                    //     $log.info('cfpLoadingBar:loading',data, a);
+                    // });
+                    // $rootScope.$on('cfpLoadingBar:loaded', function(data, a){
+                    //     $log.info('cfpLoadingBar:loaded',data, a);
+                    // });
+
+                    $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
+                        angular.element('#view.container').css('opacity', Math.round(percent) / 100);
+                    });
 
                     // get next route
                     $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
                         $scope.nextRoute = previous ? previous.$$route.originalPath : '/';
                     });
                     // authorization ping
-                    $scope.$on('event:auth-ping', function(event, deferred) {
-                        $log.debug('event:auth-ping', deferred, $scope.nextRoute);
+                    $scope.$on('event:auth-ping', function(event, callback) {
+                        $log.debug('event:auth-ping', $scope.nextRoute);
 
-                        $scope.deferred = deferred;
+                        // set callback
+                        $scope.callback = callback;
 
                         authResource.authentifiedRequest('GET', '/api/ping', {}, function(){
                             // authService.loginConfirmed();
-                            $log.info('User Authenticaed go to next route ' + $scope.nextRoute);
-                            $scope.deferred.resolve();
+                            $log.info('User authenticaed go to next route ' + $scope.nextRoute);
+                            // call calllback
+                            $scope.callback.call(this);
+                            // $scope.callback.apply(this, ['Hi', 3, 2, 1]);
                         });
                     });
                     // authorization login successfull
@@ -40,7 +60,7 @@ define(['angular'], function(angular) {
                     });
                     // authorization login required
                     $scope.$on('event:auth-loginRequired', function(event, data) {
-                        $log.debug('event:auth-loginRequired', data, $scope.deferred);
+                        $log.debug('event:auth-loginRequired', data);
                         // remove token n user
                         $cookieStore.remove('user');
                         $rootScope.user = null;
