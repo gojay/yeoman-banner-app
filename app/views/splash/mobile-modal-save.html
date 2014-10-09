@@ -1,0 +1,25 @@
+<div class="modal-header">
+    <h3 class="modal-title"><i class="fa fa-cog"></i> Save Configuration</h3>
+</div>
+<div class="modal-body">
+	<div ng-show="loading.load" style="position: absolute;top: 40%;left: 40%;">
+		<wave-spinner></wave-spinner>
+		<label style="padding-top:25px">{{ loading.message }}</label>
+	</div>
+	<form style="opacity: {{ loading.load ? 0.5 : 1 }}">
+		<div class="form-group">
+			<label for="title">Name</label>
+			<input type="text" class="form-control" id="name" placeholder="Name of app" ng-model="data.title">
+		</div>
+		<div class="form-group">
+			<label for=""></label>
+			<img ng-src="{{data.image}}" width="200" />
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="save()" ng-disabled="loading.load">
+    	<i class="fa fa-circle-o-notch fa-spin" ng-if="loading.load"></i> Save
+    </button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

@@ -1,0 +1,472 @@
+<div class="form-horizontal margin-top-bottom">
+    <div class="form-group" style="{{ dropdown.sizeIsOpen ? 'min-height:120px' : '' }}">
+        <div class="btn-group col-xs-12">
+            <div class="btn-group btn-block" dropdown is-open="dropdown.sizeIsOpen">
+                <button type="button" class="btn btn-sm btn-block btn-primary dropdown-toggle">
+                    {{ fabric.presetSize.name ? fabric.presetSize.name : 'Select poster size' }}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li ng-click='fabric.presetSize = size; fabric.setCanvasSize(size.width, size.height); fabric.setDirty(true); dropdown.sizeIsOpen = !dropdown.sizeIsOpen' ng-repeat='size in FabricConstants.presetSizes'><a>{{ size.name }}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div ng-hide="!fabric.presetSize" class="well">
+        <fieldset>
+            <legend>Screenshot</legend>
+            <div class="form-group">
+                <label for="screenshot" class="col-md-12 control-label">Upload application screenshot</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 field-top">
+                    <upload-image upload-image-class="btn-primary btn-block" upload-image-options="screenshotUploadOptions" ng-model="mobile.images.screenshot"></upload-image>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Application</legend>
+            <div class="form-group">
+                <label for="applcation-name" class="col-md-12 control-label">Application Name</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <input type="text" class="input-sm form-control" ng-model="mobile.text.app" ui-event="{
+										focus:'fabric.setActiveObjectByName(\'app-name\')', 
+										blur :'fabric.deactivateAll()'
+									}" />
+                </div>
+            </div>
+            <div class="form-group" ng-class="{
+		 					 	'has-error'  : !mobile.qr.iphone.valid,
+		 					 	'has-success': mobile.qr.iphone.valid
+		 					 }">
+                <label for="iphone-qr-url" class="col-md-12 control-label">Iphone QR URL</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <input type="url" name="iphone" class="input-sm form-control" ng-model="mobile.qr.iphone.url" ui-event="{ 
+								   		focus: 'onFocusQR($event)', 
+									   	keyup: 'onKeyUpQR($event)',
+								   		blur : 'onBlurQR($event)' 
+								   	}" ng-disabled="mobile.qr.iphone.loading" />
+                    <wave-spinner ng-show="mobile.qr.iphone.loading"></wave-spinner>
+                </div>
+            </div>
+            <div class="form-group" ng-class="{
+		 					 	'has-error'  : !mobile.qr.android.valid,
+		 					 	'has-success': mobile.qr.android.valid
+		 					 }">
+                <label for="android-qr-url" class="col-md-12 control-label">Android QR URL</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <input type="url" name="android" class="input-sm form-control" ng-model="mobile.qr.android.url" ui-event="{ 
+								   		focus: 'onFocusQR($event)', 
+									   	keyup: 'onKeyUpQR($event)',
+								   		blur : 'onBlurQR($event)' 
+								   	}" ng-disabled="mobile.qr.android.loading" />
+                    <wave-spinner ng-show="mobile.qr.android.loading"></wave-spinner>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Testimonial</legend>
+            <div class="form-group">
+                <label for="testimoni-left" class="col-md-6 control-label">Photo Left</label>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <button class="btn btn-sm btn-default" ng-click="getPhoto('left')">Select photo</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="testimoni-right" class="col-md-12 control-label">Testimoni Left</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <textarea rows="5" class="input-sm form-control" ng-model="mobile.text.left" ui-event="{
+										focus:'fabric.setActiveObjectByName(\'testimoni-text-left\')', 
+										blur :'fabric.deactivateAll()'
+									}"></textarea>
+                </div>
+            </div>
+            <hr/>
+            <div class="form-group">
+                <label for="testimoni-left" class="col-md-6 control-label">Photo Right</label>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <button class="btn btn-sm btn-default" ng-click="getPhoto('right')">Select photo</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="testimoni-right" class="col-md-12 control-label">Testimoni Right</label>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <textarea rows="5" class="input-sm form-control" ng-model="mobile.text.right" ui-event="{
+										focus:'fabric.setActiveObjectByName(\'testimoni-text-right\')', 
+										blur :'fabric.deactivateAll()'
+									}"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="form-group">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <a class="btn btn-sm btn-default btn-block" ng-click="save()">
+                    <i class="fa fa-save"></i> Save
+                </a>
+                <a class="btn btn-sm btn-block" ng-class="mobile.disable.generate ? 'btn-info' : 'btn-success'" ng-disabled="loading" ng-click="generatePoster('download-mobile')">
+                    <i class="fa fa-gear"></i> Generate
+                </a>
+                <a id="download-mobile" class="btn btn-sm btn-block btn-success" ng-disabled="loading" ng-hide="mobile.disable.download">
+                    <i class="fa fa-download"></i> Download
+                </a>
+                <wave-spinner ng-show="loading"></wave-spinner>
+            </div>
+            <!-- <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-show="mobile.poster">
+							<img ng-src="{{ mobile.poster }}" alt="">
+						</div> -->
+        </div>
+    </div>
+</div>
+<!--
+<accordion close-others="accordion.closeOthers">
+    <accordion-group heading="Basic" is-open="accordion.isFirstOpen" class="panel-primary">
+		<div class="form-horizontal">
+			<div class="form-group"
+				style="{{ dropdown.sizeIsOpen ? 'min-height:120px' : '' }}">
+				<div class="btn-group col-xs-12">
+                    <div class="btn-group btn-block" dropdown is-open="dropdown.sizeIsOpen">
+                        <button type="button" class="btn btn-sm btn-block btn-primary dropdown-toggle">
+                            {{ fabric.presetSize.name ? fabric.presetSize.name : 'Select poster size' }}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-click='fabric.presetSize = size; fabric.setCanvasSize(size.width, size.height); fabric.setDirty(true); dropdown.sizeIsOpen = !dropdown.sizeIsOpen' ng-repeat='size in FabricConstants.presetSizes'><a>{{ size.name }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+			</div>
+
+			<div ng-hide="!fabric.presetSize">
+				<fieldset>
+					<legend>Screenshot</legend>
+					<div class="form-group">
+						<label for="screenshot" class="col-md-12 control-label">Upload application screenshot</label>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 field-top">
+							<button type="button" class="btn btn-sm btn-block btn-primary">Upload Image</button>
+							<upload-image class="margin-top-bottom"
+								upload-image-class="btn-primary btn-block"
+								upload-image-options="screenshotUploadOptions"
+								ng-model="mobile.images.screenshot"></upload-image>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Application</legend>
+					<div class="form-group">
+						<label for="applcation-name" class="col-md-12 control-label">Application Name</label>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<input type="text" class="input-sm form-control"
+								ng-model="mobile.text.app"
+								ui-event="{
+									focus:'fabric.setActiveObjectByName(\'app-name\')', 
+									blur :'fabric.deactivateAll()'
+								}" />
+						</div>
+					</div>
+					<div class="form-group" ng-class="{
+	 					 	'has-error'  : !mobile.qr.iphone.valid,
+	 					 	'has-success': mobile.qr.iphone.valid
+	 					 }">
+						<label for="iphone-qr-url" class="col-md-12 control-label">Iphone QR URL</label>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<input type="url" name="iphone" class="input-sm form-control"
+								ng-model="mobile.qr.iphone.url" 
+							   	ui-event="{ 
+							   		focus: 'mobile.onFocusQR($event)', 
+								   	keyup: 'mobile.onKeyUpQR($event)',
+							   		blur : 'mobile.onBlurQR($event)' 
+							   	}"
+							   	ng-disabled="mobile.qr.iphone.loading" />
+							   	<wave-spinner ng-show="mobile.qr.iphone.loading"></wave-spinner>
+						</div>
+					</div>
+					<div class="form-group" ng-class="{
+	 					 	'has-error'  : !mobile.qr.android.valid,
+	 					 	'has-success': mobile.qr.android.valid
+	 					 }">
+						<label for="android-qr-url" class="col-md-12 control-label">Android QR URL</label>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<input type="url" name="android" class="input-sm form-control"
+								ng-model="mobile.qr.android.url" 
+							   	ui-event="{ 
+							   		focus: 'mobile.onFocusQR($event)', 
+								   	keyup: 'mobile.onKeyUpQR($event)',
+							   		blur : 'mobile.onBlurQR($event)' 
+							   	}"
+							   	ng-disabled="mobile.qr.android.loading" />
+							   	<wave-spinner ng-show="mobile.qr.android.loading"></wave-spinner>
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Testimonial</legend>
+					<div class="form-group">
+						<label for="testimoni-left" class="col-md-6 control-label">Photo Left</label>
+						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+							<button class="btn btn-sm btn-default" ng-click="mobile.getPhoto('left')">Select photo</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="testimoni-right" class="col-md-12 control-label">Testimoni Left</label>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<textarea rows="5" class="input-sm form-control"ng-model="mobile.text.left"
+								ui-event="{
+									focus:'fabric.setActiveObjectByName(\'testimoni-text-left\')', 
+									blur :'fabric.deactivateAll()'
+								}"></textarea>
+						</div>
+					</div>
+					<hr/>
+					<div class="form-group">
+						<label for="testimoni-left" class="col-md-6 control-label">Photo Right</label>
+						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+							<button class="btn btn-sm btn-default" ng-click="mobile.getPhoto('right')">Select photo</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="testimoni-right" class="col-md-12 control-label">Testimoni Right</label>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<textarea rows="5" class="input-sm form-control"ng-model="mobile.text.right"
+								ui-event="{
+									focus:'fabric.setActiveObjectByName(\'testimoni-text-right\')', 
+									blur :'fabric.deactivateAll()'
+								}"></textarea>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+    </accordion-group>
+
+    <accordion-group heading="Advanced" class="panel-primary">
+		<div class="form-horizontal">
+			<div ng-show="fabric.selectedObject.type == 'text' || fabric.selectedObject.type == 'i-text'" class="field-bottom">
+				<fieldset>
+					<legend>Color</legend>
+					<div class="form-group">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<input type="color" class="input-sm form-control" ng-model="fabric.selectedObject.fill">
+						</div>
+						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+							<input type="text" class="input-sm form-control" ng-model="fabric.selectedObject.fill">
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Stroke</legend>
+					<div class="form-group">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<input type="color" class="input-sm form-control" ng-model="fabric.selectedObject.stroke">
+						</div>
+						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+							<input type="text" class="input-sm form-control" ng-model="fabric.selectedObject.stroke">
+						</div>
+					</div>
+				</fieldset>
+				<fieldset style="{{ dropdown.fontIsOpen ? 'min-height: 460px;' : '' }}">
+					<legend>Fonts</legend>
+					<div class="form-group">
+						<div class="btn-group col-xs-12">
+		                    <div class="btn-group btn-block" dropdown is-open="dropdown.fontIsOpen">
+		                        <button type="button" class="btn btn-sm btn-block btn-primary dropdown-toggle"
+		                        	style='font-family: "{{ fabric.selectedObject.fontFamily }}";'>
+		                             {{ fabric.selectedObject.fontFamily }}
+		                            <span class="caret"></span>
+		                        </button>
+		                        <ul class="dropdown-menu">
+								    <li ng-repeat='font in FabricConstants.fonts' ng-click='fabric.setFontFamily(font.name); dropdown.fontIsOpen = !dropdown.fontIsOpen' style='font-family: "{{ font.name }}";'>
+	                                    <a><span class='object-font-family-preview' style='font-family: {{ font.name }};'>
+	                                    {{ font.name }}
+	                                </span></a>
+	                                </li>
+								</ul>
+		                    </div>
+		                </div>
+					</div>
+					<div class="row">
+						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+							<div class="form-group">
+								<label for="font-size" class="col-md-12"><i class="fa fa-font"></i></label>
+								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+									<input type="number" class="input-sm form-control"
+										 ng-model="fabric.selectedObject.fontSize">
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+							<div class="form-group">
+								<label for="font-size" class="col-md-12"><i class="fa fa-align-left"></i></label>
+								<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+									<input type="number" class="input-sm form-control"
+										 ng-model="fabric.selectedObject.lineHeight">
+								</div>
+							</div>
+						</div>
+						<div class="btn-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
+						  	<button type="button" class="btn btn-sm"
+						  		ng-class="{ 
+						  			'btn-default': fabric.selectedObject.textAlign != 'left',
+						  			'btn-primary': fabric.selectedObject.textAlign == 'left'
+						  		}"
+						  		ng-click="fabric.selectedObject.textAlign = 'left'">
+						  		<i class="fa fa-align-left"></i>
+						  	</button>
+						  	<button type="button" class="btn btn-sm"
+						  		ng-class="{ 
+						  			'btn-default': fabric.selectedObject.textAlign != 'center',
+						  			'btn-primary': fabric.selectedObject.textAlign == 'center'
+						  		}"
+						  		ng-click="fabric.selectedObject.textAlign = 'center'">
+						  		<i class="fa fa-align-center"></i></button>
+						  	<button type="button" class="btn btn-sm"
+						  		ng-class="{ 
+						  			'btn-default': fabric.selectedObject.textAlign != 'right',
+						  			'btn-primary': fabric.selectedObject.textAlign == 'right'
+						  		}"
+						  		ng-click="fabric.selectedObject.textAlign = 'right'">
+						  		<i class="fa fa-align-right"></i></button>
+						</div>
+						<div class="btn-group col-xs-6 col-sm-6 col-md-6 col-lg-6">
+						  	<button type="button" class="btn btn-sm"
+						  		ng-class="{ 
+						  			'btn-default': !fabric.isBold(),
+						  			'btn-primary': fabric.isBold()
+						  		}"
+						  		ng-click="fabric.toggleBold()">
+						  		<i class="fa fa-bold"></i>
+						  	</button>
+						  	<button type="button" class="btn btn-sm"
+						  		ng-class="{ 
+						  			'btn-default': !fabric.isItalic(),
+						  			'btn-primary': fabric.isItalic()
+						  		}"
+						  		ng-click="fabric.toggleItalic()">
+						  		<i class="fa fa-italic"></i>
+						  	</button>
+						  	<button type="button" class="btn btn-sm btn-default"
+						  		ng-class="{ 
+						  			'btn-default': !fabric.isUnderline(),
+						  			'btn-primary': fabric.isUnderline()
+						  		}"
+						  		ng-click="fabric.toggleUnderline()">
+						  		<i class="fa fa-italic"></i>
+						  	</button>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+
+			<fieldset>
+				<legend>Controls</legend>
+				<div class="form-group">
+					<label for="transparent" class="col-md-4 control-label">Transparent</label>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="range" min="0" max="1" step=".1" 
+							ng-model="fabric.selectedObject.opacity" 
+							class="input-sm form-control">
+					</div>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="number" min="0.1" max="1" step="0.1" 
+							ng-model="fabric.selectedObject.opacity" 
+							class="input-sm form-control">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="angle" class="col-md-4 control-label">Angle</label>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="range" min="-90" max="90" 
+							ng-model="fabric.controls.angle" 
+							class="input-sm form-control">
+					</div>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="number" min="-90" max="90" 
+							ng-model="fabric.controls.angle" 
+							class="input-sm form-control">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="left" class="col-md-4 control-label">Left</label>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="range" class="input-sm form-control" 
+							min="0"
+							max="{{fabric.maxBounding.left}}"
+							ng-model="fabric.controls.left" 
+							class="input-sm form-control">
+					</div>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="number" class="input-sm form-control" 
+							min="0"
+							max="{{fabric.maxBounding.left}}"
+							ng-model="fabric.controls.left" 
+							class="input-sm form-control">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="right" class="col-md-4 control-label">Top</label>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="range" class="input-sm form-control" 
+							min="0"
+							max="{{fabric.maxBounding.top}}"
+							ng-model="fabric.controls.top" 
+							class="input-sm form-control">
+					</div>
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+						<input type="number" class="input-sm form-control" 
+							min="0"
+							max="{{fabric.maxBounding.top}}"
+							ng-model="fabric.controls.top" 
+							class="input-sm form-control">
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Position</legend>
+				<div class="form-group">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="btn-group-vertical btn-block">
+							<button class="btn btn-sm btn-default" ng-click="fabric.center()"><i class="fa fa-arrows"></i> Center</button>
+							<button class="btn btn-sm btn-default" ng-click="fabric.centerH()"><i class="fa fa-arrows-h"></i> Center Horizontal</button>
+							<button class="btn btn-sm btn-default" ng-click="fabric.centerV()"><i class="fa fa-arrows-v"></i> Center Vertical</button>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Lock</legend>
+				<div class="form-group">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<div class="btn-group-vertical btn-block">
+							<button class="btn btn-sm" 
+								ng-click="fabric.toggleLockActiveObject(); fabric.setDirty(true)" 
+								ng-class="{ 
+									'btn-default': !fabric.selectedObject.lockObject,
+									'btn-primary': fabric.selectedObject.lockObject
+								}">Lock All</button>
+							<button class="btn btn-sm" 
+								ng-click="fabric.toggleLockMovementXActiveObject(); fabric.setDirty(true)" 
+								ng-class="{ 
+									'btn-default': !fabric.selectedObject.lockMovementX,
+									'btn-primary': fabric.selectedObject.lockMovementX
+								}">Lock MovementX</button>
+							<button class="btn btn-sm" 
+								ng-click="fabric.toggleLockMovementYActiveObject(); fabric.setDirty(true)" 
+								ng-class="{ 
+									'btn-default': !fabric.selectedObject.lockMovementY,
+									'btn-primary': fabric.selectedObject.lockMovementY
+								}">Lock MovementY</button>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+    </accordion-group>
+</accordion>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<button class="btn btn-sm btn-block btn-primary"><i class="fa fa-gear"></i> Generate</button>
+	<button class="btn btn-sm btn-block btn-success"><i class="fa fa-download"></i> Download</button>
+</div>
+-->
