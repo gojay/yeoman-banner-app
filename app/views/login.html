@@ -40,17 +40,18 @@
 	  border-top-right-radius: 0;
 	}
 </style>
-<form class="form-signin" role="form" ng-submit="user.login()">
-	<div ng-if="alert" class="alert alert-dismissable alert-warning">
-	  <button type="button" class="close" data-dismiss="alert">×</button>
-	  <h4>{{ alert.status }}</h4>
-	  <p bind-unsafe-html="alert.description"></p>
+<form class="form-signin" role="form">
+	<div ng-if="$root.authError" class="alert alert-dismissable alert-warning">
+	  <!-- <button type="button" class="close" data-dismiss="alert">×</button> -->
+	  <h4>{{ $root.authError.status }}</h4>
+	  <p bind-unsafe-html="$root.authError.description"></p>
 	</div>
+
     <h2 class="form-signin-heading">Please sign in</h2>
     <input type="text" class="form-control" placeholder="Username" ng-model="user.username" required>
     <input type="password" class="form-control" placeholder="Password" ng-model="user.password" required>
     <!-- <label class="checkbox">
       <input type="checkbox" value="remember-me"> Remember me
     </label> -->
-    <button class="btn btn-primary btn-block" type="submit" ng-class="{'disabled':loading}"><i class="fa fa-circle-o-notch fa-spin" ng-if="loading"></i> Sign in</button>
+    <button class="btn btn-primary btn-block" ng-class="{'disabled':loading}" ng-click="login()"><i class="fa fa-circle-o-notch fa-spin" ng-if="loading"></i> Sign in</button>
 </form>

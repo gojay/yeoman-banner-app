@@ -56,7 +56,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'ID': '1413098344',
             'SECRET': '66a3eb9d8de587d82e951fbaa69bdb080543a2208'
         })
-        .constant('APIURL', 'http://api.local/banner-api/public/api/v1') // 'http://localhost:8080/api/v1
+        .constant('APIURL', 'http://api/banner-api/public/api/v1') // 'http://localhost:8080/api/v1
         .constant('PUSHER', {
             config: {
                 appID: '89723',
@@ -135,11 +135,29 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     /* facebook */
                     .when('/facebook/banner', {
                         templateUrl: 'views/banner.html',
-                        controller: 'BannerCtrl'
+                        controller: 'BannerCtrl',
+                        resolve: {
+                            delay: function($q, $timeout, $rootScope, authResource) {
+                                var deferred = $q.defer();
+                                $rootScope.$broadcast('event:auth-ping', function(){
+                                    deferred.resolve();
+                                });
+                                return deferred.promise;
+                            }
+                        }
                     })
                     .when('/facebook/conversation', {
                         templateUrl: 'views/conversation.html',
-                        controller: 'ConversationCtrl'
+                        controller: 'ConversationCtrl',
+                        resolve: {
+                            delay: function($q, $timeout, $rootScope, authResource) {
+                                var deferred = $q.defer();
+                                $rootScope.$broadcast('event:auth-ping', function(){
+                                    deferred.resolve();
+                                });
+                                return deferred.promise;
+                            }
+                        }
                     })
                     /* splash/poster */
                     .when('/splash/mobile', {
@@ -262,6 +280,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         ])
         .run(['$rootScope', '$cookieStore', '$window', '$timeout', /*'snapRemote',*/
             function($rootScope, $cookieStore, $window, $timeout /*, snapRemote*/ ) {
+
+                $window.addEventListener('resize', function() {
+                    $rootScope.$digest();
+                });
                 
                 // safe applying scope
                 $rootScope.safeApply = function(fn) {
@@ -322,6 +344,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     return linkheader;
                 }
 
+                $rootScope.nextRoute = '/';
                 // user info authenticated
                 $rootScope.user = $cookieStore.get('user');
                 // sidemenu
@@ -340,23 +363,9 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                 };
 
-                $window.addEventListener('resize', function() {
-                    $rootScope.$digest();
-                });
-
                 var oldLocation = '';
-                // $rootScope.$on('$locationChangeStart', function(event, next, current) {
-                //     $rootScope.isLogin = ( next.indexOf('login') !== -1 );
-                //     if( next.indexOf('#') !== -1 && next.indexOf('login') == -1 ) 
-                //         $rootScope.$broadcast('event:auth-ping', next);
-                // });
-                // http://tgeorgiev.blogspot.com/2013/11/animate-ngview-transitions-in-angularjs.html
                 $rootScope.$on('$routeChangeStart', function(event, next) {
                     // $rootScope.isLogin = next.$$route.originalPath == '/login';
-                    // $rootScope.isLogin = false;
-                    // if( angular.isDefined(next.$$route.controller) && next.$$route.controller != 'LoginCtrl' ) 
-                    //     $rootScope.$broadcast('event:auth-ping');
-                    
                     var isDownwards = true;
                     if (next && next.$$route) {
                         var newLocation = next.$$route.originalPath;
@@ -366,6 +375,14 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         oldLocation = newLocation;
                     }
                     $rootScope.isDownwards = isDownwards;
+                });
+                // get next route
+                $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
+                    $rootScope.currentRoute = current ? current.$$route.originalPath : '/';
+                    $rootScope.nextRoute = previous ? previous.$$route.originalPath : '/';
+                });
+                $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
+                    angular.element('#view.container').css('opacity', Math.round(percent) / 100);
                 });
             }
         ]);

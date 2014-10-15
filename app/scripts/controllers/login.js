@@ -2,15 +2,10 @@ define(['angular'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.LoginCtrl', [])
-    .controller('LoginCtrl', ['$scope', '$rootScope', '$http', '$log', 'authService', 'APP', 'APIURL',
-        function ($scope, $rootScope, $http, $log, authService, APP, APIURL) {
+    .controller('LoginCtrl', ['$scope', '$rootScope', '$http', '$log', '$timeout', 'authService', 'APP', 'APIURL',
+        function ($scope, $rootScope, $http, $log, $timeout, authService, APP, APIURL) {
         
-      	$scope.$on('event:auth-error', function(event, message){
-            console.log('event:auth-error', message);
-      		$scope.alert = message;
-      	});
-
-        // $scope.loading = $rootScope.isLoading = false;
+        $scope.loading = false;
         $scope.user = {
             "username"  : 'gojay',
             "password"  : 'gojay86',
@@ -18,7 +13,7 @@ define(['angular'], function (angular) {
         };
 
         // login OAuth grant type user credentials
-        $scope.user.login = function(){
+        $scope.login = function(){
             $log.info('user logged in...');
 
             $http({
@@ -28,13 +23,10 @@ define(['angular'], function (angular) {
                 headers: {
                     'Content-Type' : 'application/json',
                     'Authorization': 'Basic ' + btoa(APP.ID+':'+APP.SECRET)
-                },
-                // withCredentials: true
+                }
             })
             .success(function(data, status){
                 $log.debug('auth:login:success', data, status);
-
-                if (status < 200 || status >= 300) return;
 
                 // clear login user
                 $scope.user.username = null;
@@ -50,6 +42,12 @@ define(['angular'], function (angular) {
             .error(function(data, status){
                 $log.error('auth:login:error');
                 $log.debug('error:', data, status);
+                $log.debug('error:', $rootScope);
+
+                $rootScope.authError = {
+                    status     : status + ' Unauthorized',
+                    description: data['error_description']
+                };
             });
         };
     }]);
