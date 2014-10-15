@@ -2,8 +2,8 @@ define(['angular', 'pusher', 'moment'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.PusherCtrl', [])
-    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', '$filter', 'BASEURL', 'PUSHER', 'pushMessage', 
-    	function ($scope, $log, $timeout, $location, $http, $cookieStore, $filter, BASEURL, PUSHER, pushMessage) {
+    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', '$filter', 'APIURL', 'PUSHER', 'pushMessage', 
+    	function ($scope, $log, $timeout, $location, $http, $cookieStore, $filter, APIURL, PUSHER, pushMessage) {
         	$scope.connectionStatus = 'disconnected';
         	$scope.connected = false;
     		// $scope.sending = false;
@@ -42,7 +42,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
         		$log.info('get pusher user');
         		$http({
 			        method: 'GET',
-			        url: BASEURL + '/api/pusher/user',
+			        url: APIURL + '/api/pusher/user',
                     headers: {'X-Auth-Token' : token},
 			        withCredentials: true
 			     }).success(function(data){
@@ -58,7 +58,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
     	  	// pusher logs
           	Pusher.log = function( msg ) { $log.log('Pusher.log', msg); };
           	// pusher authentication endpoint
-  			Pusher.channel_auth_endpoint = BASEURL + (( pusher_channel == 'private' ) ? 
+  			Pusher.channel_auth_endpoint = APIURL + (( pusher_channel == 'private' ) ? 
   						  												'/api/pusher/auth/socket' :
   						  												'/api/pusher/auth/presence?username='+user.username+'&email='+user.email);
     		
@@ -192,7 +192,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
 
                 // $http({
                 //     method: 'POST',
-                //     url: BASEURL + '/api/pusher/message',
+                //     url: APIURL + '/api/pusher/message',
                 //     headers: { 'X-Auth-Token':token },
                 //     withCredentials: true
                 //  }).success(function(data){

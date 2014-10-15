@@ -2,26 +2,29 @@ define(['angular', 'angular-resource'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.services.AuthResource', ['ngResource'])
-	.service('authResource', ['$http', '$timeout', '$resource', '$cookies', '$cookieStore', 'BASEURL', 
-		function authResource($http, $timeout, $resource, $cookies, $cookieStore, BASEURL) {
+	.service('authResource', ['$http', '$timeout', '$resource', '$cookies', '$cookieStore', 'APIURL', 
+		function authResource($http, $timeout, $resource, $cookies, $cookieStore, APIURL) {
 		// AngularJS will instantiate a singleton by calling "new" on this function
 		var self = this;
 		return {
 			authentifiedRequest: function(method, url, data, okCallback, errCallback){
-				var user = $cookieStore.get('user');
+				var oauth = $cookieStore.get('oauth');
 
 				var headers = {};
-				if( user ) headers = {'X-Auth-Token' : user.token };
+				if( oauth ) {
+					headers['Authorization'] = oauth['token_type'] + ' ' + oauth['access_token'];
+				}
+
 				if($.inArray(angular.uppercase(method), ['POST', 'PUT']) >= 0){
 					headers['Content-Type'] = 'application/x-www-form-urlencoded';
 				}
 
 	            $http({
 	                method : method,
-	                url    : BASEURL + url,
+	                url    : APIURL + url,
 	                data   : data,
 	                headers: headers,
-	                withCredentials: true
+	                // withCredentials: true
 	            }).success(okCallback).error(errCallback);
 	        },
 			request: function(url){

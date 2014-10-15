@@ -116,9 +116,9 @@ define(['angular'], function(angular) {
 
 
             // fake the initial load so first time users can see it right away:
-            $scope.start();
-            $timeout(function() {
-              $scope.complete();
-            }, 10000);
+            // $scope.start();
+            // $timeout(function() {
+            //   $scope.complete();
+            // }, 10000);
         });
 });

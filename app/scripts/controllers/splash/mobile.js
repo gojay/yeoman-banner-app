@@ -22,7 +22,7 @@ define([
     	'$http', 
     	'$log',
     	'$timeout',
-    	'BASEURL',
+    	'APIURL',
 
     	'Postermobile',
     	'RecentMobilePhotos',
@@ -37,7 +37,7 @@ define([
     	'mobile',
     	function (
     		$rootScope, $scope, $http, $log, $timeout, 
-    		BASEURL, Postermobile, RecentMobilePhotos, SaveMobile, $modal, slidePush, 
+    		APIURL, Postermobile, RecentMobilePhotos, SaveMobile, $modal, slidePush, 
     		Fabric, FabricConstants, Keypress, mobile) {
 
     		$log.debug('mobile', mobile);
@@ -566,14 +566,14 @@ define([
                     setObjectImage( 'testimoni-pic-'+index, imgDataURI );
                 };
 				img.crossOrigin = "Anonymous";
-                img.src = BASEURL + "/images/upload/" + $scope.mobile.photos[photoIndex];
+                img.src = APIURL + "/images/upload/" + $scope.mobile.photos[photoIndex];
             };
 
             $scope.save = function(){
             	var modalInstance = $modal.open({
                     // templateUrl: 'modalSave.html',
                     templateUrl: 'views/splash/mobile-modal-save.html',
-                    controller: function($scope, $rootScope, $modalInstance, $timeout, $log, $upload, BASEURL, data) {
+                    controller: function($scope, $rootScope, $modalInstance, $timeout, $log, $upload, APIURL, data) {
 
                     	$log.debug('data', data);
 
@@ -602,7 +602,7 @@ define([
 							file.name = slugify($scope.data.title);
                         	// upload screenshot
 							$upload.upload({
-                                url    : BASEURL + '/api/upload-test',
+                                url    : APIURL + '/api/upload-test',
                                 method : 'POST',
                                 data   : {
                                 	width : 'original',
@@ -614,7 +614,7 @@ define([
                                 $log.debug('response', response);
                         		$scope.loading.message = 'Saving configuration...';
 
-                        		$scope.data.image = BASEURL + '/' + response.data.url;
+                        		$scope.data.image = APIURL + '/' + response.data.url;
 	                        	$scope.data['meta'] = {
 	                        		'mobile' : $scope.mobile,
 	                        		'config' : $scope.fabric.getJSON( true )

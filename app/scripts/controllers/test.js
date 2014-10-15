@@ -2,8 +2,8 @@ define(['angular'], function(angular) {
     'use strict';
 
     angular.module('bannerAppApp.controllers.TestCtrl', [])
-        .controller('TestCtrl', ['$scope', '$cookieStore', '$location', '$log', '$http', 'BASEURL',  
-            function($scope, $cookieStore, $location, $log, $http, BASEURL) {
+        .controller('TestCtrl', ['$scope', '$cookieStore', '$location', '$log', '$http', 'APIURL',  
+            function($scope, $cookieStore, $location, $log, $http, APIURL) {
             $scope.awesomeThings = [
                 'HTML5 Boilerplate',
                 'AngularJS',
@@ -20,17 +20,16 @@ define(['angular'], function(angular) {
                 return $cookieStore.get('user');
             };
 
-            // var api = 'http://api.local/REST/public/api/v1/contacts?page=1&per_page=5';
-            var api = BASEURL + '/api/test';
+            var api = APIURL + '/contacts';
             $http({
-                method: 'GET',
+                method: 'POST',
                 url: api,
                 data: {
                     'page': 1,
                     'per_page': 5
                 },
                 headers: {
-                    Authorization: 'Basic ' + btoa('MyVeryLongAPIKey:password')
+                    // Authorization: 'Basic ' + btoa('MyVeryLongAPIKey:password')
                 }
                 // withCredentials: true
             }).success(function(data, status, headers, config) {

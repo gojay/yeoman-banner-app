@@ -52,7 +52,11 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         .constant('jdFontselectConfig', {
             googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         })
-        .constant('BASEURL', 'http://angularjs.local/require-angular-banner-creator')
+        .constant('APP', {
+            'ID': '1413098344',
+            'SECRET': '66a3eb9d8de587d82e951fbaa69bdb080543a2208'
+        })
+        .constant('APIURL', 'http://api.local/banner-api/public/api/v1') // 'http://localhost:8080/api/v1
         .constant('PUSHER', {
             config: {
                 appID: '89723',
@@ -114,15 +118,15 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     .when('/', {
                         templateUrl: 'views/main.html',
                         controller: 'MainCtrl',
-                        // resolve: {
-                        //     delay: function($q, $timeout, $rootScope, authResource) {
-                        //         var deferred = $q.defer();
-                        //         $rootScope.$broadcast('event:auth-ping', function(){
-                        //             deferred.resolve();
-                        //         });
-                        //         return deferred.promise;
-                        //     }
-                        // }
+                        resolve: {
+                            delay: function($q, $timeout, $rootScope, authResource) {
+                                var deferred = $q.defer();
+                                $rootScope.$broadcast('event:auth-ping', function(){
+                                    deferred.resolve();
+                                });
+                                return deferred.promise;
+                            }
+                        }
                     })
                     .when('/bootstrap', {
                         templateUrl: 'views/bootstrap.html',
