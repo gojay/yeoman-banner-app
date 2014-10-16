@@ -575,7 +575,7 @@ define(['angular'], function (angular) {
 
 				var deferred = $q.defer();
 
-				authResource.authentifiedRequest('GET', '/api/splash/mobile/photos', {}, function(data){
+				authResource.authentifiedRequest('GET', '/splash/mobiles/photos', {}, function(data){
 					deferred.resolve(data);
 				}, function(err){
 					deferred.reject('Unable to fetch splash mobile photos ' + err);
@@ -590,7 +590,7 @@ define(['angular'], function (angular) {
 
 				var deferred = $q.defer();
 
-				authResource.authentifiedRequest('GET', '/api/splash/mobile', {}, function(data){
+				authResource.authentifiedRequest('GET', '/splash/mobiles', {}, function(data){
 					deferred.resolve(data);
 				}, function(err){
 					deferred.reject('Unable to fetch splash mobile ' + err);
@@ -605,7 +605,7 @@ define(['angular'], function (angular) {
 
 				var deferred = $q.defer();
 
-				authResource.authentifiedRequest('GET', '/api/splash/mobile/' + $route.current.params.mobileId, {}, function(data){
+				authResource.authentifiedRequest('GET', '/splash/mobiles/' + $route.current.params.mobileId, {}, function(data){
 					deferred.resolve(data);
 				}, function(err){
 					deferred.reject('Unable to fetch splash mobile ' + err);
@@ -621,7 +621,7 @@ define(['angular'], function (angular) {
 				console.log('SaveMobile:data', data);
 
 				var deferred = $q.defer();
-				authResource.authentifiedRequest('POST', '/api/splash/mobile', data, function(response){
+				authResource.authentifiedRequest('POST', '/splash/mobiles', data, function(response){
 					deferred.resolve(response);
 				}, function(err){
 					deferred.reject(err);

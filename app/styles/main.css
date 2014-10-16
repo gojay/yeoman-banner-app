@@ -336,3 +336,7 @@ input[type="range"]::-webkit-slider-thumb {
   left: 8px;
   font-size: 10px;
 }
+
+.modal-window-center {
+  margin-top: 100px;
+}

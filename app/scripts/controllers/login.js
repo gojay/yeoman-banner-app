@@ -5,7 +5,7 @@ define(['angular'], function (angular) {
     .controller('LoginCtrl', ['$scope', '$rootScope', '$http', '$log', '$timeout', 'authService', 'APP', 'APIURL',
         function ($scope, $rootScope, $http, $log, $timeout, authService, APP, APIURL) {
         
-        $scope.loading = false;
+        $rootScope.loading = false;
         $scope.user = {
             "username"  : 'gojay',
             "password"  : 'gojay86',
@@ -16,6 +16,7 @@ define(['angular'], function (angular) {
         $scope.login = function(){
             $log.info('user logged in...');
 
+            $rootScope.loading = true;
             $http({
                 method : 'POST',
                 url    : APIURL + '/auth/login',
@@ -42,8 +43,9 @@ define(['angular'], function (angular) {
             .error(function(data, status){
                 $log.error('auth:login:error');
                 $log.debug('error:', data, status);
-                $log.debug('error:', $rootScope);
 
+                $rootScope.loading = false;
+                
                 $rootScope.authError = {
                     status     : status + ' Unauthorized',
                     description: data['error_description']

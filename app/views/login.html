@@ -53,5 +53,7 @@
     <!-- <label class="checkbox">
       <input type="checkbox" value="remember-me"> Remember me
     </label> -->
-    <button class="btn btn-primary btn-block" ng-class="{'disabled':loading}" ng-click="login()"><i class="fa fa-circle-o-notch fa-spin" ng-if="loading"></i> Sign in</button>
+    <button class="btn btn-primary btn-block" ng-class="{'disabled':$root.loading}" ng-click="login()">Sign in</button>
+    <button class="btn btn-success btn-block" ng-class="{'disabled':$root.loading}" ng-click="refresh()">Refresh Token</button>
+    <button class="btn btn-warning btn-block" ng-class="{'disabled':$root.loading}" ng-click="logout()">Cancel</button>
 </form>

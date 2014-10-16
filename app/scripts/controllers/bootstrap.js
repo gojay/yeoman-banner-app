@@ -144,12 +144,27 @@ define(['angular'], function (angular) {
 	  $scope.open = function (size) {
 
 	    var modalInstance = $modal.open({
-	      templateUrl: 'myModalContent.html',
-	      controller: ModalInstanceCtrl,
-	      size: size,
-	      resolve: {
+	    	backdrop: 'static',
+	      	templateUrl: 'myModalContent.html',
+	      	controller: function ($scope, $modalInstance, items) {
+
+			  $scope.items = items;
+			  $scope.selected = {
+			    item: $scope.items[0]
+			  };
+
+			  $scope.ok = function () {
+			    $modalInstance.close($scope.selected.item);
+			  };
+
+			  $scope.cancel = function () {
+			    $modalInstance.dismiss('cancel');
+			  };
+			},
+	      	size: size,
+	     	 	resolve: {
 	        items: function () {
-	          return $scope.items;
+	          	return $scope.items;
 	        }
 	      }
 	    });
