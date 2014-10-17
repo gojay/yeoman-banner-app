@@ -56,7 +56,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'ID': '1413098344',
             'SECRET': '66a3eb9d8de587d82e951fbaa69bdb080543a2208'
         })
-        .constant('APIURL', 'http://api.local/banner-api/public/api/v1') // 'http://localhost:8080/api/v1
+        .constant('APIURL', 'http://api/banner-api/public/api/v1') // 'http://localhost:8080/api/v1
         .constant('PUSHER', {
             config: {
                 appID: '89723',
@@ -135,7 +135,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         resolve: {
                             delay: function($q, $timeout, $rootScope, authResource) {
                                 var deferred = $q.defer();
-                                $rootScope.$broadcast('event:auth-ping', '/facebook/banner', function(){
+                                $rootScope.$broadcast('event:auth-ping', function(){
                                     deferred.resolve();
                                 });
                                 return deferred.promise;
@@ -209,12 +209,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         controller: 'RaphaelCtrl',
                         resolve: {
                             delay: function($q, $timeout, $rootScope) {
-                                console.log('delay');
-                                
-                                $rootScope.isLoading = true;
                                 var delay = $q.defer();
                                 $timeout(function() {
-                                    $rootScope.isLoading = false;
                                     delay.resolve();
                                 }, 1000);
                                 return delay.promise;
@@ -243,7 +239,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         resolve: {
                             delay: function($q, $timeout, $rootScope) {
                                 var deferred = $q.defer();
-                                $rootScope.$broadcast('event:auth-ping', '/pusher', deferred);
+                                $rootScope.$broadcast('event:auth-ping', deferred);
                                 return deferred.promise;
                             }
                         }
@@ -357,7 +353,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
 
                 var oldLocation = '';
                 $rootScope.$on('$routeChangeStart', function(event, next) {
-                    $rootScope.isLogin = next.$$route.originalPath == '/login';
+                    $rootScope.isLogin = angular.isDefined(next.$$route) && next.$$route.originalPath == '/login';
                     var isDownwards = true;
                     if (next && next.$$route) {
                         var newLocation = next.$$route.originalPath;
@@ -368,16 +364,11 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                     $rootScope.isDownwards = isDownwards;
                 });
-                // get next route
-                $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
-                    $rootScope.currentRoute = current ? current.$$route.originalPath : '/';
-                    $rootScope.nextRoute = previous ? previous.$$route.originalPath : '/';
-                });
                 $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
                     angular.element('#view.container').css('opacity', Math.round(percent) / 100);
                 });
                 $rootScope.$on('cfpLoadingBar:completed', function(data, percent){
-                    console.info('cfpLoadingBar:completed');
+                    // console.info('cfpLoadingBar:completed');
                     $rootScope.loading = false;
                 });
             }
