@@ -31,7 +31,7 @@
     <!-- endbuild -->
 </head>
 
-<body ng-app="bannerAppApp" class="auth-application" style="padding-top: 70px;">
+<body ng-app="bannerAppApp" style="padding-top: 70px;">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -60,13 +60,16 @@
 
     <!-- transition http://angular-transitions.mgechev.com/ -->
     <!-- <double-bounce-spinner class="spinkit" style="width:100%" ng-if="$root.isLoading"></double-bounce-spinner> -->
-    <div id="view" class="container" 
+    <!-- <div id="view" class="container" 
         ng-class="{ 
             'at-view-slide-in-right at-view-slide-out-right': !$root.isLogin && !$root.isDownwards,
             'at-view-slide-in-left at-view-slide-out-left'  : !$root.isLogin && $root.isDownwards
         }" 
-        ng-view></div>
-    <div class="overlay"></div>
+        ng-view>
+    </div> -->
+    <!-- <div class="overlay"></div> -->
+    
+    <auth-application></auth-application>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID
      <script>

@@ -112,48 +112,32 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 // compile sanitazion
                 $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|blob):/);
                 $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob):|data:image\//);
-                
+
+                var pingResolver = {
+                    delay: function($q, $timeout, $rootScope, authResource) {
+                        var deferred = $q.defer();
+                        $rootScope.$broadcast('event:auth-ping', function(){
+                            deferred.resolve();
+                        });
+                        return deferred.promise;
+                    }
+                };
                 // route
                 $routeProvider
                     .when('/', {
                         templateUrl: 'views/main.html',
-                        controller: 'MainCtrl',
-                        // resolve: {
-                        //     delay: function($q, $timeout, $rootScope, authResource) {
-                        //         var deferred = $q.defer();
-                        //         $rootScope.$broadcast('event:auth-ping', '/', function(){
-                        //             deferred.resolve();
-                        //         });
-                        //         return deferred.promise;
-                        //     }
-                        // }
+                        controller: 'MainCtrl'
                     })
                     /* facebook */
                     .when('/facebook/banner', {
                         templateUrl: 'views/banner.html',
                         controller: 'BannerCtrl',
-                        resolve: {
-                            delay: function($q, $timeout, $rootScope, authResource) {
-                                var deferred = $q.defer();
-                                $rootScope.$broadcast('event:auth-ping', function(){
-                                    deferred.resolve();
-                                });
-                                return deferred.promise;
-                            }
-                        }
+                        resolve: pingResolver
                     })
                     .when('/facebook/conversation', {
                         templateUrl: 'views/conversation.html',
                         controller: 'ConversationCtrl',
-                        resolve: {
-                            delay: function($q, $timeout, $rootScope, authResource) {
-                                var deferred = $q.defer();
-                                $rootScope.$broadcast('event:auth-ping', function(){
-                                    deferred.resolve();
-                                });
-                                return deferred.promise;
-                            }
-                        }
+                        resolve: pingResolver
                     })
                     /* splash/poster */
                     .when('/splash/mobile', {
@@ -236,13 +220,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     .when('/pusher', {
                         templateUrl: 'views/pusher.html',
                         controller: 'PusherCtrl',
-                        resolve: {
-                            delay: function($q, $timeout, $rootScope) {
-                                var deferred = $q.defer();
-                                $rootScope.$broadcast('event:auth-ping', deferred);
-                                return deferred.promise;
-                            }
-                        }
+                        resolve: pingResolver
                     })
                     .when('/bootstrap', {
                         templateUrl: 'views/bootstrap.html',
@@ -259,10 +237,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     .otherwise({
                         redirectTo: '/'
                     });
-
-                // $locationProvider
-                //     .html5Mode(false)
-                //     .hashPrefix('!');
             }
         ])
         .run(['$rootScope', '$cookieStore', '$window', '$timeout', /*'snapRemote',*/
@@ -334,7 +308,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 $rootScope.nextRoute = '/';
                 // user info authenticated
                 $rootScope.openLoginDialog = false;
-                $rootScope.user = $cookieStore.get('user') || false;
+                $rootScope.user = angular.fromJson(localStorage.getItem('user')) || false;
                 // sidemenu
                 $rootScope.menus = {
                     top: {

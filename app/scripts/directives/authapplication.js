@@ -2,10 +2,11 @@ define(['angular'], function(angular) {
     'use strict';
 
     angular.module('bannerAppApp.directives.Authapplication', [])
-        .directive('authApplication', ['$rootScope', '$log', '$route', '$location', '$cookieStore', '$modal', 'authUser',
-            function($rootScope, $log, $route, $location, $cookieStore, $modal, authUser) {
+        .directive('authApplication', ['$rootScope', '$log', '$route', '$location', '$cookieStore', '$modal', 'authService', 'authUser',
+            function($rootScope, $log, $route, $location, $cookieStore, $modal, authService, authUser) {
             return {
-                restrict: 'C',
+                restrict: 'E',
+                template: '<div id="view" class="container" ng-class="{\'at-view-slide-in-right at-view-slide-out-right\': !$root.isLogin && !$root.isDownwards, \'at-view-slide-in-left at-view-slide-out-left\'  : !$root.isLogin && $root.isDownwards}" ng-view></div>',
                 link: function postLink($scope, $element, $attrs) {
 
                     var callback  = null;
@@ -30,21 +31,19 @@ define(['angular'], function(angular) {
                                     
                                     // get token OAuth user credentials
                                     $scope.login = function(){
+                                        $rootScope.loading = true;
                                         $log.info('[LoginDialog] user logged in...');
                                         
-                                        authUser.login($scope.user).then(function(data, status){
-                                            $log.debug('auth:login:success', data, status);
+                                        authUser.login($scope.user).then(function(data){
+                                            $log.debug('auth:login:success', data);
 
                                             // clear login user
                                             $scope.user.username = null;
                                             $scope.user.password = null;
                                             
                                             // login confirmed
-                                            // send data, then update config headers token
-                                            authService.loginConfirmed(data, function(config){
-                                                config.headers['Authorization'] = data['token_type'] + ' ' + data['access_token'];
-                                                return config;
-                                            });
+                                            data['expires'] = Date.now() + (data['expires_in'] * 1000);
+                                            authService.loginConfirmed(data);
                                         });
                                     };
                                     // OAuth refresh token
@@ -59,11 +58,7 @@ define(['angular'], function(angular) {
                                             LoginDialog.close();
 
                                             // login confirmed
-                                            // send data, then update config headers token
-                                            authService.loginConfirmed(data, function(config){
-                                                config.headers['Authorization'] = data['token_type'] + ' ' + data['access_token'];
-                                                return config;
-                                            });
+                                            authService.loginConfirmed(data);
                                         })
                                     };
                                     // logout
@@ -112,28 +107,22 @@ define(['angular'], function(angular) {
                     });
 
                     // authorization login required
-                    $scope.$on('event:auth-loginRequired', function(event, data) {
-                        $log.debug('event:auth-loginRequired', data, data.headers());
+                    $scope.$on('event:auth-loginRequired', function(event, rejection) {
+                        $log.debug('event:auth-loginRequired', rejection, rejection.headers());
 
+                        $rootScope.isLogin = true;
                         $rootScope.loading = false;
-                        // set auth error message
-                        $rootScope.authError = {
-                            statusCode   : data.status,
-                            statusMessage: data.statusText,
-                            description  : data.data['error_description']
-                        };
 
                         // check token is expired ?
                         var regExpired = new RegExp("expired","i");
-                        if( data.status == 401 && 
-                            data.data.error === 'invalid_token' &&
-                            regExpired.test(data.data['error_description']) ) {
+                        if( (angular.isDefined(rejection.data.error) && rejection.data.error === 'invalid_token') &&
+                            (angular.isDefined(rejection.data['error_description']) && regExpired.test(rejection.data['error_description'])) ) {
                             $log.error('[loginRequired] Your token is expired...');
                             // do something when token is expired..
                             $rootScope.authError['expired'] = true;
                         }
 
-                        $log.info('[loginConfirmed] ' + (LoginDialog.opened ? 'login dialog is opened' : 'open login dialog...'));
+                        $log.info('[loginRequired] ' + (LoginDialog.opened ? 'login dialog is opened' : 'open login dialog...'));
                         if( !LoginDialog.opened ) LoginDialog.open();
                     });
 
@@ -141,17 +130,20 @@ define(['angular'], function(angular) {
                     $scope.$on('event:auth-loginConfirmed', function(event, oauth) {
                         $log.debug('event:auth-loginConfirmed', event, oauth);
 
+                        $rootScope.isLogin = false;
+
                         // close login dialog
-                        LoginDialog.close();
+                        if( LoginDialog.opened ) LoginDialog.close();
 
                         // put token data
                         $log.info('[loginConfirmed] put token..');
-                        if(angular.isDefined($cookieStore.get('oauth'))) {
-                            $log.info('[loginConfirmed] refresh token..');
+                        if(localStorage.getItem('token')) {
+                            $log.info('[loginConfirmed] is refresh token..');
                         }
-                        $cookieStore.put('oauth', oauth);
+                        var token = angular.toJson(oauth);
+                        localStorage.setItem('token', token);
 
-                        var hasUser = $rootScope.user != null && $cookieStore.get('user') != null;
+                        var hasUser = $rootScope.user && localStorage.getItem('user');
                         if( hasUser ) {
                             $log.info('[loginConfirmed] allready has user info..');
                             $log.info('[loginConfirmed] go to ' + $location.url());
@@ -164,14 +156,14 @@ define(['angular'], function(angular) {
                                 // set user n token cookie
                                 $log.info('[loginConfirmed] set user n token into cookie...');
                                 $rootScope.user = user;
-                                $cookieStore.put('user', user);
+                                // serialize obj json
+                                localStorage.setItem('user', angular.toJson(user));
                                 // redirect to next route
                                 $log.info('[loginConfirmed] go to ' + $location.url());
                                 $route.reload();
                             });
                         }
                     });
-                    
                 }
             };
         }]);

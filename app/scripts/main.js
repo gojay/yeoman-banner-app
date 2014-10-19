@@ -6,7 +6,8 @@ require.config({
         'angular-cookies': '../bower_components/angular-cookies/angular-cookies.min',
         'angular-sanitize': '../bower_components/angular-sanitize/angular-sanitize.min',
         'angular-resource': '../bower_components/angular-resource/angular-resource.min',
-        'angular-http-auth': '../bower_components/angular-http-auth/src/http-auth-interceptor',
+        // 'angular-http-auth': '../bower_components/angular-http-auth/src/http-auth-interceptor',
+        'angular-http-auth': 'lib/http-auth-interceptor',
         'angular-mocks': '../bower_components/angular-mocks/angular-mocks.min',
 
         'angular-animate': '../bower_components/angular-animate/angular-animate.min',
@@ -17,7 +18,8 @@ require.config({
         'angular-file-upload-shim': '../bower_components/ng-file-upload-shim/angular-file-upload-shim',
         'angular-gravatar': '../bower_components/angularjs-gravatar/dist/angularjs-gravatardirective.min',
         // 'angular-snap': '../bower_components/angular-snap/angular-snap',
-        'angular-loading-bar': '../bower_components/angular-loading-bar/src/loading-bar',
+        // 'angular-loading-bar': '../bower_components/angular-loading-bar/build/loading-bar.min',
+        'angular-loading-bar': 'lib/loading-bar',
 
         'angular-slide-push': 'lib/slide-push/slide.and.push',
 
