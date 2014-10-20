@@ -2,8 +2,8 @@ define(['angular', 'pusher', 'moment'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.PusherCtrl', [])
-    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', '$filter', 'APIURL', 'PUSHER', 'pushMessage', 
-    	function ($scope, $log, $timeout, $location, $http, $cookieStore, $filter, APIURL, PUSHER, pushMessage) {
+    .controller('PusherCtrl', ['$scope', '$log', '$timeout', '$location', '$http', '$cookieStore', '$filter', 'API', 'PUSHER', 'pushMessage', 
+    	function ($scope, $log, $timeout, $location, $http, $cookieStore, $filter, API, PUSHER, pushMessage) {
         	$scope.connectionStatus = 'disconnected';
         	$scope.connected = false;
     		// $scope.sending = false;
@@ -42,7 +42,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
         		$log.info('get pusher user');
         		$http({
 			        method: 'GET',
-			        url: APIURL + '/api/pusher/user',
+			        url: API.URL + '/api/pusher/user',
                     headers: {'X-Auth-Token' : token},
 			        withCredentials: true
 			     }).success(function(data){
@@ -58,7 +58,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
     	  	// pusher logs
           	Pusher.log = function( msg ) { $log.log('Pusher.log', msg); };
           	// pusher authentication endpoint
-  			Pusher.channel_auth_endpoint = APIURL + (( pusher_channel == 'private' ) ? 
+  			Pusher.channel_auth_endpoint = API.URL + (( pusher_channel == 'private' ) ? 
   						  												'/api/pusher/auth/socket' :
   						  												'/api/pusher/auth/presence?username='+user.username+'&email='+user.email);
     		
@@ -192,7 +192,7 @@ define(['angular', 'pusher', 'moment'], function (angular) {
 
                 // $http({
                 //     method: 'POST',
-                //     url: APIURL + '/api/pusher/message',
+                //     url: API.URL + '/api/pusher/message',
                 //     headers: { 'X-Auth-Token':token },
                 //     withCredentials: true
                 //  }).success(function(data){

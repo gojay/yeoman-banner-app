@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile', 'services/jwthelper'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -29,6 +29,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.services.AuthResource',
             'bannerAppApp.services.Banner',
             'bannerAppApp.services.Postermobile',
+            'bannerAppApp.services.Jwthelper',
 /*angJSDeps*/
             'ngRoute',
             'ngCookies',
@@ -49,14 +50,20 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
 
             'chieffancypants.loadingBar'
         ])
-        .constant('jdFontselectConfig', {
-            googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
+        // .constant('jdFontselectConfig', {
+        //     googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
+        // })
+        .constant('API', {
+            'URL'   : 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
+            'GRANT' : 'user', // grant type : user (user credentials) or jwt
+            'CLIENT': {
+                'ID'    : '1413098344',
+                'SECRET': '66a3eb9d8de587d82e951fbaa69bdb080543a2208'
+            },
+            'USER': {
+                'ID': '2'
+            }
         })
-        .constant('APP', {
-            'ID': '1413098344',
-            'SECRET': '66a3eb9d8de587d82e951fbaa69bdb080543a2208'
-        })
-        .constant('APIURL', 'http://api/banner-api/public/api/v1') // 'http://localhost:8080/api/v1
         .constant('PUSHER', {
             config: {
                 appID: '89723',
@@ -91,17 +98,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 }
             }
         ])
-        .directive('clickLink', ['$location', function($location) {
-            return {
-                link: function(scope, element, attrs) {
-                    element.on('click', function() {
-                        scope.$apply(function() {
-                            $location.path(attrs.clickLink);
-                        });
-                    });
-                }
-            }
-        }])
         .config(['$compileProvider', '$routeProvider', '$locationProvider', '$logProvider', 'cfpLoadingBarProvider',
             function($compileProvider, $routeProvider, $locationProvider, $logProvider, cfpLoadingBarProvider) {
                 // $log debug enable/disable
@@ -241,11 +237,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         ])
         .run(['$rootScope', '$cookieStore', '$window', '$timeout', /*'snapRemote',*/
             function($rootScope, $cookieStore, $window, $timeout /*, snapRemote*/ ) {
-
-                $window.addEventListener('resize', function() {
-                    $rootScope.$digest();
-                });
-                
                 // safe applying scope
                 $rootScope.safeApply = function(fn) {
                     var phase = this.$root.$$phase;
@@ -305,11 +296,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     return linkheader;
                 }
 
-                $rootScope.nextRoute = '/';
                 // user info authenticated
                 $rootScope.openLoginDialog = false;
                 $rootScope.user = angular.fromJson(localStorage.getItem('user')) || false;
-                // sidemenu
+                // sidemenus
                 $rootScope.menus = {
                     top: {
                         model: null,

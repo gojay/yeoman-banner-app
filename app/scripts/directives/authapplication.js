@@ -34,7 +34,7 @@ define(['angular'], function(angular) {
                                         $rootScope.loading = true;
                                         $log.info('[LoginDialog] user logged in...');
                                         
-                                        authUser.login($scope.user).then(function(data){
+                                        authUser.oauthUser($scope.user).then(function(data){
                                             $log.debug('auth:login:success', data);
 
                                             // clear login user
@@ -42,7 +42,9 @@ define(['angular'], function(angular) {
                                             $scope.user.password = null;
                                             
                                             // login confirmed
-                                            data['expires'] = Date.now() + (data['expires_in'] * 1000);
+                                            // if(!authUser.isJwt()) {
+                                            //     data['expires'] = Date.now() + (data['expires_in'] * 1000);
+                                            // }
                                             authService.loginConfirmed(data);
                                         });
                                     };
@@ -93,9 +95,6 @@ define(['angular'], function(angular) {
                     $scope.$on('event:auth-ping', function(event, callback) {
                         $log.debug('event:auth-ping', $location.url());
 
-                        $log.info('[ping] get user info..');
-                        $log.debug('[ping] user', $cookieStore.get('user'));
-
                         // set callback
                         callback = callback;
 
@@ -143,8 +142,7 @@ define(['angular'], function(angular) {
                         var token = angular.toJson(oauth);
                         localStorage.setItem('token', token);
 
-                        var hasUser = $rootScope.user && localStorage.getItem('user');
-                        if( hasUser ) {
+                        if( authUser.hasUser() ) {
                             $log.info('[loginConfirmed] allready has user info..');
                             $log.info('[loginConfirmed] go to ' + $location.url());
                             $route.reload();

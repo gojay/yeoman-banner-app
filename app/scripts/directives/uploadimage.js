@@ -30,10 +30,10 @@ define(['angular', 'angular-file-upload'], function(angular) {
                 '</div>',
                 restrict: 'E',
                 replace: true,
-                controller: ['$scope', '$http', '$timeout', '$upload', 'APIURL',
-                    function($scope, $http, $timeout, $upload, APIURL) {
+                controller: ['$scope', '$http', '$timeout', '$upload', 'API',
+                    function($scope, $http, $timeout, $upload, API) {
 
-                        var uploadURL = APIURL + '/api/upload-test';
+                        var uploadURL = API.URL + '/upload';
 
                         if( angular.isUndefined($scope.uploadOptions) ) $scope.uploadOptions = { headers:{}, data:{} };
 

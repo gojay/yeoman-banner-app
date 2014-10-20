@@ -6,9 +6,11 @@ require.config({
         'angular-cookies': '../bower_components/angular-cookies/angular-cookies.min',
         'angular-sanitize': '../bower_components/angular-sanitize/angular-sanitize.min',
         'angular-resource': '../bower_components/angular-resource/angular-resource.min',
+        
         // 'angular-http-auth': '../bower_components/angular-http-auth/src/http-auth-interceptor',
         'angular-http-auth': 'lib/http-auth-interceptor',
-        'angular-mocks': '../bower_components/angular-mocks/angular-mocks.min',
+        
+        // 'angular-mocks': '../bower_components/angular-mocks/angular-mocks.min',
 
         'angular-animate': '../bower_components/angular-animate/angular-animate.min',
         'angular-bootstrap': '../bower_components/angular-bootstrap/ui-bootstrap-tpls.min',
@@ -18,6 +20,7 @@ require.config({
         'angular-file-upload-shim': '../bower_components/ng-file-upload-shim/angular-file-upload-shim',
         'angular-gravatar': '../bower_components/angularjs-gravatar/dist/angularjs-gravatardirective.min',
         // 'angular-snap': '../bower_components/angular-snap/angular-snap',
+        
         // 'angular-loading-bar': '../bower_components/angular-loading-bar/build/loading-bar.min',
         'angular-loading-bar': 'lib/loading-bar',
 
@@ -51,7 +54,10 @@ require.config({
         'fabricWindow': 'lib/fabric/fabricWindow',
 
         'pusher': 'http://js.pusher.com/2.2/pusher.min',
-        'moment': '../bower_components/moment/moment'
+        'moment': '../bower_components/moment/moment',
+        'jsrsasign':'lib/jsrsasign-4.1.4-all-min',
+        'json':'lib/json-sans-eval-min',
+        'jwt':'lib/jws-3.0'
     },
     shim: {
         'angular': {
@@ -63,10 +69,10 @@ require.config({
         'angular-sanitize': ['angular'],
         'angular-resource': ['angular'],
         'angular-http-auth': ['angular'],
-        'angular-mocks': {
-            deps: ['angular'],
-            'exports': 'angular.mock'
-        },
+        // 'angular-mocks': {
+        //     deps: ['angular'],
+        //     'exports': 'angular.mock'
+        // },
         'angular-animate': ['angular'],
         'angular-bootstrap': ['angular'],
         'angular-ui-utils': ['angular'],
@@ -108,6 +114,8 @@ require.config({
         'fabricDirtyStatus': ['fabric'],
         'fabricUtilities': ['fabric'],
         'fabricWindow': ['fabric'],
+
+        'jwt': ['jsrsasign', 'json']
     },
     priority: [
         'angular'

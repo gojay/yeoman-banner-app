@@ -40,14 +40,14 @@
   .provider('authIterceptor', function(){
 
     this.authHeader = 'Authorization';
-    this.tokenGetter = function() {}
+    this.tokenGetter = function() { return null; }
 
-    var self = this;
+    var config = this;
 
     this.$get = ['$q', '$injector', '$rootScope', 'httpBuffer', function($q, $injector, $rootScope, httpBuffer) {
       return {
         request: function(request) {
-          if(request.ignoreAuthModule) {
+          if(request.ignoreAuthModule || /\.html|\.pem/i.test(request.url)) {
             return request;
           }
 
@@ -57,17 +57,18 @@
               request.headers['Content-Type'] = 'application/x-www-form-urlencoded';
             }
           }
-          if(request.headers[self.authHeader]) {
+
+          if(request.headers[config.authHeader]) {
             return request;
           }
 
-          var tokenPromise = $q.when($injector.invoke(self.tokenGetter, this, {
+          var tokenPromise = $q.when($injector.invoke(config.tokenGetter, this, {
             config:request
           }));
 
           return tokenPromise.then(function(token) {
             if(token) {
-              request.headers[self.authHeader] = token['token_type'] + ' ' + token['access_token'];
+              request.headers[config.authHeader] = token['token_type'] + ' ' + token['access_token'];
             }
             return request;
           });
@@ -96,42 +97,31 @@
     authIterceptorProvider.tokenGetter = function($http, authUser) {
       // deserialize obj json
       var token = angular.fromJson(localStorage.getItem('token'));
-      if(token && token.expires < Date.now()) {
+      if(authUser.isTokenExpired(token)) {
         // refresh token
+
+        if(authUser.isJwt()) {
+          return authUser.oauthJWT(token, true);
+        }
+
         return authUser.refresh(token).then(function(token){
-          token['expires'] = Date.now() + (token['expires_in'] * 1000);
+          // set expires token in standart token
+          // token['expires'] = Date.now() + (token['expires_in'] * 1000);
           localStorage.setItem('token', angular.toJson(token));
           return token;
         });
       } else {
+
+        // if grant type is jwt, auto get token
+        if(!token && authUser.isJwt()) {
+          return authUser.oauthJWT(token);
+        }
+
         return token;
       }
     }
     $httpProvider.interceptors.push('authIterceptor');
   }]);
-
-  /**
-   * $http interceptor.
-   * On 401 response (without 'ignoreAuthModule' option) stores the request
-   * and broadcasts 'event:angular-auth-loginRequired'.
-  .config(['$httpProvider', function($httpProvider) {
-    $httpProvider.interceptors.push(['$rootScope', '$q', 'httpBuffer', function($rootScope, $q, httpBuffer) {
-      return {
-        responseError: function(rejection) {
-          console.log('[responseError]', rejection);
-          if (rejection.status === 401 && !rejection.config.ignoreAuthModule) {
-            var deferred = $q.defer();
-            httpBuffer.append(rejection.config, deferred);
-            $rootScope.$broadcast('event:auth-loginRequired', rejection);
-            return deferred.promise;
-          }
-          // otherwise, default behaviour
-          return $q.reject(rejection);
-        }
-      };
-    }]);
-  }]);
-   */
 
   /**
    * Private module, a utility, required internally by 'http-auth-interceptor'.
@@ -190,4 +180,5 @@
       }
     };
   }]);
+
 })();

@@ -2,8 +2,8 @@ define(['angular'], function(angular) {
     'use strict';
 
     angular.module('bannerAppApp.controllers.TestCtrl', [])
-        .controller('TestCtrl', ['$scope', '$cookieStore', '$location', '$log', '$http', 'APIURL',  
-            function($scope, $cookieStore, $location, $log, $http, APIURL) {
+        .controller('TestCtrl', ['$scope', '$cookieStore', '$location', '$log', '$http', 'API',  
+            function($scope, $cookieStore, $location, $log, $http, API) {
             $scope.awesomeThings = [
                 'HTML5 Boilerplate',
                 'AngularJS',
@@ -20,7 +20,7 @@ define(['angular'], function(angular) {
                 return $cookieStore.get('user');
             };
 
-            var api = APIURL + '/contacts';
+            var api = API.URL + '/contacts';
             $http({
                 method: 'POST',
                 url: api,

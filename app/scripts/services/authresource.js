@@ -2,60 +2,33 @@ define(['angular', 'angular-resource'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.services.AuthResource', ['ngResource'])
-	.service('authResource', ['$http', '$resource', '$cookieStore', '$log', '$rootScope', 'APIURL', 'APP', 
-		function authResource($http, $resource, $cookieStore, $log, $rootScope, APIURL, APP) {
+	.service('authResource', ['$http', '$resource', '$log', '$rootScope', 'API', 
+		function authResource($http, $resource, $log, $rootScope, API) {
 		// AngularJS will instantiate a singleton by calling "new" on this function
 		return {
 			authentifiedRequest: function(method, url, data, okCallback, errCallback){
-				var oauth = $cookieStore.get('oauth');
-				var headers = {};
-
-				// set default header content-type for this method
-				if($.inArray(angular.uppercase(method), ['POST', 'PUT']) >= 0){
-					headers['Content-Type'] = 'application/x-www-form-urlencoded';
-				}
-
-				// if has Oauth set Header Authorization
-				if( oauth ) {
-					headers['Authorization'] = oauth['token_type'] + ' ' + oauth['access_token'];
-				} 
-
-				// Login & Refresh Token
-				// force Header Authorization Basic App
-				// force Header Content-Type is application/json
-				// set data grant_type
-				if(/login/.test(url)) {
-					headers['Content-Type']  = 'application/json';
-					headers['Authorization'] = 'Basic ' + btoa(APP.ID+':'+APP.SECRET);
-					// get access token
-					if( data ) {
-						data['grant_type'] = 'password';
-					} 
-					// create new data to refresh token
-					else if(!data && oauth) {
-						var data = {
-							'grant_type'   : 'refresh_token',
-							'refresh_token': oauth['refresh_token'],
-							'scope'		   : oauth['scope']
-						};
-					}
-				}
-
 	            $http({
 	                method : method,
-	                url    : APIURL + url,
-	                data   : data,
-	                headers: headers
+	                url    : API.URL + url,
+	                data   : data
 	            }).success(okCallback).error(errCallback);
 	        }
 		}
 	}])
-	.service('authUser', ['$q', '$rootScope', '$log', '$http', 'authResource', 'APIURL', 'APP', function authUser($q, $rootScope, $log, $http, authResource, APIURL, APP){
+	.service('authUser', ['$q', '$rootScope', '$log', '$http', 'Jwthelper', 'authService', 'API', 
+		function authUser($q, $rootScope, $log, $http, Jwthelper, authService, API){
 		// AngularJS will instantiate a singleton by calling "new" on this function
 		return {
+			isJwt: function() {
+				return API.GRANT === 'jwt';
+			},
+			hasUser: function() {
+				$rootScope.user && localStorage.getItem('user');
+			},
 			ping: function() {
 				var deferred = $q.defer();
-				$http.get(APIURL + '/auth/ping')
+
+				$http.get(API.URL + '/auth/ping')
 					.success(function(response){
 						deferred.resolve(response);
 					})
@@ -73,7 +46,7 @@ define(['angular', 'angular-resource'], function (angular) {
 			},
 			me: function() {
 				var deferred = $q.defer();
-				$http.get(APIURL + '/auth/me')
+				$http.get(API.URL + '/auth/me')
 					.success(function(response){
 						deferred.resolve(response);
 					})
@@ -89,20 +62,10 @@ define(['angular', 'angular-resource'], function (angular) {
 					});
 				return deferred.promise;
 			},
-			login: function(data) {
+			login: function(params) {
 				var deferred = $q.defer();
-
-				// add data grant type
-				angular.extend(data, {
-					'grant_type':'password'
-				});
-
-				// set headers Authorization Basic
-				var headers = {
-					'Content-Type' : 'application/json',
-					'Authorization': 'Basic ' + btoa(APP.ID+':'+APP.SECRET)
-				};
-				$http.post(APIURL + '/auth/login', data, {headers: headers})
+				// get token
+				$http.post(API.URL + '/auth/login', params.data, params.config)
 					.success(function(response){
 						deferred.resolve(response);
 					})
@@ -121,7 +84,9 @@ define(['angular', 'angular-resource'], function (angular) {
 			refresh: function(token) {
 				var deferred = $q.defer();
 
-				$log.debug('[token]', token);
+				$log.info('[refresh_token] token is expired..');
+
+				// set data refresh token
 				var data = {
 					'grant_type'   : 'refresh_token',
 					'refresh_token': token['refresh_token'],
@@ -130,9 +95,9 @@ define(['angular', 'angular-resource'], function (angular) {
 				// set headers Authorization Basic
 				var headers = {
 					'Content-Type' : 'application/json',
-					'Authorization': 'Basic ' + btoa(APP.ID+':'+APP.SECRET)
+					'Authorization': 'Basic ' + btoa(API.CLIENT.ID+':'+API.CLIENT.SECRET)
 				};
-				$http.post(APIURL + '/auth/login', data, {headers: headers})
+				$http.post(API.URL + '/auth/login', data, {headers: headers})
 					.success(function(response){
 						deferred.resolve(response);
 					})
@@ -147,6 +112,69 @@ define(['angular', 'angular-resource'], function (angular) {
 						deferred.reject('Unable to refresh_token : ' + err);
 					});
 				return deferred.promise;
+			},
+			oauthUser: function(data) {
+				var self = this;
+
+				angular.extend(data, {'grant_type':'password'});
+
+				var params = {
+					data: data,
+					config: {
+						headers: {
+							'Content-Type' : 'application/json',
+							'Authorization': 'Basic ' + btoa(API.CLIENT.ID+':'+API.CLIENT.SECRET)
+						}
+					}
+				};
+
+				return self.login(params);
+			},
+			oauthJWT: function(token, refresh) {
+				var self = this;
+
+				$log.info('[getJWT]...');
+
+				// generate signed JWT
+				var jwt = Jwthelper.generateSignedJWT(API);
+				var params = {
+					data: {
+						'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+						'assertion' : jwt
+					},
+					config: {
+						headers: {
+							'Content-Type' : 'application/json',
+							'Authorization': 'Basic ' + btoa('admin:admin') // not using header Authorization for jwt
+
+						}
+					}
+				};
+
+				return self.login(params).then(function(token){
+					localStorage.setItem('token', angular.toJson(token));
+
+                    if(refresh) {
+                    	return token;
+                    }
+
+					$log.info('[getJWT] get user info...');
+
+					return self.me().then(function(user){
+                        // set user n token cookie
+                        $rootScope.user = user;
+                        // serialize obj json
+                        localStorage.setItem('user', angular.toJson(user));
+						return token;
+                    });
+				});
+			},
+			isTokenExpired: function(token) {
+				if(!token) return false;
+
+				var isExpired = Jwthelper.isTokenExpired(token['access_token']);
+				if( isExpired ) $log.error('[isTokenExpired] token is expired..');
+				return isExpired;
 			}
 		}
 	}])
