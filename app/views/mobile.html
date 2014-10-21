@@ -69,11 +69,26 @@
 		</div>
 	</div>
 	<div class="row">
-		<aside id="settings" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+		<aside id="settings" class="col-sm-12 col-md-3 col-lg-3">
 			<div ng-include src="'views/splash/mobile-setting.html'"></div>
 		</aside>
-		<section id="editor" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+		<section id="editor" class="col-sm-12 col-md-9 col-lg-9">
 			<div ng-include src="'views/splash/mobile-editor.html'"></div>
 		</section>
 	</div>
+	<div class="row" ng-hide="!fabric.presetSize">
+		<div class="col-sm-12 col-md-3 col-lg-3">
+            <a class="btn btn-sm btn-default btn-block" ng-click="save()">
+                <i class="fa fa-save"></i> Save
+            </a>
+            <a class="btn btn-sm btn-block" ng-class="mobile.disable.generate ? 'btn-info' : 'btn-success'" ng-disabled="loading" ng-click="generatePoster('download-mobile')">
+                <i class="fa fa-gear"></i> Generate
+            </a>
+            <a id="download-mobile" class="btn btn-sm btn-block btn-success" ng-disabled="loading" ng-hide="mobile.disable.download">
+                <i class="fa fa-download"></i> Download
+            </a>
+            <wave-spinner ng-show="loading"></wave-spinner>
+		</div>
+	</div>
+	<div id="qrcode"></div>
 </div>

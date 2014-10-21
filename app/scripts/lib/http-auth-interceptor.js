@@ -53,9 +53,10 @@
 
           request.headers = request.headers || {};
           if($.inArray(angular.uppercase(request.method), ['POST', 'PUT']) >= 0){
-            if(!request.headers['Content-Type']) {
-              request.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-            }
+            // console.log('request', request, !request.headers['Content-Type'], !/upload/.test(request.url));
+            // if(!request.headers['Content-Type'] || !/upload/.test(request.url)) {
+            //   request.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            // }
           }
 
           if(request.headers[config.authHeader]) {

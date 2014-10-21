@@ -14,19 +14,6 @@ define(['angular', 'angular-file-upload'], function(angular) {
                         '<span ng-show="loadingProgress == 0">{{ text }}</span>'+
                     '</button>' +
                     '<input type="file" ng-file-select="onFileSelect($files)" onclick="this.value=null" style="display:none" />' +
-                    // '<div ng-show="selectedFiles != null">' +
-                    //     '<div ng-repeat="f in selectedFiles" style="margin-top:5px">' +
-                    //         '{{f.name}}'+
-                    //         '<a title="abort" style="cursor:pointer; color:#333" ng-if="hasUploader($index) && progress[$index] < 100" ng-click="abort($index)">'+
-                    //             '<i  class="fa fa-times"></i>'+
-                    //         '</a>'+
-                    //         '<i ng-if="progress[$index] == 100" class="fa fa-check"></i>'+
-                    //         '<div class="progress progress-striped actived" ng-show="progress[$index] >= 0" style="height:21px">' +
-                    //             '<div class="progress-bar progress-bar-info" style="width:{{progress[$index]}}%">{{progress[$index]}}%</div>' +
-                    //         '</div>' +
-                    //         '<div class="err" ng-show="errorMsg != null">{{errorMsg}}</div>' +
-                    //     '</div>' +
-                    // '</div>' +
                 '</div>',
                 restrict: 'E',
                 replace: true,
@@ -91,21 +78,23 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                 $scope.upload[index] = $upload.upload({
                                     url: uploadURL,
                                     method: 'POST',
-                                    headers: $scope.uploadOptions.headers,
+                                    // headers: $scope.uploadOptions.headers,
                                     data: $scope.uploadOptions.data,
                                     file: $scope.selectedFiles[index],
-                                    fileFormDataName: 'file'
+                                    fileFormDataName: 'image'
                                 }).then(function(response) {
                                     console.log('response', response);
 
                                     $scope.upload[index] = null;
                                     $scope.loadingProgress = 0;
                                     $scope.uploadResult.push(response.data);
-                                    // $scope.text  = 'Change Image'; 
+                                    // $scope.text = 'Change Image'; 
+                                    console.log('$scope.image', $scope.image)
                                     if( angular.isArray($scope.image) )
-                                        $scope.image.push(response.data.image);
+                                        $scope.image.push(response.data.url);
                                     else
-                                        $scope.image = response.data;
+                                        $scope.image = response.data.dataURI;
+                                    console.log('$scope.image', $scope.image)
                                 }, function(response) {
                                     if (response.status > 0) {
                                         $scope.errorMsg = response.status + ': ' + JSON.stringify(response.data);

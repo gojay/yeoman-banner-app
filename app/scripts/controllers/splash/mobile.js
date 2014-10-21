@@ -42,7 +42,7 @@ define([
 
     		$log.debug('mobile', mobile);
     		$scope.mobiles = {};
-    		$scope.mobiles.data = mobile.all;
+    		$scope.mobiles.data = mobile.all.data;
     		$scope.mobiles.delete = function($index){
     			if(confirm('Are you sure ?')) {
     				delete $scope.mobiles.data[$index];
@@ -80,9 +80,17 @@ define([
 				left: {
 					model : $scope.mobiles,
 	                template: '<div ng-include src="\'views/splash/mobile-menu-left.html\'"></div>'
-
 				}
             };
+
+            $scope.toggleLeftMenu = function() {
+				var id = 'menu-left';
+				if( slidePush.isOpenById(id) ) {
+					slidePush.pushForceCloseById(id);
+				} else {
+					slidePush.pushById(id);
+				}
+            }
 
 			//
             // Controls
@@ -204,7 +212,7 @@ define([
             $scope.$watch('mobile.images.screenshot', function(image){
                 if( image == null ) return;
                 console.log('mobile.images.screenshot', image);
-                setObjectImage( 'app-screenshot', image.dataURI);
+                setObjectImage( 'app-screenshot', image );
             });
             $scope.$watchCollection('mobile.dimensions.app', function(dimension){
                 console.log('mobile.dimensions.app', dimension);
@@ -215,7 +223,6 @@ define([
             });
 
             $scope.screenshotUploadOptions = {
-            	headers: {},
             	data   : {
                 	name  : 'mobile_screenshot',
             		width : null,
@@ -278,6 +285,33 @@ define([
 					}
 				}
 			});
+
+            //
+            // QR Code image (UI_EVENT)
+            // ================================================================
+            var qrcode = angular.element('#qrcode');
+            console.log('qrcode', qrcode[0])
+
+            var currentQRURL = null;
+            $scope.onFocusQR = function(e){
+                currentQRURL = e.target.value;
+            };
+            $scope.onKeyUpQR = function(e){
+                var name  = e.target.name;
+                var valid = e.target.validity.valid;
+                $scope.mobile.qr[name].valid = e.target.validity.valid;
+            };
+            $scope.onBlurQR = function(e){
+                var name = e.target.name;
+                var url  = e.target.value;
+
+                // if url is valid && url not same before
+                if( e.target.validity.valid && currentQRURL != url ){
+
+                    mobileGenerateQR(name, url);
+
+                }
+            };
 
 			function onChangeCanvasSize( self ){
 
@@ -452,32 +486,6 @@ define([
                 }, 1000);
             }
 
-            //
-            // QR Code image (UI_EVENT)
-            // ================================================================
-            var qrcode = angular.element('#qrcode');
-
-            var currentQRURL = null;
-            $scope.onFocusQR = function(e){
-                currentQRURL = e.target.value;
-            };
-            $scope.onKeyUpQR = function(e){
-                var name  = e.target.name;
-                var valid = e.target.validity.valid;
-                $scope.mobile.qr[name].valid = e.target.validity.valid;
-            };
-            $scope.onBlurQR = function(e){
-                var name = e.target.name;
-                var url  = e.target.value;
-
-                // if url is valid && url not same before
-                if( e.target.validity.valid && currentQRURL != url ){
-
-                    mobileGenerateQR(name, url);
-
-                }
-            };
-
             // Ui Bootstrap Modal
             // ================================================================
 
@@ -493,16 +501,15 @@ define([
                         $scope.mobile = data.mobile;
                         $scope.photoIndex = null;
                         $scope.uploadOptions = {
-                        	headers: {},
                         	data   : {
 	                        	name  : 'mobile_testimonial',
 	                    		width : $scope.mobile.dimensions.testimonial.width,
 	                    		height: $scope.mobile.dimensions.testimonial.height,
-	                    		unique: {
-	                    			key: 'mobile_testimonial'
-	                    		}
+	                    		unique: true
                         	}
                         };
+
+                        console.log($scope);
                         $scope.selected = function($index) {
                             $scope.photoIndex = $index;
                             self.setPhoto($index, peopleIndex);
@@ -534,7 +541,7 @@ define([
                                 return RecentMobilePhotos().then(function(photos){
                                     // set into splash photos
                                     $rootScope.isLoading = false;
-                                    $scope.mobile.photos = photos;
+                                    $scope.mobile.photos = photos.data;
                                     return {
                                         mobile: $scope.mobile
                                     };
@@ -566,12 +573,11 @@ define([
                     setObjectImage( 'testimoni-pic-'+index, imgDataURI );
                 };
 				img.crossOrigin = "Anonymous";
-                img.src = API.URL + "/images/upload/" + $scope.mobile.photos[photoIndex];
+                img.src = $scope.mobile.photos[photoIndex];
             };
 
             $scope.save = function(){
             	var modalInstance = $modal.open({
-                    // templateUrl: 'modalSave.html',
                     templateUrl: 'views/splash/mobile-modal-save.html',
                     controller: function($scope, $rootScope, $modalInstance, $timeout, $log, $upload, API, data) {
 
@@ -582,8 +588,8 @@ define([
                         $scope.fabric  = data.fabric;
 
                         $scope.data = {
-                        	title : $scope.mobile.text.app,
-                        	image : $scope.fabric.canvas.toDataURL(),
+                        	title 		: $scope.mobile.text.app,
+                        	screenshot 	: $scope.fabric.canvas.toDataURL(),
                         };
 
                         function slugify(Text) {
@@ -604,30 +610,27 @@ define([
 							$upload.upload({
                                 url    : API.URL + '/upload',
                                 method : 'POST',
-                                data   : {
-                                	width : 'original',
-                                	height: 'original'
-                                },
-                                file: file,
-                                fileFormDataName: 'file'
+                                file   : file,
+                                fileFormDataName: 'image'
                             }).then(function(response) {
                                 $log.debug('response', response);
                         		$scope.loading.message = 'Saving configuration...';
 
-                        		$scope.data.image = API.URL + '/' + response.data.url;
-	                        	$scope.data['meta'] = {
-	                        		'mobile' : $scope.mobile,
-	                        		'config' : $scope.fabric.getJSON( true )
-	                    		};
+                        		$scope.data.screenshot = response.data.url;
+	                        	$scope.data['meta'] = [{
+	                        		'meta_key'  : 'mobile',
+	                        		'meta_value': $scope.mobile
+	                        	},{
+	                        		'meta_key'  : 'config',
+	                        		'meta_value': $scope.fabric.getJSON( true )
+	                        	}];
+
                         		// save configuration
                                 SaveMobile($scope.data).then(function(response){
 	                        		console.log('save:response', response);
 
 	                        		$rootScope.safeApply(function(){
-	                        			$rootScope.menus.left.model.push({
-		                        			image: $scope.data.image,
-		                        			title: $scope.data.title
-		                        		});
+	                        			$rootScope.menus.left.model.data.push($scope.data);
 	                        		});
 	                        		$scope.loading.load = false;
                         			$scope.loading.message = 'Please wait';
@@ -661,7 +664,9 @@ define([
                     	}
                     }
                 });
-                modalInstance.result.then(function(){ });
+                modalInstance.result.then(function(){ 
+                	$scope.toggleLeftMenu();
+                });
             };
 
             //

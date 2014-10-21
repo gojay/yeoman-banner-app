@@ -3,15 +3,15 @@
 </div>
 <div class="modal-body">
 	<div id="mobile-photos" class="row">
-		<div class="col-md-3 col-lg-3" ng-repeat="photo in mobile.photos">
+		<div ng-if="mobile.photos" class="col-sm-3 col-md-3 col-lg-3" ng-repeat="photo in mobile.photos">
 			<i ng-if="photoIndex == $index" class="fa fa-check-circle-o" style="position: absolute; top: 40%; left: 40%; color: #3685C6;"></i>
-			<img ng-src="http://dev.angularjs/_learn_/require-angular-banner-creator/images/upload/{{photo}}" width="90" height="90" class="img-circle" 
+			<img ng-src="{{photo}}" width="90" height="90" class="img-circle" 
 				style="opacity:{{ photoIndex == $index ? 0.5 : 1 }}"
 				ng-click="selected($index)">
 		</div>
 	</div>
 	<div class="row margin-top">
-		<div class="col-md-3">
+		<div class="col-sm-12 col-md-3">
       		<upload-image
 				upload-image-class="btn-primary btn-block"
 				upload-image-options="uploadOptions"

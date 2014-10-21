@@ -64,6 +64,10 @@
   top: 377px;
 }
 
+.page-header {
+  margin-top: 15px;
+}
+
 hr {
   margin-top: 10px;
   margin-bottom: 10px;

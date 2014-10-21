@@ -54,7 +54,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         //     googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         // })
         .constant('API', {
-            'URL'   : 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
+            'URL'   : 'http://api.local/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
             'GRANT' : 'user', // grant type : user (user credentials) or jwt
             'CLIENT': {
                 'ID'    : '1413098344',
@@ -329,7 +329,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     $rootScope.isDownwards = isDownwards;
                 });
                 $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
-                    angular.element('#view.container').css('opacity', Math.round(percent) / 100);
+                    // angular.element('#view.container').css('opacity', Math.round(percent) / 100);
                 });
                 $rootScope.$on('cfpLoadingBar:completed', function(data, percent){
                     // console.info('cfpLoadingBar:completed');

@@ -11,21 +11,19 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="styles/bootstrap.flatly.min.css">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
-    <link rel="stylesheet" href="bower_components/bootstrap-flatly/flatly.min.css" />
     <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css({.tmp,app}) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
-    <!-- <link rel="stylesheet" href="styles/sticky-footer-navbar.css"> -->
     <link rel="stylesheet" href="styles/ng-animation.css">
     <link rel="stylesheet" href="styles/animations.css">
-    <link rel="stylesheet" type="text/css" href="scripts/lib/font-select/angular-fontselect.css" />
+    <link rel="stylesheet" href="scripts/lib/font-select/angular-fontselect.css" type="text/css" />
     <link rel="stylesheet" href="scripts/lib/slide-push/slide.and.push.css" />
 
     <!-- endbuild -->
@@ -47,7 +45,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
             <a class="navbar-brand" ng-push-menu="menu-left"><i class="fa fa-bars"></i></a>
-            <a class="navbar-brand" href="#">Banner Creator</a>
+            <a class="navbar-brand" href="#"><img src="AngularJS.png" title="Angular JS"></a>
 
             <a class="navbar-brand pull-right" ng-push-menu="menu-right" ng-hide="$root.isLogin"><i class="fa fa-chevron-right"></i></a>
             <!-- <a id="button-menu-top" class="navbar-brand pull-right" ng-push-menu="menu-top"><i class="fa fa-gear"></i></a> -->
@@ -57,17 +55,6 @@
             </span>
         </div>
     </nav>
-
-    <!-- transition http://angular-transitions.mgechev.com/ -->
-    <!-- <double-bounce-spinner class="spinkit" style="width:100%" ng-if="$root.isLoading"></double-bounce-spinner> -->
-    <!-- <div id="view" class="container" 
-        ng-class="{ 
-            'at-view-slide-in-right at-view-slide-out-right': !$root.isLogin && !$root.isDownwards,
-            'at-view-slide-in-left at-view-slide-out-left'  : !$root.isLogin && $root.isDownwards
-        }" 
-        ng-view>
-    </div> -->
-    <!-- <div class="overlay"></div> -->
     
     <auth-application></auth-application>
 
