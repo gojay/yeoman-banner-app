@@ -52,12 +52,6 @@
           }
 
           request.headers = request.headers || {};
-          if($.inArray(angular.uppercase(request.method), ['POST', 'PUT']) >= 0){
-            // console.log('request', request, !request.headers['Content-Type'], !/upload/.test(request.url));
-            // if(!request.headers['Content-Type'] || !/upload/.test(request.url)) {
-            //   request.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-            // }
-          }
 
           if(request.headers[config.authHeader]) {
             return request;
@@ -100,11 +94,6 @@
       var token = angular.fromJson(localStorage.getItem('token'));
       if(authUser.isTokenExpired(token)) {
         // refresh token
-
-        if(authUser.isJwt()) {
-          return authUser.oauthJWT(token, true);
-        }
-
         return authUser.refresh(token).then(function(token){
           // set expires token in standart token
           // token['expires'] = Date.now() + (token['expires_in'] * 1000);

@@ -1,8 +1,15 @@
-angular.module("slidePushMenu", []).factory('slidePush', function() {
+angular.module("slidePushMenu", [])
+.factory('slidePush', function() {
     var spmenuHorizontalHeight, spmenuVerticalWidth;
-    spmenuVerticalWidth = 1229;
+    spmenuVerticalWidth = window.innerWidth * 90 / 100;
     spmenuHorizontalHeight = 330;
     return {
+        getWidth: function(){
+            return spmenuVerticalWidth;
+        },
+        getHeight: function(){
+            return spmenuHorizontalHeight;
+        },
         slide: function(menu, btn) {
             btn.toggleClass("active");
             if (menu.hasClass("spmenu-left")) {
@@ -210,9 +217,13 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
                 menu.css("bottom", -spmenuHorizontalHeight);
             }
             return menu.removeClass("spmenu-open");
+        },
+        pushForceCloseAll: function() {
+            angular.forEach(['menu-top', 'menu-left', 'menu-right'], this.pushForceCloseById)
         }
     };
-}).directive("ngSlideMenu", [
+})
+.directive("ngSlideMenu", [
     'slidePush',
     function(slidePush) {
         return {
@@ -226,7 +237,8 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
             }
         };
     }
-]).directive("ngPushMenu", [
+])
+.directive("ngPushMenu", [
     'slidePush',
     function(slidePush) {
         return {
@@ -242,7 +254,8 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
             }
         };
     }
-]).directive("ngSlidePushMenu", [
+])
+.directive("ngSlidePushMenu", [
     "$document", 'slidePush',
     function($document, slidePush) {
         var compile, link;
@@ -256,6 +269,17 @@ angular.module("slidePushMenu", []).factory('slidePush', function() {
                 classes = (attrs.spmClass ? attrs.spmClass : "");
                 classes += " spmenu spmenu-" + (attrs.position === "right" || attrs.position === "left" ? "vertical" : "horizontal") + " spmenu-" + attrs.position;
                 elem.addClass(classes);
+                // vertical
+                var width = slidePush.getWidth();
+                if(elem.hasClass('spmenu-vertical')) {
+                    elem.width(width)
+                }
+                if(elem.hasClass('spmenu-left')) {
+                    elem.css('left', -width);
+                } else if(elem.hasClass('spmenu-right')) {
+                    elem.css('right', -width);
+                }
+
                 body = angular.element("body");
                 if (attrs.button) {
                     btn = elem.find(".spmenu-button").addClass("show");

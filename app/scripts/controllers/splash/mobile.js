@@ -40,16 +40,9 @@ define([
     		API, Postermobile, RecentMobilePhotos, SaveMobile, $modal, slidePush, 
     		Fabric, FabricConstants, Keypress, mobile) {
 
-    		$log.debug('mobile', mobile);
-    		$scope.mobiles = {};
-    		$scope.mobiles.data = mobile.all.data;
-    		$scope.mobiles.delete = function($index){
-    			if(confirm('Are you sure ?')) {
-    				delete $scope.mobiles.data[$index];
-    			}
-    		};
-
     		var self = this;
+
+    		$log.debug('mobile', mobile);
 
 			$scope.accordion = {
 				closeOthers: true,
@@ -59,19 +52,36 @@ define([
 				sizeIsOpen: false,
 				fontIsOpen: false
 			};
+			$scope.isNew = true;
 
-			$scope.fabric = {};
-			$scope.FabricConstants = FabricConstants;
+            $scope.screenshotUploadOptions = {
+            	data : {
+                	name  : 'mobile_screenshot',
+            		width : null,
+            		height: null
+            	}
+            };
 
-			$scope.mobile   = mobile.detail ? mobile.detail.mobile : Postermobile.model;
-            $scope.fromJSON = mobile.detail ? mobile.detail.config : null;
+    		this.getMetaValue = function(obj, key) {
+    			var data = obj.data.meta.data;
+    			var value = $.grep(data, function(e){ 
+    				return e['meta_key'] == key; 
+    			});
+    			return value[0]['meta_value'];
+    		};
 
-			$scope.FabricConstants.presetSizes = Postermobile.presetSizes;
-			$scope.FabricConstants.CustomAttributes = Postermobile.CustomAttributes;
-
-			//
+			// ================================================================
             // Slide menus
             // ================================================================
+
+    		$scope.mobiles = {};
+    		$scope.mobiles.data = mobile.all.data;
+    		$scope.mobiles.delete = function($index){
+    			if(confirm('Are you sure ?')) {
+    				delete $scope.mobiles.data[$index];
+    			}
+    		};
+
 			$rootScope.menus = {
 				top: {
 	                model   : $scope,
@@ -83,8 +93,13 @@ define([
 				}
             };
 
-            $scope.toggleLeftMenu = function() {
+            $scope.toggleLeftMenu = function(forceClose) {
 				var id = 'menu-left';
+				if(forceClose === true) {
+					slidePush.pushForceCloseById(id);
+					return;
+				}
+
 				if( slidePush.isOpenById(id) ) {
 					slidePush.pushForceCloseById(id);
 				} else {
@@ -92,9 +107,9 @@ define([
 				}
             }
 
-			//
-            // Controls
+            // Top Menu Controls
             // ================================================================
+            
 			$scope.toggleControls = function(){
 				var id = 'menu-top';
 				var scroll = 0;
@@ -153,87 +168,20 @@ define([
 					slidePush.pushForceCloseById(id);
 				}
 			}
-
-			//
-            // Watchers
             // ================================================================
-			$scope.$watch('fabric.presetSize', function(size){
-				console.log('fabric.presetSize', size);
-			});
-			$scope.$watch('fabric.canvasScale', function(length){
-				$timeout(function(){
-					$scope.fabric.setZoom();
-				}, 1000);
-			});
-			$scope.$watch('fabric.controls.angle', function(value){
-				$timeout(function(){
-					$scope.fabric.angleControl();
-				}, 1000);
-			});
-			$scope.$watch('fabric.controls.left', function(value){
-				// if( value < 0) $scope.fabric.controls.left = 0;
-				// else if ( value > $scope.fabric.maxBounding.left) $scope.fabric.controls.left = $scope.fabric.maxBounding.left;
-				$timeout(function(){
-					$scope.fabric.leftControl();
-				}, 1000);
-			});
-			$scope.$watch('fabric.controls.top', function(value){
-				// if( value < 0) $scope.fabric.controls.top = 0;
-				// else if ( value > $scope.fabric.maxBounding.top) $scope.fabric.controls.top = $scope.fabric.maxBounding.top;
-				$timeout(function(){
-					$scope.fabric.topControl();
-				}, 1000);
-			});
-			$scope.$watch('fabric.controls.scale', function(value){
-				$timeout(function(){
-					$scope.fabric.scaleControl();
-				}, 1000);
-			});
 
-            $scope.$watch('mobile.text.app', function(newVal){
-                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'app-name') {
-                    $scope.fabric.setText(newVal);
-                    $scope.fabric.render();
-                    $scope.fabric.centerH();
-                }
-            });
-            $scope.$watch('mobile.text.left', function(newVal){
-                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-left') {
-                    $scope.fabric.setText(newVal);
-                    $scope.fabric.render();
-                }
-            });
-            $scope.$watch('mobile.text.right', function(newVal){
-                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-right') {
-                    $scope.fabric.setText(newVal);
-                    $scope.fabric.render();
-                }
-            });
-            $scope.$watch('mobile.images.screenshot', function(image){
-                if( image == null ) return;
-                console.log('mobile.images.screenshot', image);
-                setObjectImage( 'app-screenshot', image );
-            });
-            $scope.$watchCollection('mobile.dimensions.app', function(dimension){
-                console.log('mobile.dimensions.app', dimension);
-                if( !dimension ) return;
-                // $scope.screenshotUploadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
-                $scope.screenshotUploadOptions.data.width = dimension.width;
-                $scope.screenshotUploadOptions.data.height = dimension.height;
-            });
+			FabricConstants.presetSizes = Postermobile.presetSizes;
+			FabricConstants.CustomAttributes = Postermobile.CustomAttributes;
 
-            $scope.screenshotUploadOptions = {
-            	data   : {
-                	name  : 'mobile_screenshot',
-            		width : null,
-            		height: null
-            	}
-            };
+			$scope.fabric = {};
+			$scope.FabricConstants = FabricConstants;
 
 			//
 			// Init
 			// ================================================================
 			$scope.init = function() {
+				$log.info('initialize canvas:created');
+				
 				$scope.fabric = new Fabric({
 					JSONExportProperties: FabricConstants.JSONExportProperties,
 					textDefaults: FabricConstants.textDefaults,
@@ -243,78 +191,93 @@ define([
 					onChangeCanvasSize: onChangeCanvasSize
 				});
 
+	    		// new or edit mobile configuration
+				$scope.mobile   = mobile.detail ? self.getMetaValue(mobile.detail, 'mobile') : Postermobile.model;
+	            $scope.fromJSON = mobile.detail ? self.getMetaValue(mobile.detail, 'config') : null;
+
+	            // edit
 	            if( $scope.fromJSON ){
+	            	$scope.isNew = false;
 	            	$scope.fabric.presetSize = Postermobile.presetSizes[1];
 	            	$scope.loadJSON();
-
+                	// generate qr code
 	            	mobileGenerateQR('iphone');
                     mobileGenerateQR('android');
 	            }
+
+				//
+	            // Watchers
+	            // ================================================================
+				$scope.$watch('fabric.presetSize', function(size){
+					$log.debug('fabric.presetSize', size);
+				});
+				$scope.$watch('fabric.canvasScale', function(length){
+					$timeout(function(){
+						$scope.fabric.setZoom();
+					}, 1000);
+				});
+				$scope.$watch('fabric.controls.angle', function(value){
+					$timeout(function(){
+						$scope.fabric.angleControl();
+					}, 1000);
+				});
+				$scope.$watch('fabric.controls.left', function(value){
+					// if( value < 0) $scope.fabric.controls.left = 0;
+					// else if ( value > $scope.fabric.maxBounding.left) $scope.fabric.controls.left = $scope.fabric.maxBounding.left;
+					$timeout(function(){
+						$scope.fabric.leftControl();
+					}, 1000);
+				});
+				$scope.$watch('fabric.controls.top', function(value){
+					// if( value < 0) $scope.fabric.controls.top = 0;
+					// else if ( value > $scope.fabric.maxBounding.top) $scope.fabric.controls.top = $scope.fabric.maxBounding.top;
+					$timeout(function(){
+						$scope.fabric.topControl();
+					}, 1000);
+				});
+				$scope.$watch('fabric.controls.scale', function(value){
+					$timeout(function(){
+						$scope.fabric.scaleControl();
+					}, 1000);
+				});
+
+	            $scope.$watch('mobile.images.screenshot', function(image){
+	                if( image == null ) return;
+	                $log.debug('mobile.images.screenshot', image);
+	                $timeout(function(){
+		                setObjectImage( 'app-screenshot', image );
+		            }, 1000);
+	            });
+	            $scope.$watch('mobile.text.app', function(newVal){
+	                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'app-name') {
+	                    $scope.fabric.setText(newVal);
+	                    $scope.fabric.render();
+	                    $scope.fabric.centerH();
+	                }
+	            });
+	            $scope.$watch('mobile.text.left', function(newVal){
+	                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-left') {
+	                    $scope.fabric.setText(newVal);
+	                    $scope.fabric.render();
+	                }
+	            });
+	            $scope.$watch('mobile.text.right', function(newVal){
+	                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-right') {
+	                    $scope.fabric.setText(newVal);
+	                    $scope.fabric.render();
+	                }
+	            });
+	            $scope.$watchCollection('mobile.dimensions.app', function(dimension){
+	                $log.debug('mobile.dimensions.app', dimension);
+	                if( !dimension ) return;
+	                // $scope.screenshotUploadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
+	                $scope.screenshotUploadOptions.data.width = dimension.width;
+	                $scope.screenshotUploadOptions.data.height = dimension.height;
+	            });
 			};
 
-			$scope.$on('canvas:created', $scope.init);
-
-			Keypress.onSave(function(){  $scope.save() });
-			Keypress.onControls({
-				up: function(){
-					if( $scope.fabric.selectedObject ) {
-						$scope.fabric.controls.top -= 1;
-						$scope.$apply();
-						console.log('up', $scope.fabric.controls.top);
-					}
-				},
-				down: function(){
-					if( $scope.fabric.selectedObject ) {
-						$scope.fabric.controls.top += 1;
-						$scope.$apply();
-						console.log('down', $scope.fabric.controls.top);
-					}
-				},
-				left: function(){
-					if( $scope.fabric.selectedObject ) {
-						$scope.fabric.controls.left -= 1;
-						$scope.$apply();
-						console.log('left', $scope.fabric.controls.left);
-					}
-				},
-				right: function(){
-					if( $scope.fabric.selectedObject ) {
-						$scope.fabric.controls.left += 1;
-						$scope.$apply();
-						console.log('right', $scope.fabric.controls.left);
-					}
-				}
-			});
-
-            //
-            // QR Code image (UI_EVENT)
-            // ================================================================
-            var qrcode = angular.element('#qrcode');
-            console.log('qrcode', qrcode[0])
-
-            var currentQRURL = null;
-            $scope.onFocusQR = function(e){
-                currentQRURL = e.target.value;
-            };
-            $scope.onKeyUpQR = function(e){
-                var name  = e.target.name;
-                var valid = e.target.validity.valid;
-                $scope.mobile.qr[name].valid = e.target.validity.valid;
-            };
-            $scope.onBlurQR = function(e){
-                var name = e.target.name;
-                var url  = e.target.value;
-
-                // if url is valid && url not same before
-                if( e.target.validity.valid && currentQRURL != url ){
-
-                    mobileGenerateQR(name, url);
-
-                }
-            };
-
+			// create new fabric objects on change canvas size
 			function onChangeCanvasSize( self ){
-
 				var canvas  = self.canvas;
 				canvas.backgroundImage = null;
 				self.clearCanvas();
@@ -362,7 +325,9 @@ define([
                     var screenshot = $scope.mobile.images.screenshot ? 
                                         'images/upload/mobile_screenshot.png' :
                                         'images/'+ ss.width +'x'+ ss.height +'.jpg' ;
+
                     $scope.fabric.addImage(screenshot, function(object){
+                    	object.async = true;
                         object.name = 'app-screenshot';
                         object.set({
                             width  : ss.width,
@@ -442,22 +407,68 @@ define([
 					// =================================
                     mobileGenerateQR('iphone');
                     mobileGenerateQR('android');
-					
 				}
 			}
-			function setObjectImage( objectName, src, callback ){
-                var fabric = $scope.fabric;
 
-                var object = fabric.getObjectByName(objectName);
+			Keypress.onSave(function(){  $scope.save() });
+			Keypress.onControls({
+				up: function(){
+					if( $scope.fabric.selectedObject ) {
+						$scope.fabric.controls.top -= 1;
+						$scope.$apply();
+						$log.debug('up', $scope.fabric.controls.top);
+					}
+				},
+				down: function(){
+					if( $scope.fabric.selectedObject ) {
+						$scope.fabric.controls.top += 1;
+						$scope.$apply();
+						$log.debug('down', $scope.fabric.controls.top);
+					}
+				},
+				left: function(){
+					if( $scope.fabric.selectedObject ) {
+						$scope.fabric.controls.left -= 1;
+						$scope.$apply();
+						$log.debug('left', $scope.fabric.controls.left);
+					}
+				},
+				right: function(){
+					if( $scope.fabric.selectedObject ) {
+						$scope.fabric.controls.left += 1;
+						$scope.$apply();
+						$log.debug('right', $scope.fabric.controls.left);
+					}
+				}
+			});
 
-                if ( !object ) return;
+			// canvas created
+			$scope.$on('canvas:created', $scope.init);
 
-                object.getElement().src = src;
-                object.opacity = 1;
-                fabric.render();
+            //
+            // QR Code image (UI_EVENT)
+            // ================================================================
+            var qrcode = angular.element('#qrcode');
+            $log.debug('qrcode', qrcode[0])
 
-                if( callback ) callback();
-            }
+            var currentQRURL = null;
+            $scope.onFocusQR = function(e){
+                currentQRURL = e.target.value;
+            };
+            $scope.onKeyUpQR = function(e){
+                var name  = e.target.name;
+                var valid = e.target.validity.valid;
+                $scope.mobile.qr[name].valid = e.target.validity.valid;
+            };
+            $scope.onBlurQR = function(e){
+                var name = e.target.name;
+                var url  = e.target.value;
+                // if url is valid && url not same before
+                if( e.target.validity.valid && currentQRURL != url ){
+                    mobileGenerateQR(name, url);
+                }
+            };
+
             function mobileGenerateQR( name, url ){
                 var qr = $scope.mobile.qr[name];
 
@@ -485,12 +496,24 @@ define([
                     });
                 }, 1000);
             }
+			function setObjectImage( objectName, src, callback ){
+                var fabric = $scope.fabric;
+
+                var object = fabric.getObjectByName(objectName);
+                if ( !object ) return;
+
+                object.getElement().src = src;
+                object.opacity = 1;
+                fabric.render();
+
+                if( callback ) callback();
+            }
 
             // Ui Bootstrap Modal
             // ================================================================
 
             // $scope.$watch('mobile.photos', function(photos){
-            // 	console.log('mobile.photos', photos);
+            // 	$log.debug('mobile.photos', photos);
             // });
 
             $scope.getPhoto = function(peopleIndex) {
@@ -509,7 +532,7 @@ define([
                         	}
                         };
 
-                        console.log($scope);
+                        $log.debug($scope);
                         $scope.selected = function($index) {
                             $scope.photoIndex = $index;
                             self.setPhoto($index, peopleIndex);
@@ -524,13 +547,13 @@ define([
                         };
 
                         $scope.$watch('mobile.photos', function(photos){
-                        	console.log('mobile.photos', photos);
+                        	$log.debug('mobile.photos', photos);
                         });
                     },
                     size: null,
                     resolve: {
                         data: function(RecentMobilePhotos, $rootScope, $timeout){
-                            console.log($scope.mobile);
+                            $log.debug($scope.mobile);
                             if( $scope.mobile.photos.length ){
                                 return {
                                     mobile: $scope.mobile
@@ -551,7 +574,7 @@ define([
                     }
                 });
                 modalInstance.result.then(function(index) {
-                    // console.log(index);
+                    // $log.debug(index);
                 });
             };
             self.setPhoto = function(photoIndex, index) {
@@ -579,9 +602,7 @@ define([
             $scope.save = function(){
             	var modalInstance = $modal.open({
                     templateUrl: 'views/splash/mobile-modal-save.html',
-                    controller: function($scope, $rootScope, $modalInstance, $timeout, $log, $upload, API, data) {
-
-                    	$log.debug('data', data);
+                    controller: function($scope, $rootScope, $modalInstance, $route, $timeout, $log, $upload, Helpers, API, data) {
 
                         $scope.loading = data.loading;
                         $scope.mobile  = data.mobile;
@@ -592,12 +613,16 @@ define([
                         	screenshot 	: $scope.fabric.canvas.toDataURL(),
                         };
 
-                        function slugify(Text) {
-						    return Text
-							        .toLowerCase()
-							        .replace(/[^\w ]+/g,'')
-							        .replace(/ +/g,'-');
-						};
+                        var isNew = data.isNew;
+                        var isModified = $scope.fabric.isDirty();
+
+                		var urlMobile = API.URL + '/splash/mobiles',
+                			methodMobile = 'POST';
+                		// is update
+                		if(!isNew) {
+                			methodMobile = 'PUT';
+                			urlMobile += '/'+ $route.current.params.mobileId;
+                		}
 
                         $scope.save = function() {
                         	$scope.loading.load = true;
@@ -605,7 +630,7 @@ define([
 
                         	// create blob image file
 							var file = $scope.fabric.getCanvasBlobFile('image/jpeg');
-							file.name = slugify($scope.data.title);
+							file.name = Helpers.slugify($scope.data.title);
                         	// upload screenshot
 							$upload.upload({
                                 url    : API.URL + '/upload',
@@ -626,8 +651,13 @@ define([
 	                        	}];
 
                         		// save configuration
+                        		$http({
+                        			method	: methodMobile,
+                        			url 	: urlMobile,
+                        			data 	: $scope.data
+                        		})
                                 SaveMobile($scope.data).then(function(response){
-	                        		console.log('save:response', response);
+	                        		$log.debug('save:response', response);
 
 	                        		$rootScope.safeApply(function(){
 	                        			$rootScope.menus.left.model.data.push($scope.data);
@@ -659,7 +689,8 @@ define([
 		                        	message: 'Please wait'
 		                        },
                     			mobile: $scope.mobile,
-                    			fabric: $scope.fabric
+                    			fabric: $scope.fabric,
+                    			isNew : $scope.isNew
 	                        };
                     	}
                     }

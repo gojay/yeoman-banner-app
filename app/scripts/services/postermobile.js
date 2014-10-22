@@ -557,9 +557,7 @@ define(['angular'], function (angular) {
 			      "clipTo":null,
 			      "backgroundColor":"",
 			      "src":"http://127.0.0.1:9000/images/stiker_a4_2480x3508.jpg",
-			      "filters":[  
-
-			      ],
+			      "filters":[],
 			      "crossOrigin":""
 			   },
 			   "height":3508,
@@ -616,12 +614,16 @@ define(['angular'], function (angular) {
 	])
 	.service('SaveMobile', ['authResource', '$q',
 		function SaveMobile(authResource, $q){
-			return function( data ){
+			return function( data, method ){
 
 				console.log('SaveMobile:data', data);
 
+				if( !method ) {
+					method = 'POST';
+				}
+
 				var deferred = $q.defer();
-				authResource.authentifiedRequest('POST', '/splash/mobiles', data, function(response){
+				authResource.authentifiedRequest(method, '/splash/mobiles', data, function(response){
 					deferred.resolve(response);
 				}, function(err){
 					deferred.reject(err);

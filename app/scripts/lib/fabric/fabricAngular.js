@@ -256,18 +256,18 @@ angular.module('common.fabric', [
 				object.id   = self.createId();
 				object.name = "image"+object.id;
 
-				for (var p in self.imageOptions) {
-					object[p] = self.imageOptions[p];
-				}
+				// for (var p in self.imageOptions) {
+				// 	object[p] = self.imageOptions[p];
+				// }
 
-				// Add a filter that can be used to turn the image
-				// into a solid colored shape.
-				var filter = new fabric.Image.filters.Tint({
-					color: '#ffffff',
-					opacity: 0
-				});
-				object.filters.push(filter);
-				object.applyFilters(canvas.renderAll.bind(canvas));
+				// // Add a filter that can be used to turn the image
+				// // into a solid colored shape.
+				// var filter = new fabric.Image.filters.Tint({
+				// 	color: '#ffffff',
+				// 	opacity: 0
+				// });
+				// object.filters.push(filter);
+				// object.applyFilters(canvas.renderAll.bind(canvas));
 
 				if( callback ) callback( object );
 

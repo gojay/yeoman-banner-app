@@ -41,10 +41,6 @@ define(['angular'], function(angular) {
                                             $scope.user.username = null;
                                             $scope.user.password = null;
                                             
-                                            // login confirmed
-                                            // if(!authUser.isJwt()) {
-                                            //     data['expires'] = Date.now() + (data['expires_in'] * 1000);
-                                            // }
                                             authService.loginConfirmed(data);
                                         });
                                     };

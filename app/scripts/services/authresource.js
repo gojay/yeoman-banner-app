@@ -86,6 +86,16 @@ define(['angular', 'angular-resource'], function (angular) {
 
 				$log.info('[refresh_token] token is expired..');
 
+				if(!token) {
+					token = angular.fromJson(localStorage.getItem('token'));
+				}
+
+				console.log('refresh_token', angular.isUndefined(token['refresh_token']));
+
+				if(this.isJwt() || angular.isUndefined(token['refresh_token'])) {
+					return this.oauthJWT(true);
+				}
+
 				// set data refresh token
 				var data = {
 					'grant_type'   : 'refresh_token',
@@ -130,10 +140,10 @@ define(['angular', 'angular-resource'], function (angular) {
 
 				return self.login(params);
 			},
-			oauthJWT: function(token, refresh) {
+			oauthJWT: function(refresh) {
 				var self = this;
 
-				$log.info('[getJWT]...');
+				$log.info('[oauthJWT] ' + (refresh ? 'refresh' : 'get') + ' token...');
 
 				// generate signed JWT
 				var jwt = Jwthelper.generateSignedJWT(API);
@@ -154,11 +164,11 @@ define(['angular', 'angular-resource'], function (angular) {
 				return self.login(params).then(function(token){
 					localStorage.setItem('token', angular.toJson(token));
 
-                    if(refresh) {
+                    if(refresh === true) {
                     	return token;
                     }
 
-					$log.info('[getJWT] get user info...');
+					$log.info('[oauthJWT] get user info...');
 
 					return self.me().then(function(user){
                         // set user n token cookie

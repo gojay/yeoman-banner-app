@@ -17,8 +17,8 @@ define(['angular', 'angular-file-upload'], function(angular) {
                 '</div>',
                 restrict: 'E',
                 replace: true,
-                controller: ['$scope', '$http', '$timeout', '$upload', 'API',
-                    function($scope, $http, $timeout, $upload, API) {
+                controller: ['$scope', '$http', '$log', '$timeout', '$upload', 'API',
+                    function($scope, $http, $log, $timeout, $upload, API) {
 
                         var uploadURL = API.URL + '/upload';
 
@@ -57,7 +57,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                     fileReader.readAsDataURL($files[i]);
                                     var loadFile = function(fileReader, index) {
                                         fileReader.onload = function(e) {
-                                            console.log('onload', e)
+                                            $log.debug('onload', e)
                                             $timeout(function() {
                                                 $scope.dataUrls[index] = e.target.result;
                                             });
@@ -83,18 +83,18 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                     file: $scope.selectedFiles[index],
                                     fileFormDataName: 'image'
                                 }).then(function(response) {
-                                    console.log('response', response);
+                                    $log.debug('response', response);
 
                                     $scope.upload[index] = null;
                                     $scope.loadingProgress = 0;
                                     $scope.uploadResult.push(response.data);
                                     // $scope.text = 'Change Image'; 
-                                    console.log('$scope.image', $scope.image)
+                                    $log.debug('$scope.image', $scope.image)
                                     if( angular.isArray($scope.image) )
                                         $scope.image.push(response.data.url);
                                     else
                                         $scope.image = response.data.dataURI;
-                                    console.log('$scope.image', $scope.image)
+                                    $log.debug('$scope.image', $scope.image)
                                 }, function(response) {
                                     if (response.status > 0) {
                                         $scope.errorMsg = response.status + ': ' + JSON.stringify(response.data);
@@ -106,7 +106,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                 });
 
                                 // $scope.upload[index].xhr(function(xhr){
-                                // xhr.upload.addEventListener('abort', function() {console.log('abort complete')}, false);
+                                // xhr.upload.addEventListener('abort', function() {$log.debug('abort complete')}, false);
                                 // });
                             } else {
                                 var fileReader = new FileReader();

@@ -1,12 +1,12 @@
 <div class="form-horizontal margin-top-bottom">
     <div class="form-group" style="{{ dropdown.sizeIsOpen ? 'min-height:120px' : '' }}">
-        <div class="btn-group col-sm-12">
+        <div class="col-xs-12">
             <div class="btn-group btn-block" dropdown is-open="dropdown.sizeIsOpen">
                 <button type="button" class="btn btn-sm btn-block btn-primary dropdown-toggle">
                     {{ fabric.presetSize.name ? fabric.presetSize.name : 'Select poster size' }}
                     <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu col-sm-12" role="menu">
+                <ul class="dropdown-menu" role="menu">
                     <li ng-click='fabric.presetSize = size; fabric.setCanvasSize(size.width, size.height); fabric.setDirty(true); dropdown.sizeIsOpen = !dropdown.sizeIsOpen' ng-repeat='size in FabricConstants.presetSizes'><a>{{ size.name }}</a>
                     </li>
                 </ul>

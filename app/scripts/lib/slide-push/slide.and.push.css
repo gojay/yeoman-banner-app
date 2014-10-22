@@ -1,85 +1,106 @@
 /* General styles for all menus */
 .spmenu {
   /*background: #149C82;*/
-  position: fixed;
-  overflow: auto; }
-  .spmenu.spmenu-top.spmenu-open {
+    position: fixed;
+    overflow: auto;
+}
+
+.spmenu.spmenu-top.spmenu-open {
     -moz-box-shadow: -20px 0px 30px black;
     -webkit-box-shadow: -20px 0px 30px black;
-    box-shadow: -20px 0px 30px black; }
-  .spmenu.spmenu-right.spmenu-open {
-    -moz-box-shadow: 0 0px 30px black;
-    -webkit-box-shadow: 0 0px 30px black;
-    box-shadow: 0 0px 30px black; }
-  .spmenu.spmenu-left.spmenu-open {
-    -moz-box-shadow: 0 0px 30px black;
-    -webkit-box-shadow: 0 0px 30px black;
-    box-shadow: 0 0px 30px black; }
+    box-shadow: -20px 0px 30px black;
+}
 
-  .spmenu h3, .spmenu h4, .spmenu span {
-    color: black; }
-  .spmenu legend {
+.spmenu.spmenu-right.spmenu-open {
+    -moz-box-shadow: 0 0px 30px black;
+    -webkit-box-shadow: 0 0px 30px black;
+    box-shadow: 0 0px 30px black;
+}
+
+.spmenu.spmenu-left.spmenu-open {
+    -moz-box-shadow: 0 0px 30px black;
+    -webkit-box-shadow: 0 0px 30px black;
+    box-shadow: 0 0px 30px black;
+}
+
+.spmenu h3, .spmenu h4, .spmenu span {
+    color: black;
+}
+
+.spmenu legend {
     color: white;
     font-size: 15px;
-  }
+}
 
 /* Orientation-dependent styles for the content of the menu */
 .spmenu-vertical {
-  width: 1229px;
-  height: 100%;
-  top: 0;
-  z-index: 1000; }
+    /*width: 1229px;*/
+    height: 100%;
+    top: 0;
+    z-index: 1000;
+}
   /*.spmenu-vertical a, .spmenu-vertical label {
     padding: 0;
     font-size: 15px; }*/
 
 .spmenu-horizontal {
-  width: 100%;
-  height: 330px;
-  left: 0;
-  z-index: 1000;
-  /*overflow: hidden;*/ }
-  .spmenu-horizontal h3 {
+    width: 100%;
+    height: 330px;
+    left: 0;
+    z-index: 1000;
+  /*overflow: hidden;*/
+}
+
+.spmenu-horizontal h3 {
     color: white;
-    margin-top: 0; }
+    margin-top: 0;
+}
 
 /* Vertical menu that slides from the left or right */
 .spmenu-left {
-  left: -1229px;
-  border-right: 1px solid #149C82; }
+    /*left: -1229px;*/
+    border-right: 1px solid #149C82;
+}
 
 .spmenu-right {
-  right: -1229px;
-  border-left: 1px solid #149C82; }
+    /*right: -1229px;*/
+    border-left: 1px solid #149C82;
+}
 
 /* Horizontal menu that slides from the top or bottom */
 .spmenu-top {
   /*top: -150px;*/
-  top: -270px;
-  padding: 15px;
-  border-bottom: 1px solid #149C82; }
+    top: -270px;
+    padding: 15px;
+    border-bottom: 1px solid #149C82;
+}
 
 .spmenu-bottom {
-  bottom: -150px;
-  border-top: 1px solid #149C82; }
+    bottom: -150px;
+    border-top: 1px solid #149C82;
+}
 
 /* Push classes applied to the body */
 .spmenu-push {
-  overflow-x: hidden;
-  position: relative;
-  left: 0; }
+    overflow-x: hidden;
+    position: relative;
+    left: 0;
+}
 
 .spmenu-push-toright {
-  left: 1229px; }
+    /*left: 1229px;*/
+}
 
 .spmenu-push-toleft {
-  left: -1229px; }
+    /*left: -1229px;*/
+}
 
 /* Transitions */
 .spmenu, .spmenu-push {
-  -webkit-transition: all .5s ease;
-  -moz-transition: all .5s ease;
-  transition: all .5s ease; }
+    -webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    transition: all .5s ease;
+}
 
 /* Example media queries
 

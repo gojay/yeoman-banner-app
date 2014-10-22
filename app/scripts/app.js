@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile', 'services/jwthelper'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile', 'services/jwthelper', 'services/helpers'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -30,7 +30,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.services.Banner',
             'bannerAppApp.services.Postermobile',
             'bannerAppApp.services.Jwthelper',
-/*angJSDeps*/
+            'bannerAppApp.services.Helpers',
+            /*angJSDeps*/
             'ngRoute',
             'ngCookies',
             'ngResource',
@@ -149,8 +150,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                                     $log.debug('resolve recent mobiles', data);
 
                                     deferred.resolve({
-                                        all: data,
-                                        detail: null
+                                        all: data
                                     });
                                 });
 
@@ -235,8 +235,13 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     });
             }
         ])
-        .run(['$rootScope', '$cookieStore', '$window', '$timeout', /*'snapRemote',*/
-            function($rootScope, $cookieStore, $window, $timeout /*, snapRemote*/ ) {
+        .run(['$rootScope', '$cookieStore', '$window', '$timeout', 'slidePush',
+            function($rootScope, $cookieStore, $window, $timeout , slidePush ) {
+
+                $rootScope.closeMenu = function(){
+                    slidePush.pushForceCloseAll();
+                };
+
                 // safe applying scope
                 $rootScope.safeApply = function(fn) {
                     var phase = this.$root.$$phase;
@@ -248,53 +253,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         this.$apply(fn);
                     }
                 };
-
-                // parse Link Headers
-                $rootScope.parseLinkHeader = function (value) {
-
-                    if(!value) return;
-
-                    var linkexp = /<[^>]*>\s*(\s*;\s*[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*")))*(,|$)/g;
-                    var paramexp = /[^\(\)<>@,;:"\/\[\]\?={} \t]+=(([^\(\)<>@,;:"\/\[\]\?={} \t]+)|("[^"]*"))/g;
-
-                    var unquote = function(value) {
-                        if (value.charAt(0) === '"' && value.charAt(value.length - 1) === '"') {
-                            return value.substring(1, value.length - 1);
-                        }
-                        return value;
-                    }
-
-                    var matches = value.match(linkexp);
-                    var rels = {},
-                        titles = {};
-                    for (var i = 0; i < matches.length; i++) {
-                        var split = matches[i].split('>');
-                        var href = split[0].substring(1);
-                        var ps = split[1];
-
-                        var link = {};
-                        link.href = href;
-                        var s = ps.match(paramexp);
-                        for (var j = 0; j < s.length; j++) {
-                            var p = s[j];
-                            var paramsplit = p.split('=');
-                            var name = paramsplit[0];
-                            link[name] = unquote(paramsplit[1]);
-                        }
-
-                        if (link.rel !== undefined) {
-                            rels[link.rel] = link;
-                        }
-                        if (link.title !== undefined) {
-                            titles[link.title] = link;
-                        }
-                    }
-
-                    var linkheader = {};
-                    linkheader.rels = rels;
-                    linkheader.titles = titles;
-                    return linkheader;
-                }
 
                 // user info authenticated
                 $rootScope.openLoginDialog = false;
@@ -317,6 +275,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
 
                 var oldLocation = '';
                 $rootScope.$on('$routeChangeStart', function(event, next) {
+                    $rootScope.closeMenu();
                     $rootScope.isLogin = angular.isDefined(next.$$route) && next.$$route.originalPath == '/login';
                     var isDownwards = true;
                     if (next && next.$$route) {
