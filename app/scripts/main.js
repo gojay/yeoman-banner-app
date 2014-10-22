@@ -6,6 +6,7 @@ require.config({
         'angular-cookies': '../bower_components/angular-cookies/angular-cookies.min',
         'angular-sanitize': '../bower_components/angular-sanitize/angular-sanitize.min',
         'angular-resource': '../bower_components/angular-resource/angular-resource.min',
+        'angular-classy': '../bower_components/angular-classy/angular-classy.min',
         
         // 'angular-http-auth': '../bower_components/angular-http-auth/src/http-auth-interceptor',
         'angular-http-auth': 'lib/http-auth-interceptor',
@@ -68,6 +69,7 @@ require.config({
         'angular-cookies': ['angular'],
         'angular-sanitize': ['angular'],
         'angular-resource': ['angular'],
+        'angular-classy': ['angular'],
         'angular-http-auth': ['angular'],
         // 'angular-mocks': {
         //     deps: ['angular'],
@@ -134,6 +136,7 @@ require([
     'angular-cookies',
     'angular-sanitize',
     'angular-resource',
+    'angular-classy',
     'angular-http-auth',
     'angular-bootstrap',
     'angular-ui-utils',

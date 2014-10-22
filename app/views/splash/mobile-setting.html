@@ -1,4 +1,4 @@
-<div class="form-horizontal margin-top-bottom">
+<div class="form-horizontal margin-top-bottom" ng-init="{ sizeIsOpen:false, fontIsOpen:false }">
     <div class="form-group" style="{{ dropdown.sizeIsOpen ? 'min-height:120px' : '' }}">
         <div class="col-xs-12">
             <div class="btn-group btn-block" dropdown is-open="dropdown.sizeIsOpen">
@@ -69,7 +69,7 @@
             <div class="form-group">
                 <label for="testimoni-left" class="col-sm-12 col-md-6 control-label">Photo Left</label>
                 <div class="col-sm-12 col-md-6 col-lg-6">
-                    <button class="btn-block btn btn-sm btn-default" ng-click="getPhoto('left')">Select photo</button>
+                    <button class="btn-block btn btn-sm btn-default" ng-click="showModalPhoto('left')">Select photo</button>
                 </div>
             </div>
             <div class="form-group">
@@ -85,7 +85,7 @@
             <div class="form-group">
                 <label for="testimoni-left" class="col-sm-12 col-md-6 control-label">Photo Right</label>
                 <div class="col-sm-12 col-md-6 col-lg-6">
-                    <button class="btn-block btn btn-sm btn-default" ng-click="getPhoto('right')">Select photo</button>
+                    <button class="btn-block btn btn-sm btn-default" ng-click="showModalPhoto('right')">Select photo</button>
                 </div>
             </div>
             <div class="form-group">
@@ -98,20 +98,5 @@
                 </div>
             </div>
         </fieldset>
-
-        <!-- <div class="form-group">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <a class="btn btn-sm btn-default btn-block" ng-click="save()">
-                    <i class="fa fa-save"></i> Save
-                </a>
-                <a class="btn btn-sm btn-block" ng-class="mobile.disable.generate ? 'btn-info' : 'btn-success'" ng-disabled="loading" ng-click="generatePoster('download-mobile')">
-                    <i class="fa fa-gear"></i> Generate
-                </a>
-                <a id="download-mobile" class="btn btn-sm btn-block btn-success" ng-disabled="loading" ng-hide="mobile.disable.download">
-                    <i class="fa fa-download"></i> Download
-                </a>
-                <wave-spinner ng-show="loading"></wave-spinner>
-            </div>
-        </div> -->
     </div>
 </div>
