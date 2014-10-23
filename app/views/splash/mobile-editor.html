@@ -12,10 +12,10 @@
 	</div>
 	
 	<div class="row margin-top">
-	    <div class="col-sm-12 col-md-10 prefix" id="objects">
- 			<div class="col-sm-3 col-md-3 col-lg-3 field-top" ng-repeat="object in fabric.getObjects()">
+	    <div class="col-xs-12 col-sm-12 col-md-10 prefix" id="objects">
+ 			<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 field-top" ng-repeat="object in fabric.getObjects()">
  				<div class="btn-group btn-block">
-	 				<button type="button" class="col-sm-3 btn btn-sm btn-default" ng-click="fabric.setActiveObject(object);toggleControls()">
+	 				<button type="button" class="col-xs-3 col-sm-3 btn btn-sm btn-default" ng-click="fabric.setActiveObject(object);toggleControls()">
 	                 	<i ng-if="object.type == 'text' || object.type == 'i-text'" class="fa fa-font"></i>
 			            <i ng-if="object.type == 'image'" class="fa fa-image"></i>
 			            <i ng-if="object.type == 'group'" class="fa fa-group"></i>
@@ -23,19 +23,19 @@
 			            <i ng-if="object.type == 'circle'" class="fa fa-circle"></i>
 			            <i ng-if="object.type == 'rect'" class="fa fa-square"></i>
 		            </button>
-		 			<button type="button" class="col-sm-9 btn btn-sm" ng-click="fabric.setActiveObject(object); fabric.toggleControlObject(true)" ng-class="{'btn-primary': object.active, 'btn-default': !object.active}" title="{{ object.name ? object.name : object.id }}">
+		 			<button type="button" class="col-xs-9 col-sm-9 btn btn-sm" ng-click="fabric.setActiveObject(object); fabric.toggleControlObject(true)" ng-class="{'btn-primary': object.active, 'btn-default': !object.active}" title="{{ object.name ? object.name : object.id }}">
 	            		<small>{{ object.name ? object.name : object.id }}</small>
 	                </button>
  				</div>
  			</div>
 	    </div>
-	    <div class="col-sm-12 col-md-2 field-top" ng-show="fabric.selectedObject">
+	    <div class="col-xs-12 col-sm-12 col-md-2 field-top" ng-show="fabric.selectedObject">
 	        <button class="btn-block btn btn-sm btn-warning" ng-click="deselectObject()">Deselect Object</button>
 	    </div>
 	</div>
 </div>
 
-<div class="col-md-12 margin-top-bottom image-builder" parent-click="fabric.deactivateAll()">
+<div class="col-xs-12 col-md-12 margin-top-bottom image-builder" parent-click="fabric.deactivateAll()">
     <div id="canvas-mobile" class="fabric-container">
         <canvas fabric="fabric"></canvas>
         <div id="qrcode"></div>

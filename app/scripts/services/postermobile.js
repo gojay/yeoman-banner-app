@@ -570,9 +570,7 @@ define(['angular'], function (angular) {
 	.service('RecentMobilePhotos', ['authResource', '$q',
 		function RecentMobilePhotos(authResource, $q){
 			return function(){
-
 				var deferred = $q.defer();
-
 				authResource.authentifiedRequest('GET', '/splash/mobiles/photos', {}, function(data){
 					deferred.resolve(data);
 				}, function(err){
@@ -585,9 +583,7 @@ define(['angular'], function (angular) {
 	.service('RecentMobiles', ['authResource', '$q',
 		function RecentMobiles(authResource, $q){
 			return function(){
-
 				var deferred = $q.defer();
-
 				authResource.authentifiedRequest('GET', '/splash/mobiles', {}, function(data){
 					deferred.resolve(data);
 				}, function(err){
@@ -600,9 +596,7 @@ define(['angular'], function (angular) {
 	.service('DetailMobile', ['authResource', '$q', '$route',
 		function DetailMobile(authResource, $q, $route){
 			return function(){
-
 				var deferred = $q.defer();
-
 				authResource.authentifiedRequest('GET', '/splash/mobiles/' + $route.current.params.mobileId, {}, function(data){
 					deferred.resolve(data);
 				}, function(err){
@@ -612,18 +606,22 @@ define(['angular'], function (angular) {
 			};
 		}
 	])
-	.service('SaveMobile', ['authResource', '$q',
-		function SaveMobile(authResource, $q){
-			return function( data, method ){
+	.service('SaveMobile', ['authResource', '$q', '$route',
+		function SaveMobile(authResource, $q, $route){
+			return function( data ){
 
-				console.log('SaveMobile:data', data);
-
-				if( !method ) {
+				var url = '/splash/mobiles',
 					method = 'POST';
+				if(angular.isDefined($route.current.params.mobileId)) {
+					url += '/' + $route.current.params.mobileId;
+					method = 'PUT';
 				}
 
+				console.log('SaveMobile:params', method, url);
+				console.log('SaveMobile:data', data);
+
 				var deferred = $q.defer();
-				authResource.authentifiedRequest(method, '/splash/mobiles', data, function(response){
+				authResource.authentifiedRequest(method, url, data, function(response){
 					deferred.resolve(response);
 				}, function(err){
 					deferred.reject(err);

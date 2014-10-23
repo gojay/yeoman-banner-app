@@ -11,18 +11,23 @@ define([
 ], function (angular) {
   'use strict';
 
-  	var app = angular.module('bannerAppApp.controllers.SplashMobileCtrl', [
-  		'classy',
-  		'common.fabric',
-  		'common.fabric.utilities',
-  		'common.fabric.constants'
-  	]);
-
   	/**
   	 * Angular Classy
   	 * Cleaner class-based controllers for AngularJS
   	 * http://davej.github.io/angular-classy/
+	 *
+  	 * classy-extends : plugin allows base controllers for Angular Classy.
+  	 * https://github.com/wuxiaoying/classy-extends
   	 */
+
+  	var app = angular.module('bannerAppApp.controllers.SplashMobileCtrl', [
+  		'classy', 
+  		'classy-extends',
+  		'classy-initScope',
+  		'common.fabric',
+  		'common.fabric.utilities',
+  		'common.fabric.constants'
+  	]);
 
   	app.classy.controller({
   		name: 'SplashMobileCtrl',
@@ -45,6 +50,9 @@ define([
 
 	    	'mobile'
 	    ],
+	    initScope: {
+	        fabric: {}
+	    },
 	    _qrcodeElement: null,
 		_currentQRURL: null,
 	    init: function() {
@@ -56,13 +64,42 @@ define([
 
 	    	this._qrcodeElement = angular.element('#qrcode');
 
+            this._initMenus();
+
+			this.$.screenshotUploadOptions = {
+            	data: {
+                	name  : 'mobile_screenshot',
+            		width : null,
+            		height: null
+            	}
+            };
+
 	    	this.FabricConstants.presetSizes = this.Postermobile.presetSizes;
 			this.FabricConstants.CustomAttributes = this.Postermobile.CustomAttributes;
 
-			this.$.fabric = {};
 			this.$.FabricConstants = this.FabricConstants;
 
 	    	this.$.$on('canvas:created', this._onCanvasCreated);
+	    },
+	    _initMenus: function() {
+            this.$.mobiles = {};
+    		this.$.mobiles.data = this.mobile.all.data;
+    		this.$.mobiles.delete = function($index){
+    			if(confirm('Are you sure ?')) {
+    				delete this.$.mobiles.data[$index];
+    			}
+    		};
+
+            this.$rootScope.menus = {
+				top: {
+	                model   : this.$,
+	                template: '<div ng-include src="\'views/splash/mobile-menu-top.html\'"></div>'
+				},
+				left: {
+					model : this.$.mobiles,
+	                template: '<div ng-include src="\'views/splash/mobile-menu-left.html\'"></div>'
+				}
+            };
 	    },
 	    watch: {
 			// 'fabric.presetSize': function(size){
@@ -163,17 +200,25 @@ define([
         // Ui Bootstrap Modal
         // =====================
         showModalPhoto: function(position) {
+        	var log = this.$log;
         	var mobile = this.$.mobile;
+        	var fabric = this.$.fabric;
+
+        	// this.$.digest();
+
+        	log.log('showModalPhoto', this);
 
         	var modalInstance = this.$modal.open({
                 templateUrl: 'views/splash/mobile-modal-photo.html',
                 controller : 'ModalPhotoSplashMobileCtrl',
                 resolve: {
-                    data: function($rootScope, $timeout, RecentMobilePhotos){
-                    	this.$log('resolve:photos', mobile.photos);
+                    mobile: function($rootScope, $timeout, RecentMobilePhotos){
+                    	log.log('resolve:photos', mobile.photos);
                         if( mobile.photos.length ){
                             return {
-                                mobile: mobile
+                            	fabric: fabric,
+                                data: mobile,	
+                                position: position
                             };
                         } else {
                             // get mobile photos from 'upload' directory with 'RecentMobilePhotos' service
@@ -182,7 +227,9 @@ define([
                                 $rootScope.isLoading = false;
                                 mobile.photos = photos.data;
                                 return {
-                                    mobile: mobile
+                                	fabric: fabric,
+                                    data: mobile,	
+                                	position: position
                                 };
                             })
                         }
@@ -191,10 +238,13 @@ define([
             });
         },
         saveConfig: function() {
-        	var scope = {
+        	var data = {
+    			loading: {
+                	load: false,
+                	message: 'Please wait'
+                },
         		mobile: this.$.mobile,
         		fabric: this.$.fabric,
-        		isNew: this.$.isNew,
         	};
 
         	var modalInstance = this.$modal.open({
@@ -202,15 +252,7 @@ define([
                 controller : 'ModalSaveSplashMobileCtrl',
                 resolve: {
                     data: function(){
-                		return {
-                			loading: {
-	                        	load: false,
-	                        	message: 'Please wait'
-	                        },
-                			mobile: scope.mobile,
-                			fabric: scope.fabric,
-                			isNew : scope.isNew
-                        };
+                		return data;
                 	}
                 }
             });
@@ -295,18 +337,19 @@ define([
 				}
 			});
 
+    		// set scope mobile & formJSON
     		// new or edit mobile configuration
 			this.$.mobile   = this.mobile.detail ? this._getMetaValue(this.mobile.detail, 'mobile') : this.Postermobile.model;
             this.$.fromJSON = this.mobile.detail ? this._getMetaValue(this.mobile.detail, 'config') : null;
 
             // is edit, load configuration from JSON
             if( this.$.fromJSON ){
-            	this.$.isNew = false;
             	this.$.fabric.presetSize = this.Postermobile.presetSizes[1];
-            	this._fromJSON();
-            	// generate qr code
-            	this._mobileGenerateQR('iphone');
-                this._mobileGenerateQR('android');
+            	this._fromJSON(function() {
+	            	// generate qr code
+	            	self._mobileGenerateQR('iphone');
+	                self._mobileGenerateQR('android');
+            	});
             }
 
 			//
@@ -316,7 +359,7 @@ define([
 			this.$.$evalAsync(
                 function( $scope ) {
 
-                    self.$log.log( "$evalAsync", $scope );
+                    self.$log.log("$evalAsync", $scope);
 
 					$scope.$watch('fabric.presetSize', function(size){
 						self.$log.debug('fabric.presetSize', size);
@@ -337,10 +380,13 @@ define([
 						$scope.fabric.scaleControl();
 					});
 
-		            $scope.$watch('mobile.images.screenshot', function(image){
-		                if( image == null ) return;
-		                self.$log.debug('mobile.images.screenshot', image);
-		                self._setObjectImage( 'app-screenshot', image );
+		            $scope.$watch('mobile.images.screenshot', function(newval, oldval){
+		            	if(newval){
+			                self.$log.debug('mobile.images.screenshot', newval);
+		                	self.$timeout(function(){
+		                		self._setObjectImage( 'app-screenshot', newval);
+		                	},400);
+					    }
 		            });
 		            $scope.$watch('mobile.text.app', function(newVal){
 		                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'app-name') {
@@ -530,16 +576,20 @@ define([
             
             var canvasQR   = self._qrcodeElement.find('canvas')[0],
             	imgDataURI = canvasQR.toDataURL('image/jpeg');
-
-            // set qr image to object
-            self._setObjectImage('qr-'+name, imgDataURI, function(){
-                qr.url = url;
-                qr.loading = false;
-            	self._qrcodeElement.empty();
-            });
+            
+            this.$timeout(function(){
+	            // set qr image to object
+	            self._setObjectImage('qr-'+name, imgDataURI, function(){
+	                qr.url = url;
+	                qr.loading = false;
+	            	self._qrcodeElement.empty();
+	            });
+            }, 1000);
         },
 		_setObjectImage: function( objectName, src, callback ){
-            var fabric = $scope.fabric;
+            var fabric = this.$.fabric;
+
+            this.$log.debug('fabric', this.$.fabric.canvas.getObjects());
 
             var object = fabric.getObjectByName(objectName);
             if ( !object ) return;
@@ -554,28 +604,29 @@ define([
 			var jsonString = this.$.fabric.getJSON();
         	return JSON.parse(jsonString);
 		},
-		_fromJSON: function() {
+		_fromJSON: function(callback) {
 			this.$.fabric.canvasOriginalWidth = 2480;
         	this.$.fabric.canvasOriginalHeight = 3508;
         	this.$.fabric.canvasScale = 0.3;
-        	this.$.fabric.loadJSON(this.$.fromJSON);
+        	this.$.fabric.loadJSON(this.$.fromJSON, callback);
 		}
   	});
 
 	// Controller Modal Photo 
 	// =========================
 	app.classy.controller({
-		name: 'ModalPhotoSplashMobileCtrl',
-		inject: [
-			'$scope', 
-			'$modalInstance', 
-			'$timeout', 
-			'$log', 
-			'data'
-		],
+		extends: 'SplashMobileCtrl',
+		name   : 'ModalPhotoSplashMobileCtrl',
+		inject : ['$modalInstance'],
 		init: function() {
-			this.$.mobile = this.data.mobile;
+			this._super(arguments);
+            this.$log.debug('ModalPhotoSplashMobileCtrl', this);
+
+			this._position = this.mobile.position;
+        	this.$.fabric  = this.mobile.fabric;
+			this.$.mobile  = this.mobile.data;
             this.$.photoIndex = null;
+
             this.$.uploadOptions = {
             	data: {
                 	name  : 'mobile_testimonial',
@@ -584,17 +635,15 @@ define([
             		unique: true
             	}
             };
-
-            this.$log.debug('scope:ModalPhotoSplashMobileCtrl', this.$);
 		},
 		watch: {
 			'mobile.photos': function(photos){
             	this.$log.debug('mobile.photos', photos);
             }
 		},
-		selected: function(position) {
-			this.$.photoIndex = $index;
-            this._setPhoto($index, position);
+		selected: function(selected) {
+			this.$.photoIndex = selected;
+            this._setPhoto(selected, this._position);
 		},
 		ok: function() {
 			this.$modalInstance.close();
@@ -602,7 +651,9 @@ define([
 		cancel: function() {
 			this.$modalInstance.dismiss('cancel'); 
 		},
-        _setPhoto: function() {
+		_position: null,
+        _setPhoto: function(photoIndex, position) {
+        	var self = this;
         	// create canvas
             var canvas = document.createElement('canvas');
             // get canvas context
@@ -617,11 +668,15 @@ define([
                 ctx.drawImage(img, 0, 0);
                 // convert to image png
                 var imgDataURI = canvas.toDataURL('image/png');
-                this.$.mobile.images.testimonials[index] = imgDataURI;
-                self._setObjectImage( 'testimoni-pic-'+index, imgDataURI );
+                self.$.mobile.images.testimonials[position] = imgDataURI;
+                self._setObjectImage( 'testimoni-pic-'+position, imgDataURI );
             };
 			img.crossOrigin = "Anonymous";
             img.src = this.$.mobile.photos[photoIndex];
+        },
+        _setObjectImage: function() {
+            this.$log.debug('call _setObjectImage from child', this);
+			this._super(arguments);
         }
 	});
 
@@ -639,12 +694,15 @@ define([
 			'$modalInstance',
 			'Helpers',
 			'API',
+			'SaveMobile',
 			'data',
 		],
 		init: function() {
-			this.$.loading = data.loading;
-            this.$.mobile  = data.mobile;
-            this.$.fabric  = data.fabric;
+            this.$log.debug('ModalSaveSplashMobileCtrl', this);
+
+			this.$.loading = this.data.loading;
+            this.$.mobile  = this.data.mobile;
+            this.$.fabric  = this.data.fabric;
 
             this.$.data = {
             	title 		: this.$.mobile.text.app,
@@ -654,10 +712,12 @@ define([
         save: function() {
         	var self = this;
 
+        	var API = this.API;
+
         	this.$.loading.load = true;
         	this.$.loading.message = 'Generating image...';
 
-            var isModified = $scope.fabric.isDirty();
+            var isModified = this.$.fabric.isDirty();
 
         	// create blob image file
 			var file  = this.$.fabric.getCanvasBlobFile('image/jpeg');
@@ -672,45 +732,37 @@ define([
             }).then(function(response) {
                 self.$log.debug('upload:response', response);
 
-        		this.$.loading.message = 'Saving configuration...';
+        		self.$.loading.message = 'Saving configuration...';
 
         		// create data
-        		this.$.data.screenshot = response.data.url;
-            	this.$.data['meta'] = [{
+        		self.$.data.screenshot = response.data.url;
+            	self.$.data['meta'] = [{
             		'meta_key'  : 'mobile',
-            		'meta_value': this.$.mobile
+            		'meta_value': self.$.mobile
             	},{
             		'meta_key'  : 'config',
-            		'meta_value': this.$.fabric.getJSON( true )
+            		'meta_value': self.$.fabric.getJSON( true )
             	}];
 
-	            var method = data.isNew ? 'POST' : 'PUT' ;
-	    		var url = API.URL + (data.isNew ? '/splash/mobiles' : '/splash/mobiles/' + this.$route.current.params.mobileId);
-
         		// save configuration
-        		this.$http({
-        			method	: method,
-        			url 	: url,
-        			data 	: this.$.data
-        		})
-                success.then(function(response){
-            		this.$log.debug('save:response', response);
+                self.SaveMobile(self.$.data).then(function(response){
+            		self.$log.debug('save:response', response);
 
-            		this.$rootScope.safeApply(function(){
-            			this.$rootScope.menus.left.model.data.push(this.$.data);
+            		self.$rootScope.safeApply(function(){
+            			self.$rootScope.menus.left.model.data.push(self.$.data);
             		});
-            		this.$.loading.load = false;
-        			this.$.loading.message = 'Please wait';
+            		self.$.loading.load = false;
+        			self.$.loading.message = 'Please wait';
 
-                    this.$modalInstance.close();
+                    self.$modalInstance.close();
                 });
 
             }, function(response) {
-                this.$log.error('upload:success', response);
+                self.$log.error('upload:success', response);
             }, function(evt) {
                 // Math.min is to fix IE which reports 200% sometimes
                 var Progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-                this.$log.info('upload:progress', Progress);
+                self.$log.info('upload:progress', Progress);
             });
         },
         cancel: function() {

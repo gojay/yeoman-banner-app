@@ -10,7 +10,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                 },
                 template: '<div>' +
                     '<button class="btn btn-sm">'+
-                        '<span ng-show="loadingProgress > 0"><i class="fa fa-circle-o-notch fa-spin"></i> Uploading {{loadingProgress}}%</span>'+
+                        '<span ng-show="loadingProgress > 0"><i class="fa fa-circle-o-notch fa-spin"></i> Uploading..</span>'+
                         '<span ng-show="loadingProgress == 0">{{ text }}</span>'+
                     '</button>' +
                     '<input type="file" ng-file-select="onFileSelect($files)" onclick="this.value=null" style="display:none" />' +
@@ -57,7 +57,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                     fileReader.readAsDataURL($files[i]);
                                     var loadFile = function(fileReader, index) {
                                         fileReader.onload = function(e) {
-                                            $log.debug('onload', e)
+                                            $log.debug('[uploadImage]onload', e);
                                             $timeout(function() {
                                                 $scope.dataUrls[index] = e.target.result;
                                             });
@@ -102,6 +102,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                     }
                                 }, function(evt) {
                                     // Math.min is to fix IE which reports 200% sometimes
+                                    $log.info('[uploadImage] ' + Math.min(100, parseInt(100.0 * evt.loaded / evt.total)))
                                     $scope.progress[index] = $scope.loadingProgress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
                                 });
 

@@ -7,6 +7,8 @@ require.config({
         'angular-sanitize': '../bower_components/angular-sanitize/angular-sanitize.min',
         'angular-resource': '../bower_components/angular-resource/angular-resource.min',
         'angular-classy': '../bower_components/angular-classy/angular-classy.min',
+        'classy-extends': '../bower_components/classy-extends/classy-extends',
+        'classy-init-scope': '../bower_components/classy-initScope/classy-initScope',
         
         // 'angular-http-auth': '../bower_components/angular-http-auth/src/http-auth-interceptor',
         'angular-http-auth': 'lib/http-auth-interceptor',
@@ -69,28 +71,23 @@ require.config({
         'angular-cookies': ['angular'],
         'angular-sanitize': ['angular'],
         'angular-resource': ['angular'],
-        'angular-classy': ['angular'],
         'angular-http-auth': ['angular'],
-        // 'angular-mocks': {
-        //     deps: ['angular'],
-        //     'exports': 'angular.mock'
-        // },
+
+        'angular-classy': ['angular'],
+        'classy-extends': ['angular', 'angular-classy'],
+        'classy-init-scope': ['angular', 'angular-classy'],
+        
         'angular-animate': ['angular'],
         'angular-bootstrap': ['angular'],
         'angular-ui-utils': ['angular'],
         'angular-spinkit': ['angular'],
         'angular-file-upload': ['angular'],
         'angular-gravatar': ['angular'],
-        // 'angular-file-upload-shim': ['angular'],
-        // 'angular-snap': ['angular', 'snap'],
         'angular-loading-bar': ['angular'],
 
         'angular-font-select': ['angular', 'webfontloader'],
         'angular-slide-push': ['angular'],
 
-        // 'snap': {
-        //     'exports': 'snap'
-        // },
         'webfontloader': {
             'exports': 'webfontloader'
         },
@@ -137,6 +134,8 @@ require([
     'angular-sanitize',
     'angular-resource',
     'angular-classy',
+    'classy-extends',
+    'classy-init-scope',
     'angular-http-auth',
     'angular-bootstrap',
     'angular-ui-utils',

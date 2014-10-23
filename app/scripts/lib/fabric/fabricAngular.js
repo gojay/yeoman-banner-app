@@ -1040,7 +1040,7 @@ angular.module('common.fabric', [
 			return angular.isDefined(isObject) && isObject ? JSON.parse(json) : json ;
 		};
 
-		self.loadJSON = function(json) {
+		self.loadJSON = function(json, callback) {
 			self.setLoading(true);
 			canvas.loadFromJSON(json, function() {
 				$timeout(function() {
@@ -1051,6 +1051,10 @@ angular.module('common.fabric', [
 					}
 
 					self.render();
+					
+					if(callback) {
+						callback()
+					}
 				});
 			});
 		};

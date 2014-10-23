@@ -6,7 +6,7 @@
                     {{ fabric.presetSize.name ? fabric.presetSize.name : 'Select poster size' }}
                     <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu" role="menu">
+                <ul class="dropdown-menu col-xs-12" role="menu">
                     <li ng-click='fabric.presetSize = size; fabric.setCanvasSize(size.width, size.height); fabric.setDirty(true); dropdown.sizeIsOpen = !dropdown.sizeIsOpen' ng-repeat='size in FabricConstants.presetSizes'><a>{{ size.name }}</a>
                     </li>
                 </ul>
@@ -69,7 +69,7 @@
             <div class="form-group">
                 <label for="testimoni-left" class="col-sm-12 col-md-6 control-label">Photo Left</label>
                 <div class="col-sm-12 col-md-6 col-lg-6">
-                    <button class="btn-block btn btn-sm btn-default" ng-click="showModalPhoto('left')">Select photo</button>
+                    <button class="btn-block btn btn-sm btn-primary" ng-click="showModalPhoto('left')">Select photo</button>
                 </div>
             </div>
             <div class="form-group">
@@ -85,7 +85,7 @@
             <div class="form-group">
                 <label for="testimoni-left" class="col-sm-12 col-md-6 control-label">Photo Right</label>
                 <div class="col-sm-12 col-md-6 col-lg-6">
-                    <button class="btn-block btn btn-sm btn-default" ng-click="showModalPhoto('right')">Select photo</button>
+                    <button class="btn-block btn btn-sm btn-primary" ng-click="showModalPhoto('right')">Select photo</button>
                 </div>
             </div>
             <div class="form-group">
