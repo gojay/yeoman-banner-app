@@ -93,7 +93,7 @@ define(['angular', 'angular-file-upload'], function(angular) {
                                     if( angular.isArray($scope.image) )
                                         $scope.image.push(response.data.url);
                                     else
-                                        $scope.image = response.data.dataURI;
+                                        $scope.image = response.data.url;
                                     $log.debug('$scope.image', $scope.image)
                                 }, function(response) {
                                     if (response.status > 0) {

@@ -55,7 +55,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         //     googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         // })
         .constant('API', {
-            'URL'   : 'http://api.local/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
+            'URL'   : 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
             'GRANT' : 'user', // grant type : user (user credentials) or jwt
             'CLIENT': {
                 'ID'    : '1413098344',
@@ -254,24 +254,24 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                 };
 
-                // user info authenticated
-                $rootScope.openLoginDialog = false;
-                $rootScope.user = angular.fromJson(localStorage.getItem('user')) || false;
-                // sidemenus
-                $rootScope.menus = {
-                    top: {
-                        model: null,
-                        template: null
-                    },
-                    left: {
-                        model: null,
-                        template: null
-                    },
-                    right: {
-                        model: null,
-                        template: null
+                angular.extend($rootScope, {
+                    loading : false,
+                    user    : angular.fromJson(localStorage.getItem('user')) || false,
+                    menus   : {
+                        top: {
+                            model: null,
+                            template: null
+                        },
+                        left: {
+                            model: null,
+                            template: null
+                        },
+                        right: {
+                            model: null,
+                            template: null
+                        }
                     }
-                };
+                });
 
                 var oldLocation = '';
                 $rootScope.$on('$routeChangeStart', function(event, next) {
@@ -287,11 +287,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                     $rootScope.isDownwards = isDownwards;
                 });
-                $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
-                    // angular.element('#view.container').css('opacity', Math.round(percent) / 100);
-                });
+                // $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
+                //     angular.element('#view.container').css('opacity', Math.round(percent) / 100);
+                // });
                 $rootScope.$on('cfpLoadingBar:completed', function(data, percent){
-                    // console.info('cfpLoadingBar:completed');
                     $rootScope.loading = false;
                 });
             }

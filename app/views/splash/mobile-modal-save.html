@@ -8,8 +8,12 @@
 	</div>
 	<form style="opacity: {{ loading.load ? 0.5 : 1 }}">
 		<div class="form-group">
-			<label for="title">Name</label>
+			<label for="name">Name</label>
 			<input type="text" class="form-control" id="name" placeholder="Name of app" ng-model="data.title">
+		</div>
+		<div class="form-group">
+			<label for="description">Description</label>
+			<textarea class="form-control" id="description" placeholder="Description of app" ng-model="data.description"></textarea>
 		</div>
 		<div class="form-group">
 			<label for=""></label>

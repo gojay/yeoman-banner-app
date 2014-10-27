@@ -29,8 +29,8 @@
             <div class="form-group">
                 <label for="applcation-name" class="col-md-12 control-label">Application Name</label>
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <input type="text" class="input-sm form-control" ng-model="mobile.text.app" ui-event="{
-										focus:'fabric.setActiveObjectByName(\'app-name\')', 
+                    <input type="text" id="application-name" class="input-sm form-control" ng-model="mobile.text.app" ui-event="{
+										focus:'onFocusName($event)', 
 										blur :'fabric.deactivateAll()'
 									}" />
                 </div>

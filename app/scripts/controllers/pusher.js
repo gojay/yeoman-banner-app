@@ -1,4 +1,4 @@
-define(['angular', 'pusher', 'moment'], function (angular) {
+define(['angular', /*'pusher',*/ 'moment'], function (angular) {
   'use strict';
 
   angular.module('bannerAppApp.controllers.PusherCtrl', [])

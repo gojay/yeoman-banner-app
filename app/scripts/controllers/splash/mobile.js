@@ -51,37 +51,21 @@ define([
 	    	'mobile'
 	    ],
 	    initScope: {
-	        fabric: {}
-	    },
-	    _qrcodeElement: null,
-		_currentQRURL: null,
-	    init: function() {
-	    	var log = this.$log;
-
-	    	log.debug('this', this);
-	    	log.debug('$scope', this.$);
-	    	log.debug('mobile', this.mobile);
-
-	    	this._qrcodeElement = angular.element('#qrcode');
-
-            this._initMenus();
-
-			this.$.screenshotUploadOptions = {
+	        fabric: {},
+	        screenshotUploadOptions: {
             	data: {
                 	name  : 'mobile_screenshot',
             		width : null,
-            		height: null
+            		height: null,
+            		unique: true
             	}
-            };
-
-	    	this.FabricConstants.presetSizes = this.Postermobile.presetSizes;
-			this.FabricConstants.CustomAttributes = this.Postermobile.CustomAttributes;
-
-			this.$.FabricConstants = this.FabricConstants;
-
-	    	this.$.$on('canvas:created', this._onCanvasCreated);
+            }
 	    },
+	    _id: null,
+	    _qrcodeElement: null,
+		_currentQRURL: null,
 	    _initMenus: function() {
+
             this.$.mobiles = {};
     		this.$.mobiles.data = this.mobile.all.data;
     		this.$.mobiles.delete = function($index){
@@ -100,7 +84,35 @@ define([
 	                template: '<div ng-include src="\'views/splash/mobile-menu-left.html\'"></div>'
 				}
             };
+
+	    	this.$log.log('init:menu', this);
 	    },
+	    init: function() {
+	    	var log = this.$log;
+
+	    	log.debug('this', this);
+	    	log.debug('$scope', this.$);
+	    	log.debug('mobile', this.mobile);
+
+	    	this._qrcodeElement = angular.element('#qrcode');
+
+            this._initMenus();
+
+            this._id = this.mobile.detail ? this.mobile.detail.id : 1;
+
+    		// set scope mobile & formJSON
+			this.$.mobile   = this.mobile.detail ? this._getMetaValue(this.mobile.detail, 'mobile') : this.Postermobile.model;
+            this.$.fromJSON = this.mobile.detail ? this._getMetaValue(this.mobile.detail, 'config') : null;
+
+	    	this.FabricConstants.presetSizes 	  = this.Postermobile.presetSizes;
+			this.FabricConstants.CustomAttributes = this.Postermobile.CustomAttributes;
+
+			this.$.FabricConstants = this.FabricConstants;
+
+	    	this.$.$on('canvas:created', this._onCanvasCreated);
+	    },
+	    // Scope Watch
+        // =====================
 	    watch: {
 			// 'fabric.presetSize': function(size){
 			// 	this.$log.debug('fabric.presetSize', size);
@@ -110,31 +122,23 @@ define([
 			// 	this.$.fabric.setZoom();
 			// }
 	    },
-	    // binding menus
+	    // event click : toggle menu
         // =====================
-	    toggleLeftMenu: function(forceClose) {
-			var id = 'menu-left';
+	    toggleMenu: function(position, forceClose) {
+			var id = 'menu-' + position;
+			var slideMenu = this.slidePush;
+
 			if(forceClose === true) {
-				this.slidePush.pushForceCloseById(id);
+				slideMenu.pushForceCloseById(id);
 				return;
 			}
 
-			if( this.slidePush.isOpenById(id) ) {
-				this.slidePush.pushForceCloseById(id);
+			if( slideMenu.isOpenById(id) ) {
+				slideMenu.pushForceCloseById(id);
 			} else {
-				this.slidePush.pushById(id);
+				slideMenu.pushById(id);
 			}
         },
-        toggleControls: function(){
-			var id = 'menu-top';
-			var scroll = 0;
-			if( this.slidePush.isOpenById(id) ) {
-				this.slidePush.pushForceCloseById(id);
-			} else {
-				if( !this.$.fabric.selectedObject ) return;
-				this.slidePush.pushById(id);
-			}
-		},
 		resetControls: function(){
 			var fabric = this.$.fabric;
 			var object = fabric.selectedObject;
@@ -175,14 +179,21 @@ define([
 		deselectObject: function(){
 			var id = 'menu-top';
 			this.$.fabric.deactivateAll();
-			if( this.slidePush.isOpenById(id) ) {
-				this.slidePush.pushForceCloseById(id);
-			}
+			this.toggleMenu('top', true);
 		},
-		// binding QR Code
+		// event click : ui-event
         // =====================
+        onFocusName: function(e) {
+        	this.$.fabric.setActiveObjectByName('app-name');
+        	this.$timeout(function() {
+        		angular.element(e.currentTarget).select();
+        	});
+        },
 		onFocusQR: function(e){
             this._currentQRURL = e.target.value;
+        	this.$timeout(function() {
+        		angular.element(e.currentTarget).select();
+        	});
         },
         onKeyUpQR: function(e){
             var name  = e.target.name;
@@ -194,19 +205,17 @@ define([
             var url  = e.target.value;
             // if url is valid && url not same before
             if( e.target.validity.valid && this._currentQRURL != url ){
-                this._mobileGenerateQR(name, url);
+                this._generateQR(name, url);
             }
         },
-        // Ui Bootstrap Modal
+        // event click : show Modal
         // =====================
         showModalPhoto: function(position) {
         	var log = this.$log;
         	var mobile = this.$.mobile;
         	var fabric = this.$.fabric;
 
-        	// this.$.digest();
-
-        	log.log('showModalPhoto', this);
+        	log.log('[showModalPhoto]', this);
 
         	var modalInstance = this.$modal.open({
                 templateUrl: 'views/splash/mobile-modal-photo.html',
@@ -237,7 +246,8 @@ define([
                 }
             });
         },
-        saveConfig: function() {
+        showModalSave: function() {
+        	var self = this;
         	var data = {
     			loading: {
                 	load: false,
@@ -256,8 +266,11 @@ define([
                 	}
                 }
             });
+            modalInstance.result.then(function(){
+            	self.toggleMenu('left');
+            });
         },
-        // binding generate Poster
+        // event click : generate Poster
         // =====================
         generatePoster: function(id) {
         	var fabric = this.$.fabric;
@@ -308,47 +321,42 @@ define([
 			this.Keypress.onSave(function(){  this.$.save() });
 			this.Keypress.onControls({
 				up: function(){
-					if( this.$.fabric.selectedObject ) {
-						this.$.fabric.controls.top -= 1;
-						this.$.$apply();
-						this.$log.debug('up', this.$.fabric.controls.top);
+					if( self.$.fabric.selectedObject ) {
+						self.$.fabric.controls.top -= 1;
+						self.$.$apply();
+						self.$log.debug('up', self.$.fabric.controls.top);
 					}
 				},
 				down: function(){
-					if( this.$.fabric.selectedObject ) {
-						this.$.fabric.controls.top += 1;
-						this.$.$apply();
-						this.$log.debug('down', this.$.fabric.controls.top);
+					if( self.$.fabric.selectedObject ) {
+						self.$.fabric.controls.top += 1;
+						self.$.$apply();
+						self.$log.debug('down', self.$.fabric.controls.top);
 					}
 				},
 				left: function(){
-					if( this.$.fabric.selectedObject ) {
-						this.$.fabric.controls.left -= 1;
-						this.$.$apply();
-						this.$log.debug('left', this.$.fabric.controls.left);
+					if( self.$.fabric.selectedObject ) {
+						self.$.fabric.controls.left -= 1;
+						self.$.$apply();
+						self.$log.debug('left', self.$.fabric.controls.left);
 					}
 				},
 				right: function(){
-					if( this.$.fabric.selectedObject ) {
-						this.$.fabric.controls.left += 1;
-						this.$.$apply();
-						this.$log.debug('right', this.$.fabric.controls.left);
+					if( self.$.fabric.selectedObject ) {
+						self.$.fabric.controls.left += 1;
+						self.$.$apply();
+						self.$log.debug('right', self.$.fabric.controls.left);
 					}
 				}
 			});
-
-    		// set scope mobile & formJSON
-    		// new or edit mobile configuration
-			this.$.mobile   = this.mobile.detail ? this._getMetaValue(this.mobile.detail, 'mobile') : this.Postermobile.model;
-            this.$.fromJSON = this.mobile.detail ? this._getMetaValue(this.mobile.detail, 'config') : null;
 
             // is edit, load configuration from JSON
             if( this.$.fromJSON ){
             	this.$.fabric.presetSize = this.Postermobile.presetSizes[1];
             	this._fromJSON(function() {
 	            	// generate qr code
-	            	self._mobileGenerateQR('iphone');
-	                self._mobileGenerateQR('android');
+	            	self._generateQR('iphone');
+	                self._generateQR('android');
             	});
             }
 
@@ -381,11 +389,9 @@ define([
 					});
 
 		            $scope.$watch('mobile.images.screenshot', function(newval, oldval){
-		            	if(newval){
+		            	if(newval && typeof newVal === 'string'){
 			                self.$log.debug('mobile.images.screenshot', newval);
-		                	self.$timeout(function(){
-		                		self._setObjectImage( 'app-screenshot', newval);
-		                	},400);
+	                		self._setObjectImage( 'app-screenshot', newval);
 					    }
 		            });
 		            $scope.$watch('mobile.text.app', function(newVal){
@@ -463,11 +469,10 @@ define([
 
 				// screenshot
                 var screenshot = this.$.mobile.images.screenshot ? 
-                                    'images/upload/mobile_screenshot.png' :
+                                    this.$.mobile.images.screenshot :
                                     'images/'+ ss.width +'x'+ ss.height +'.jpg' ;
 
                 this.$.fabric.addImage(screenshot, function(object){
-                	object.async = true;
                     object.name = 'app-screenshot';
                     object.set({
                         width  : ss.width,
@@ -545,8 +550,8 @@ define([
 
                 // generate QR
 				// =================================
-                this._mobileGenerateQR('iphone');
-                this._mobileGenerateQR('android');
+                this._generateQR('iphone');
+                this._generateQR('android');
 			}
 		},
 		_getMetaValue: function(obj, key) {
@@ -556,7 +561,7 @@ define([
 			});
 			return value[0]['meta_value'];
 		},
-		_mobileGenerateQR: function( name, url ){
+		_generateQR: function( name, url ){
 			var self = this;
 
             var qr = this.$.mobile.qr[name];
@@ -618,8 +623,10 @@ define([
 		extends: 'SplashMobileCtrl',
 		name   : 'ModalPhotoSplashMobileCtrl',
 		inject : ['$modalInstance'],
+		_position: null,
 		init: function() {
-			this._super(arguments);
+			// this._super(arguments);
+
             this.$log.debug('ModalPhotoSplashMobileCtrl', this);
 
 			this._position = this.mobile.position;
@@ -651,31 +658,14 @@ define([
 		cancel: function() {
 			this.$modalInstance.dismiss('cancel'); 
 		},
-		_position: null,
         _setPhoto: function(photoIndex, position) {
         	var self = this;
-        	// create canvas
-            var canvas = document.createElement('canvas');
-            // get canvas context
-            var ctx = canvas.getContext("2d");
-            // create image
-            var img = new Image();
-            img.onload = function() {
-                // set canvas dimension
-                canvas.width  = img.width;
-                canvas.height = img.height;
-                // draw image
-                ctx.drawImage(img, 0, 0);
-                // convert to image png
-                var imgDataURI = canvas.toDataURL('image/png');
-                self.$.mobile.images.testimonials[position] = imgDataURI;
-                self._setObjectImage( 'testimoni-pic-'+position, imgDataURI );
-            };
-			img.crossOrigin = "Anonymous";
-            img.src = this.$.mobile.photos[photoIndex];
+
+        	var img = this.$.mobile.photos[photoIndex];
+        	self.$.mobile.images.testimonials[position] = img;
+            self._setObjectImage( 'testimoni-pic-'+position, img );
         },
         _setObjectImage: function() {
-            this.$log.debug('call _setObjectImage from child', this);
 			this._super(arguments);
         }
 	});
@@ -698,6 +688,8 @@ define([
 			'data',
 		],
 		init: function() {
+        	var self = this;
+
             this.$log.debug('ModalSaveSplashMobileCtrl', this);
 
 			this.$.loading = this.data.loading;
@@ -706,8 +698,18 @@ define([
 
             this.$.data = {
             	title 		: this.$.mobile.text.app,
+            	description : '',
             	screenshot 	: this.$.fabric.canvas.toDataURL(),
+            	meta 		: [{
+	        		'meta_key'  : 'mobile',
+	        		'meta_value': self.$.mobile
+	        	},{
+	        		'meta_key'  : 'config',
+	        		'meta_value': self.$.fabric.getJSON( true )
+	        	}]
             };
+
+            this.$log.debug('data', self.$.data);
 		},
         save: function() {
         	var self = this;
@@ -715,7 +717,7 @@ define([
         	var API = this.API;
 
         	this.$.loading.load = true;
-        	this.$.loading.message = 'Generating image...';
+        	this.$.loading.message = 'Generating screenshot...';
 
             var isModified = this.$.fabric.isDirty();
 
@@ -736,21 +738,16 @@ define([
 
         		// create data
         		self.$.data.screenshot = response.data.url;
-            	self.$.data['meta'] = [{
-            		'meta_key'  : 'mobile',
-            		'meta_value': self.$.mobile
-            	},{
-            		'meta_key'  : 'config',
-            		'meta_value': self.$.fabric.getJSON( true )
-            	}];
 
         		// save configuration
                 self.SaveMobile(self.$.data).then(function(response){
             		self.$log.debug('save:response', response);
 
-            		self.$rootScope.safeApply(function(){
-            			self.$rootScope.menus.left.model.data.push(self.$.data);
-            		});
+            		angular.extend(self.$.data, {id:response.id});
+
+            		// update model left menu
+        			self.$rootScope.menus.left.model.data.push(self.$.data);
+
             		self.$.loading.load = false;
         			self.$.loading.message = 'Please wait';
 
