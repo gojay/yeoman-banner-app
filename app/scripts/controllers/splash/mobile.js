@@ -54,10 +54,9 @@ define([
 	        fabric: {},
 	        screenshotUploadOptions: {
             	data: {
-                	name  : 'mobile_screenshot',
-            		width : null,
-            		height: null,
-            		unique: true
+                	name   : 'screenshot',
+                	width  : null,
+                	height : null
             	}
             }
 	    },
@@ -90,15 +89,12 @@ define([
 	    init: function() {
 	    	var log = this.$log;
 
-	    	log.debug('this', this);
-	    	log.debug('$scope', this.$);
-	    	log.debug('mobile', this.mobile);
-
 	    	this._qrcodeElement = angular.element('#qrcode');
 
             this._initMenus();
 
-            this._id = this.mobile.detail ? this.mobile.detail.id : 1;
+            this._id = this.mobile.detail ? this.mobile.detail.data.id : this.$.mobiles.data.length + 1;
+            this.$.screenshotUploadOptions.data['id'] = this._id;
 
     		// set scope mobile & formJSON
 			this.$.mobile   = this.mobile.detail ? this._getMetaValue(this.mobile.detail, 'mobile') : this.Postermobile.model;
@@ -109,19 +105,55 @@ define([
 
 			this.$.FabricConstants = this.FabricConstants;
 
+	    	log.debug('this', this);
+
 	    	this.$.$on('canvas:created', this._onCanvasCreated);
 	    },
 	    // Scope Watch
         // =====================
 	    watch: {
-			// 'fabric.presetSize': function(size){
-			// 	this.$log.debug('fabric.presetSize', size);
-			// },
-			// 'fabric.canvasScale': function(scale){
-			// 	this.$log.debug('fabric.canvasScale', scale);
-			// 	this.$.fabric.setZoom();
-			// }
+		    'mobile.images.screenshot'		: '_onChangeMobileScreenshot',
+		    'mobile.text.app'				: '_onChangeMobileTextApp',
+		    'mobile.text.left'				: '_onChangeMobileText',
+		    'mobile.text.right'				: '_onChangeMobileTextRight',
+		    '{object}mobile.dimensions.app'	: '_onChangeMobileDimension'
 	    },
+	    _onChangeMobileScreenshot: function(newVal, oldval) {
+	    	this.$log.info('watch:mobile.images.screenshot..');
+	    	if(typeof newVal === 'string'){
+                this.$log.debug('mobile.images.screenshot', newVal);
+        		this._setObjectImage('app-screenshot', newVal);
+		    }
+	    },
+	    _onChangeMobileTextApp: function(newval, oldval) {
+	    	this.$log.info('watch:mobile.text.app..');
+	    	if (typeof newVal === 'string' && this.$.fabric.selectedObject && this.$.fabric.selectedObject.name == 'app-name') {
+                this.$.fabric.setText(newVal);
+                this.$.fabric.render();
+                this.$.fabric.centerH();
+            }
+	    },
+	    _onChangeMobileTextLeft: function(newVal, oldval) {
+	    	this.$log.info('watch:mobile.text.left..');
+	    	if (typeof newVal === 'string' && this.$.fabric.selectedObject && this.$.fabric.selectedObject.name == 'testimoni-text-left') {
+                this.$.fabric.setText(newVal);
+                this.$.fabric.render();
+            }
+	    },
+	    _onChangeMobileTextRight: function(newval, oldval) {
+	    	this.$log.info('watch:mobile.text.right..');
+	    	if (typeof newVal === 'string' && this.$.fabric.selectedObject && this.$.fabric.selectedObject.name == 'testimoni-text-right') {
+                this.$.fabric.setText(newVal);
+                this.$.fabric.render();
+            }
+	    },
+	    _onChangeMobileDimension: function(dimension){
+            this.$log.debug('mobile.dimensions.app', dimension);
+            if( !dimension ) return;
+            // $scope.screenshotUploadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
+            this.$.screenshotUploadOptions.data.width  = dimension.width;
+            this.$.screenshotUploadOptions.data.height = dimension.height;
+        },
 	    // event click : toggle menu
         // =====================
 	    toggleMenu: function(position, forceClose) {
@@ -249,6 +281,7 @@ define([
         showModalSave: function() {
         	var self = this;
         	var data = {
+        		id: this._id,
     			loading: {
                 	load: false,
                 	message: 'Please wait'
@@ -388,38 +421,38 @@ define([
 						$scope.fabric.scaleControl();
 					});
 
-		            $scope.$watch('mobile.images.screenshot', function(newval, oldval){
-		            	if(newval && typeof newVal === 'string'){
-			                self.$log.debug('mobile.images.screenshot', newval);
-	                		self._setObjectImage( 'app-screenshot', newval);
-					    }
-		            });
-		            $scope.$watch('mobile.text.app', function(newVal){
-		                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'app-name') {
-		                    $scope.fabric.setText(newVal);
-		                    $scope.fabric.render();
-		                    $scope.fabric.centerH();
-		                }
-		            });
-		            $scope.$watch('mobile.text.left', function(newVal){
-		                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-left') {
-		                    $scope.fabric.setText(newVal);
-		                    $scope.fabric.render();
-		                }
-		            });
-		            $scope.$watch('mobile.text.right', function(newVal){
-		                if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-right') {
-		                    $scope.fabric.setText(newVal);
-		                    $scope.fabric.render();
-		                }
-		            });
-		            $scope.$watchCollection('mobile.dimensions.app', function(dimension){
-		                self.$log.debug('mobile.dimensions.app', dimension);
-		                if( !dimension ) return;
-		                // $scope.screenshotUploadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
-		                $scope.screenshotUploadOptions.data.width = dimension.width;
-		                $scope.screenshotUploadOptions.data.height = dimension.height;
-		            });
+		       //      $scope.$watch('mobile.images.screenshot', function(newval, oldval){
+		       //      	if(newval){
+			      //           self.$log.debug('mobile.images.screenshot', newval);
+	        //         		self._setObjectImage('app-screenshot', newval);
+					    // }
+		       //      });
+		       //      $scope.$watch('mobile.text.app', function(newVal){
+		       //          if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'app-name') {
+		       //              $scope.fabric.setText(newVal);
+		       //              $scope.fabric.render();
+		       //              $scope.fabric.centerH();
+		       //          }
+		       //      });
+		       //      $scope.$watch('mobile.text.left', function(newVal){
+		       //          if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-left') {
+		       //              $scope.fabric.setText(newVal);
+		       //              $scope.fabric.render();
+		       //          }
+		       //      });
+		       //      $scope.$watch('mobile.text.right', function(newVal){
+		       //          if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-right') {
+		       //              $scope.fabric.setText(newVal);
+		       //              $scope.fabric.render();
+		       //          }
+		       //      });
+		            // $scope.$watchCollection('mobile.dimensions.app', function(dimension){
+		            //     self.$log.debug('mobile.dimensions.app', dimension);
+		            //     if( !dimension ) return;
+		            //     // $scope.screenshotUploadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
+		            //     $scope.screenshotUploadOptions.data.width = dimension.width;
+		            //     $scope.screenshotUploadOptions.data.height = dimension.height;
+		            // });
                 }
             );
 		},
@@ -510,7 +543,7 @@ define([
 				// add testimoni image-cirlcle & text Left
 				// =================================
                 var imgTestimonialLeft = this.$.mobile.images.testimonials.left ? 
-                                    'images/upload/mobile_testimonial_left.jpg' :
+                                    this.$.mobile.images.testimonials.left :
                                     'images/'+ testimoniDimension.width +'x'+ testimoniDimension.height +'.jpg' ;
                 this.$.fabric.addImageCircle(imgTestimonialLeft, function(object){
                     callbackImage( object, 'testimoni-pic-left', 'people', 'left' );
@@ -530,7 +563,7 @@ define([
                 // add testimoni image-cirlcle & text Right
 				// =================================
                 var imgTestimonialRight = this.$.mobile.images.testimonials.right ? 
-                                    'images/upload/mobile_testimonial_right.jpg' :
+                                    this.$.mobile.images.testimonials.right :
                                     'images/'+ testimoniDimension.width +'x'+ testimoniDimension.height +'.jpg' ;
                 this.$.fabric.addImageCircle(imgTestimonialRight, function(object){
                     callbackImage( object, 'testimoni-pic-right', 'people', 'right' );
@@ -610,8 +643,8 @@ define([
         	return JSON.parse(jsonString);
 		},
 		_fromJSON: function(callback) {
-			this.$.fabric.canvasOriginalWidth = 2480;
-        	this.$.fabric.canvasOriginalHeight = 3508;
+			this.$.fabric.canvasOriginalWidth  = this.$.fromJSON.originalWidth;
+        	this.$.fabric.canvasOriginalHeight = this.$.fromJSON.originalHeight;
         	this.$.fabric.canvasScale = 0.3;
         	this.$.fabric.loadJSON(this.$.fromJSON, callback);
 		}
@@ -636,7 +669,8 @@ define([
 
             this.$.uploadOptions = {
             	data: {
-                	name  : 'mobile_testimonial',
+            		id 	  : 'avatar',
+                	name  : 'testimonial',
             		width : this.$.mobile.dimensions.testimonial.width,
             		height: this.$.mobile.dimensions.testimonial.height,
             		unique: true
@@ -692,9 +726,10 @@ define([
 
             this.$log.debug('ModalSaveSplashMobileCtrl', this);
 
-			this.$.loading = this.data.loading;
-            this.$.mobile  = this.data.mobile;
-            this.$.fabric  = this.data.fabric;
+			this.$.loading 	= this.data.loading;
+			this.$.id 		= this.data.id;
+            this.$.mobile  	= this.data.mobile;
+            this.$.fabric  	= this.data.fabric;
 
             this.$.data = {
             	title 		: this.$.mobile.text.app,
@@ -723,12 +758,14 @@ define([
 
         	// create blob image file
 			var file  = this.$.fabric.getCanvasBlobFile('image/jpeg');
-			file.name = this.Helpers.slugify(this.$.data.title);
+			// file.name = this.Helpers.slugify(this.$.data.title);
+			file.name = 'poster';
 
         	// upload screenshot
 			this.$upload.upload({
                 url    : API.URL + '/upload',
                 method : 'POST',
+                data   : { id:self.$.id },
                 file   : file,
                 fileFormDataName: 'image'
             }).then(function(response) {
@@ -736,7 +773,7 @@ define([
 
         		self.$.loading.message = 'Saving configuration...';
 
-        		// create data
+        		// set data screenshot url
         		self.$.data.screenshot = response.data.url;
 
         		// save configuration
