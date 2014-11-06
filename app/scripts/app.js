@@ -1,5 +1,5 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', , 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile', 'services/jwthelper', 'services/helpers'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile', 'services/jwthelper', 'services/helpers'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
 
     return angular.module('bannerAppApp', [
@@ -31,7 +31,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.services.Postermobile',
             'bannerAppApp.services.Jwthelper',
             'bannerAppApp.services.Helpers',
-            /*angJSDeps*/
+/*angJSDeps*/
             'ngRoute',
             'ngCookies',
             'ngResource',
@@ -55,7 +55,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         //     googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
         // })
         .constant('API', {
-            'URL'   : 'http://api.local/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
+            'URL'   : 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
             'GRANT' : 'user', // grant type : user (user credentials) or jwt
             'CLIENT': {
                 'ID'    : '1413098344',
@@ -104,12 +104,14 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 // $log debug enable/disable
                 $logProvider.debugEnabled(true);
 
+                // set spinner loading bar
                 cfpLoadingBarProvider.includeSpinner = true;
 
                 // compile sanitazion
                 $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|blob):/);
                 $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|blob):|data:image\//);
 
+                // ping auth resolver
                 var pingResolver = {
                     delay: function($q, $timeout, $rootScope, authResource) {
                         var deferred = $q.defer();
@@ -119,7 +121,8 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         return deferred.promise;
                     }
                 };
-                // route
+
+                // router
                 $routeProvider
                     .when('/', {
                         templateUrl: 'views/main.html',
@@ -129,7 +132,16 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     .when('/facebook/banner', {
                         templateUrl: 'views/banner.html',
                         controller: 'BannerCtrl',
-                        resolve: pingResolver
+                        resolve: {
+                            data: function($q, $log, Banner) {
+                                return Banner.get({ id: 'templates' }).$promise.then(function(templates) {
+                                    $log.debug('templates', templates);
+                                    return {
+                                        templates: templates.data
+                                    };
+                                });
+                            }
+                        }
                     })
                     .when('/facebook/conversation', {
                         templateUrl: 'views/conversation.html',
@@ -238,12 +250,13 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
         .run(['$rootScope', '$cookieStore', '$window', '$timeout', 'slidePush',
             function($rootScope, $cookieStore, $window, $timeout , slidePush ) {
 
-                $rootScope.closeMenu = function(){
+                // global close all menus
+                var closeMenu = function(){
                     slidePush.pushForceCloseAll();
                 };
 
                 // safe applying scope
-                $rootScope.safeApply = function(fn) {
+                var safeApply = function(fn) {
                     var phase = this.$root.$$phase;
                     if(phase == '$apply' || phase == '$digest') {
                         if(fn && (typeof(fn) === 'function')) {
@@ -270,7 +283,9 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                             model: null,
                             template: null
                         }
-                    }
+                    },
+                    closeMenu: closeMenu,
+                    safeApply: safeApply
                 });
 
                 var oldLocation = '';
@@ -287,12 +302,12 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                     $rootScope.isDownwards = isDownwards;
                 });
-                // $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
-                //     angular.element('#view.container').css('opacity', Math.round(percent) / 100);
-                // });
                 $rootScope.$on('cfpLoadingBar:completed', function(data, percent){
                     $rootScope.loading = false;
                 });
+                // $rootScope.$on('cfpLoadingBar:progress', function(data, percent){
+                //     angular.element('#view.container').css('opacity', Math.round(percent) / 100);
+                // });
             }
         ]);
 });
