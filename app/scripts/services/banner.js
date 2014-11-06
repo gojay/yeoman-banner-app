@@ -43,7 +43,6 @@ define(['angular'], function(angular) {
                         enable : true,
                         type   : 1,
                         set    : 'feris',
-                        uploaded : false,
                         image : BannerImages.bg[0]
                     },
                     logo : {
@@ -55,10 +54,10 @@ define(['angular'], function(angular) {
                         },
                         w : 0,
                         h : 0,
-                        uploaded : false,
                         image  : BannerImages.logo[0],
                     },
                     prize : {
+                        selected: 0,
                         figure: {
                             disabled: true,
                             top: 0,
@@ -77,19 +76,22 @@ define(['angular'], function(angular) {
                             text   : 'Enter prize 1 description',
                             limit  : 75,
                             counter: 75,
-                            uploaded : false,
                         },
                         2: {
                             text    : 'Enter prize 2 description',
                             limit   : 75,
                             counter : 75,
-                            uploaded : false,
                         },
                         3: {
                             text    : 'Enter prize 3 description',
                             limit   : 75,
                             counter : 75,
-                            uploaded : false,
+                        },
+
+                        text: {
+                            1: 'Enter prize 1 description',
+                            2: 'Enter prize 2 description',
+                            3: 'Enter prize 3 description',
                         },
 
                         images: {

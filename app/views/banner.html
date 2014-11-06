@@ -42,7 +42,7 @@
 			<button type="button" class="btn btn-sm btn-block"
 				style="{{ showEditor ? 'margin-top:15px' : '' }}" 
 				ng-class="showEditor ? 'btn-primary' : 'btn-success' "
-				ng-click="showEditor = !showEditor">
+				ng-click="doSetting()">
 				<i ng-class="showEditor ? 'fa fa-bars' : 'fa fa-gear' "></i> 
 				{{ showEditor? 'Templates' : 'Settings' }}
 			</button>
@@ -172,15 +172,21 @@
 					    <div class="form-horizontal">
 					    	<div class="form-group" ng-show="banner.prize.selected >= 1">
 					    		<label class="col-md-5 control-label">Prize 1</label>
-					    		<div class="col-md-7"><button class="btn btn-primary btn-sm">Select an image</button></div>
+					    		<div class="col-md-7">
+					    			<upload-image upload-image-class="btn-primary btn-block" upload-image-options="uploadOptions.prize[1]" ng-model="banner.prize.images[1]"></upload-image>
+					    		</div>
 					    	</div>
 					    	<div class="form-group" ng-show="banner.prize.selected >= 2">
 					    		<label class="col-md-5 control-label">Prize 2</label>
-					    		<div class="col-md-7"><button class="btn btn-primary btn-sm">Select an image</button></div>
+					    		<div class="col-md-7">
+					    			<upload-image upload-image-class="btn-primary btn-block" upload-image-options="uploadOptions.prize[2]" ng-model="banner.prize.images[2]"></upload-image>
+				    			</div>
 					    	</div>
 					    	<div class="form-group" ng-show="banner.prize.selected >= 3">
 					    		<label class="col-md-5 control-label">Prize 3</label>
-					    		<div class="col-md-7"><button class="btn btn-primary btn-sm">Select an image</button></div>
+					    		<div class="col-md-7">
+					    			<upload-image upload-image-class="btn-primary btn-block" upload-image-options="uploadOptions.prize[3]" ng-model="banner.prize.images[3]"></upload-image>
+				    			</div>
 					    	</div>
 					    	<div class="form-group">
 					    		<label class="col-md-4 control-label">Position</label>
@@ -198,20 +204,57 @@
 			        <accordion-group heading="Text" class="panel-primary">
 			            <div class="form-group">
 						    <label for="textTitle">Title</label>
-						    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title">
-						    <p class="help-block text-right">Limit: 100/100</p>
+						    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title" tooltip="Add a new line by comma" ng-model="banner.mtitle.text">
 					  	</div>
 					  	<div class="form-group">
 						    <label for="textDescription">Description</label>
-						    <textarea class="form-control input-sm" id="textDescription" placeholder="Description"></textarea>
-						    <p class="help-block text-right">Limit: 100/100</p>
+						    <textarea class="form-control input-sm" id="textDescription" placeholder="Description" 
+						    	msd-elastic="\n"
+						    	ng-model="banner.mdescription.text"></textarea>
+					  	</div>
+
+					  	<div ng-if="banner.prize.selected > 0">
+					  		<fieldset>
+					  			<legend>Header</legend>
+					            <div class="form-group">
+								    <label for="textTitle">Prize Header Title</label>
+								    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title"
+								    	ng-model="banner.prize.header.title">
+							  	</div>
+					            <div class="form-group">
+								    <label for="textTitle">Prize Header Description</label>
+								    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title"
+								    	ng-model="banner.prize.header.description.like">
+								    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title"
+								    	ng-model="banner.prize.header.title"
+								    	ng-model="banner.prize.header.description.enter">
+							  	</div>
+					  		</fieldset>
+					  		<fieldset>
+					  			<legend>Description</legend>
+							  	<div class="form-group" ng-show="banner.prize.selected >= 1">
+								    <label for="textPrizeDescription-1">Prize 1</label>
+								    <textarea class="form-control input-sm" id="textPrizeDescription-1" placeholder="Enter prize 1 description"
+								    	ng-model="banner.prize.text[1]"></textarea>
+							  	</div>
+							  	<div class="form-group" ng-show="banner.prize.selected >= 2">
+								    <label for="textPrizeDescription-2">Prize 2</label>
+								    <textarea class="form-control input-sm" id="textPrizeDescription-2" placeholder="Enter prize 2 description"
+								    	ng-model="banner.prize.text[2]"></textarea>
+							  	</div>
+							  	<div class="form-group" ng-show="banner.prize.selected >= 3">
+								    <label for="textPrizeDescription-3">Prize 3</label>
+								    <textarea class="form-control input-sm" id="textPrizeDescription-3" placeholder="Enter prize 3 description"
+								    	ng-model="banner.prize.text[3]"></textarea>
+							  	</div>
+					  		</fieldset>
 					  	</div>
 			        </accordion-group>
 			    </accordion>
 			</div>
 		</aside>
 		<section id="editor" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
-			<h3 style="text-align:center; margin:10px auto 15px; {{ showEditor ? 'visibility:visible' : 'visibility:hidden'}}">{{ banner.prize.text }}</h3>
+			<h3 style="text-align:center; margin:10px auto 15px; {{ showEditor ? 'visibility:visible' : 'visibility:hidden'}}">{{title}}</h3>
 			<div class="tab-content text-center">
 	         	<div class="tab-pane active" id="0-prize">
 				    <img src="http://placehold.it/810x381&text=Template+Empty+Prize">

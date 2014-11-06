@@ -26,6 +26,7 @@ require.config({
         
         // 'angular-loading-bar': '../bower_components/angular-loading-bar/build/loading-bar.min',
         'angular-loading-bar': 'lib/loading-bar',
+        'angular-elastic': '../bower_components/angular-elastic/elastic',
 
         'angular-slide-push': 'lib/slide-push/slide.and.push',
 
@@ -35,8 +36,9 @@ require.config({
         'jquery': '../bower_components/jquery/dist/jquery.min',
         'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
         // 'snap': 'lib/snap.min',
-        'qrcode': 'lib/jquery.qrcode.min',
-        // 'jquery-cookie': 'lib/jquery.cookie',
+        'jquery-qrcode': 'lib/jquery.qrcode.min',
+        'jquery-imgareaselect': '../bower_components/imgareaselect/jquery.imgareaselect.dev',
+        'jquery-blockui': '../bower_components/blockui/jquery.blockUI',
 
         'raphael': 'lib/raphael/raphael',
         'raphael-group': 'lib/raphael/raphael.group',
@@ -60,7 +62,9 @@ require.config({
         'moment': '../bower_components/moment/moment',
         'jsrsasign':'lib/jsrsasign-4.1.4-all-min',
         'json':'lib/json-sans-eval-min',
-        'jwt':'lib/jws-3.0'
+        'jwt':'lib/jws-3.0',
+
+        'lodash': '../bower_components/lodash/dist/lodash.min'
     },
     shim: {
         'angular': {
@@ -87,14 +91,16 @@ require.config({
 
         'angular-font-select': ['angular', 'webfontloader'],
         'angular-slide-push': ['angular'],
+        'angular-elastic': ['angular'],
 
         'webfontloader': {
             'exports': 'webfontloader'
         },
 
         'bootstrap': ['jquery'],
-        'qrcode': ['jquery'],
-        'jquery-cookie': ['jquery'],
+        'jquery-qrcode': ['jquery'],
+        'jquery-imgareaselect': ['jquery'],
+        'jquery-blockui': ['jquery'],
 
         'raphael': ['jquery'],
         'raphael-group': ['raphael'],

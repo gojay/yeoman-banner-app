@@ -1,16 +1,19 @@
 define([
 	'angular',
+	'lodash',
+	'angular-elastic',
 	'fabricAngular',
 	'fabricCanvas', 
 	'fabricConstants', 
 	'fabricDirective', 
 	'fabricDirtyStatus',
 	'fabricUtilities',
-	'fabricWindow'
-], function (angular) {
+	'fabricWindow',
+], function (angular, _) {
   'use strict';
 
   	var app = angular.module('bannerAppApp.controllers.BannerCtrl', [
+  		'monospaced.elastic',
   		'classy', 
   		'classy-extends',
   		'classy-initScope',
@@ -42,35 +45,35 @@ define([
 	        uploadOptions: {
 	        	background: {
 	        		data: {
+	        			id: 'test',
 	                	name  : 'background',
 	            		width : null,
-	            		height: null,
-	            		unique: true
+	            		height: null
 	        		}
 	        	},
-	        	prizes: {
-		        	one: {
+	        	prize: {
+		        	1: {
 		        		data: {
+	        				id: 'test',
 		                	name  : 'prize-1',
 		            		width : null,
-		            		height: null,
-		            		unique: true
+		            		height: null
 		        		}
 		        	},
-		        	two: {
+		        	2: {
 		        		data: {
+	        				id: 'test',
 		                	name  : 'prize-2',
 		            		width : null,
-		            		height: null,
-		            		unique: true
+		            		height: null
 		        		}
 		        	},
-		        	three: {
+		        	3: {
 		        		data: {
+	        				id: 'test',
 		                	name  : 'prize-3',
 		            		width : null,
-		            		height: null,
-		            		unique: true
+		            		height: null
 		        		}
 		        	}
 	        	}
@@ -79,7 +82,8 @@ define([
   		init: function() {
   			var self = this;
 
-  			this.$.templates = this.data.templates;
+  			this.$.templates  = this.data.templates;
+  			this.$.dimensions = this.BannerData.dimensions;
 			this.$.banner = new this.Banner();
 
 			angular.extend(this.$.banner, this.BannerData.data);
@@ -89,10 +93,10 @@ define([
 	      		.click(function (e) {
 				    e.preventDefault();
 				    $(this).tab('show');
-				  	self.$.banner.selected = prize;
 				}).on('shown.bs.tab', function (e) {
 					var prize = $(e.target).data('prize');
 				  	self.$.title = e.target.text;
+				  	self.$.banner.prize.selected = prize;
 				  	self.$.$apply();
 				});
   		},
@@ -109,7 +113,9 @@ define([
   			'banner.badge.hide' 			: '_onBadgeHidden',
   			'banner.badge.selected' 		: '_onBadgeSelected',
 
-		    '{object}banner.prizes.images' 	: '_onChangePrizeImages'
+  			'banner.prize.selected' 		: '_onPrizeSelected',
+		    '{object}banner.prize.text' 	: '_onChangePrizeText',
+		    '{object}banner.prize.images' 	: '_onChangePrizeImages'
   		},
 
   		setBgOverlay: function(isOverlay) {
@@ -128,42 +134,63 @@ define([
 			this.$.banner.badge.selected = index;
 		},
 
+		doSetting: function() {
+			this.$.showEditor = !this.$.showEditor;
+		},
 		generate: function() {
 			this.$.banner.$save(function(response) {
 				this.$log.debug('[SAVE]', response);
 			});
 		},
 
-  		_onBackgroundOverlay: function(oldVal, newVal) {
-  			this.$log.log('_onBackgroundOverlay', oldVal, newVal);
+  		_onBackgroundOverlay: function(newVal, oldVal) {
+  			this.$log.log('_onBackgroundOverlay', newVal, oldVal);
   		},
-  		_onBackgroundType: function(oldVal, newVal) {
-  			this.$log.log('_onBackgroundType', oldVal, newVal);
+  		_onBackgroundType: function(newVal, oldVal) {
+  			this.$log.log('_onBackgroundType', newVal, oldVal);
   		},
-  		_onBackgroundImage: function(oldVal, newVal) {
-  			this.$log.log('_onBackgroundImage', oldVal, newVal);
-  		},
-
-  		_onFacebookSelected: function(oldVal, newVal) {
-  			this.$log.log('_onFacebookSelected', oldVal, newVal);
-  		},
-  		_onFacebookSize: function(oldVal, newVal) {
-  			this.$log.log('_onFacebookSize', oldVal, newVal);
+  		_onBackgroundImage: function(newVal, oldVal) {
+  			this.$log.log('_onBackgroundImage', newVal, oldVal);
   		},
 
-  		_onLogoHidden: function(oldVal, newVal) {
-  			this.$log.log('_onLogoHidden', oldVal, newVal);
+  		_onFacebookSelected: function(newVal, oldVal) {
+  			this.$log.log('_onFacebookSelected', newVal, oldVal);
+  		},
+  		_onFacebookSize: function(newVal, oldVal) {
+  			this.$log.log('_onFacebookSize', newVal, oldVal);
   		},
 
-  		_onBadgeHidden: function(oldVal, newVal) {
-  			this.$log.log('_onBadgeHidden', oldVal, newVal);
-  		},
-  		_onBadgeSelected: function(oldVal, newVal) {
-  			this.$log.log('_onBadgeSelected', oldVal, newVal);
+  		_onLogoHidden: function(newVal, oldVal) {
+  			this.$log.log('_onLogoHidden', newVal, oldVal);
   		},
 
-  		_onChangePrizeImages: function(oldVal, newVal) {
-  			this.$log.log('_onChangePrizeImages', oldVal, newVal);
+  		_onBadgeHidden: function(newVal, oldVal) {
+  			this.$log.log('_onBadgeHidden', newVal, oldVal);
+  		},
+  		_onBadgeSelected: function(newVal, oldVal) {
+  			this.$log.log('_onBadgeSelected', newVal, oldVal);
+  		},
+
+  		_onPrizeSelected: function(newVal, oldVal) {
+  			this.$log.log('_onPrizeSelected', newVal, oldVal);
+
+  			var dimensions = this.$.dimensions['tpl-' + newVal];
+  			_.extend(this.$.uploadOptions.background.data, dimensions.background);
+
+  			if( dimensions.prize ) {
+				_.map(this.$.uploadOptions.prize, function(item) {
+					item = _.extend(item.data, dimensions.prize);
+					return item;
+				});
+  			}
+
+  			this.$log.log(this.$.uploadOptions);
+  		},
+  		_onChangePrizeText: function(newVal, oldVal) {
+  			this.$log.log('_onChangePrizeText', newVal, oldVal);
+  		},
+  		_onChangePrizeImages: function(newVal, oldVal) {
+  			this.$log.log('_onChangePrizeImages', newVal, oldVal);
   		}
   	});
 

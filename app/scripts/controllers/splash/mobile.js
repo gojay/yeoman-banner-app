@@ -7,7 +7,7 @@ define([
 	'fabricDirtyStatus',
 	'fabricUtilities',
 	'fabricWindow',
-	'qrcode'
+	'jquery-qrcode'
 ], function (angular) {
   'use strict';
 

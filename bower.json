@@ -26,7 +26,12 @@
     "angular-loading-bar": "~0.6.0",
     "angular-classy": "*",
     "classy-extends": "*",
-    "classy-initScope": "https://github.com/wuxiaoying/classy-initScope.git"
+    "classy-initScope": "https://github.com/wuxiaoying/classy-initScope.git",
+    "lodash": "~2.4.1",
+    "angular-elastic": "~2.4.0",
+    "imgareaselect": "~0.9.10",
+    "blockui": "*",
+    "angular-cropme": "~0.2.8"
   },
   "devDependencies": {
     "angular-mocks": "1.2.11",
