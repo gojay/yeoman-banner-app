@@ -97,19 +97,21 @@ angular.module('common.fabric.constants', [])
 
 		fonts: [
 			{ name: 'Arial' },
+			{ name: 'Helvetica' },
 			{ name: 'Myriad Pro' },
-			{ name: 'Croissant One' },
-			{ name: 'Architects Daughter' },
-			{ name: 'Emblema One' },
-			{ name: 'Graduate' },
-			{ name: 'Hammersmith One' },
-			{ name: 'Oswald' },
-			{ name: 'Oxygen' },
-			{ name: 'Krona One' },
-			{ name: 'Indie Flower' },
-			{ name: 'Courgette' },
-			{ name: 'Gruppo' },
-			{ name: 'Ranchers' }
+			{ name: 'Delicious' },
+			{ name: 'Verdana' },
+			{ name: 'Georgia' },
+			{ name: 'Courier' },
+			{ name: 'Comic Sans MS' },
+			{ name: 'Impact' },
+			{ name: 'Rockwell' },
+			{ name: 'Times New Roman' },
+			{ name: 'Monaco' },
+			{ name: 'Optima' },
+			{ name: 'Hoefler Text' },
+			{ name: 'Plaster' },
+			{ name: 'Engagement' }
 		],
 
 		shapeCategories: [
@@ -209,126 +211,10 @@ angular.module('common.fabric.constants', [])
 			fontSize: 40,
 			fill: '#434343',
 			textAlign: 'left',
-			strokeWidth: 1,
-			stroke: '#454545',
+			// strokeWidth: 1,
+			// stroke: '#454545',
 			keepCenterH: false
-		}, objectDefaults),
-
-		CustomAttributes: {
-			'a4': {
-				200 : {
-					'text':{
-						app : {
-							size: 52,  // 65 * 3
-							left: 674, // 314 * 3
-							top: 266   // 120 * 3
-						},
-						people: {
-							left:{
-								size: 28,  // 43 * 3
-								left: 414, // 201 * 3
-								top: 1691   // 751 * 3
-							},
-							right:{
-								size: 28,  // 43 * 3
-								left: 1174, // 201 * 3
-								top: 1691   // 751 * 3
-							}
-						}
-					},
-					'ss': {
-						width: 430, 
-						height: 760,
-						left: 214,
-						top : 560
-					},
-					'qr': {
-						'iphone': {
-							width: 180,
-							height: 180,
-							top : 1240, // 1836
-							left: 882 // 1306
-						},
-						'android': {
-							width: 180,
-							height: 180,
-							top : 1240, // 1836
-							left: 1283 // 1906
-						}
-					},
-					'people': {
-						left: {
-							width : 235, // 235 
-							height: 235, // 235
-							top : 1680, // 2506
-							left: 125 // 176 52
-						},
-						right: {
-							width : 235, // 235
-							height: 235, // 380
-							top : 1680, // 2506 751
-							left: 885 // 1316 394
-						}
-					}
-				},
-
-				300: {
-					'text':{
-						app : {
-							size: 95, // 65 * 3
-							left: 964, // 314 * 3
-							top: 360   // 120 * 3
-						},
-						people: {
-							left:{
-								size: 42,  // 43 * 3
-								left: 621, // 201 * 3
-								top: 2537  // 751 * 3
-							},
-							right:{
-								size: 42,   // 43 * 3
-								left: 1761, // 201 * 3
-								top: 2537   // 751 * 3
-							}
-						}
-					},
-					'ss': {
-						width: 640, // 427
-						height: 1138, // 758
-						left: 324, // 216
-						top : 842 // 561
-					},
-					'qr': {
-						'iphone': {
-							width: 280,
-							height: 280,
-							top : 1852, // 1836
-							left: 1316 // 1306
-						},
-						'android': {
-							width: 280,
-							height: 280,
-							top : 1852, // 1836
-							left: 1914 // 1906
-						}
-					},
-					'people': {
-						left: {
-							width : 380, // 380 
-							height: 380, // 380
-							top : 2506, // 2506
-							left: 176 // 176 52
-						},
-						right: {
-							width : 380, // 380
-							height: 380, // 380
-							top : 2506, // 2506 751
-							left: 1316 // 1316 394
-						}
-					}
-				}
-			}
-		}
+		}, objectDefaults)
 
 	};
 

@@ -27,6 +27,7 @@ require.config({
         // 'angular-loading-bar': '../bower_components/angular-loading-bar/build/loading-bar.min',
         'angular-loading-bar': 'lib/loading-bar',
         'angular-elastic': '../bower_components/angular-elastic/elastic',
+        'angular-toggle-switch': '../bower_components/angular-toggle-switch/angular-toggle-switch.min',
 
         'angular-slide-push': 'lib/slide-push/slide.and.push',
 
@@ -47,7 +48,8 @@ require.config({
         'raphael-json': 'lib/raphael/raphael.json',
         // 'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min',
 
-        'fabric': 'lib/fabric/fabric',
+        // 'fabric': 'lib/fabric/fabric',
+        'fabric': 'lib/fabric/fabric.1.4.12',
         'fabricUtils': 'lib/fabric/utils',
 
         'fabricAngular': 'lib/fabric/fabricAngular',
@@ -64,7 +66,9 @@ require.config({
         'json':'lib/json-sans-eval-min',
         'jwt':'lib/jws-3.0',
 
-        'lodash': '../bower_components/lodash/dist/lodash.min'
+        'lodash': '../bower_components/lodash/dist/lodash.min',
+        'underscore.string': '../bower_components/underscore.string/dist/underscore.string.min'
+
     },
     shim: {
         'angular': {
@@ -92,6 +96,7 @@ require.config({
         'angular-font-select': ['angular', 'webfontloader'],
         'angular-slide-push': ['angular'],
         'angular-elastic': ['angular'],
+        'angular-toggle-switch': ['angular'],
 
         'webfontloader': {
             'exports': 'webfontloader'
@@ -120,7 +125,9 @@ require.config({
         'fabricUtilities': ['fabric'],
         'fabricWindow': ['fabric'],
 
-        'jwt': ['jsrsasign', 'json']
+        'jwt': ['jsrsasign', 'json'],
+
+        'underscore.string': ['lodash']
     },
     priority: [
         'angular'
@@ -153,6 +160,7 @@ require([
     // 'angular-snap',
     // 'angular-font-select',
     'angular-slide-push',
+    'angular-toggle-switch',
     'bootstrap',
     // 'jquery-cookie'
 ], function(jquery, angularFileUploadShim, angular, app) {

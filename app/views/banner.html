@@ -1,4 +1,5 @@
 <style>
+	hr { margin-top: 0; }
 	.field-top {
 		padding-top: 10px;
 	}
@@ -9,20 +10,73 @@
 		padding-top: 10px;
 		padding-bottom: 10px;
 	}
+
+	.image-builder-container {
+	    position: relative;
+	}
+	.image-builder {
+	    background: rgb(236, 240, 241);
+	    box-sizing: border-box;
+	    border: 1px solid #cacaca;
+	    min-height: 460px;
+	    text-align: center;
+	    position: relative;
+	    overflow-x: scroll;
+	    overflow-y: hidden;
+	    width: 100%;
+	}
+	.image-cover {
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    top: 0;
+	    position: absolute;
+	    z-index: 2;
+	}
+	.fabric-container {
+	    background: white;
+	    border-radius: 1px;
+	    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .4);
+	    display: inline-block;
+	    margin: 50px;
+	    position: relative;
+	    vertical-align: middle;
+	    z-index: 0;
+	}
+
+	.wave-spinner {
+		position: absolute;
+		top: 1px;
+		left: 38%;
+		z-index: 1;
+		margin: 0 !important;
+	}
 </style>
 <div class="page-header">
 	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+		<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
 			<ol class="breadcrumb bg-white">
 			  <li><a href="#" class="text-primary">Home</a></li>
 			  <li><a href="#" class="text-primary" disabled>Facebook</a></li>
 			  <li class="text-primary active">{{title}}</li>
 			</ol>
-			<hr>
+		</div>
+		<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+			<div class="pull-right">
+				<toggle-switch
+				    ng-model="fullEditor"
+				    knob-label="Editor">
+				<toggle-switch>
+			</div>
+			<!-- <div class="btn-group pull-right">
+				<button type="button" class="btn btn-sm btn-primary" ng-click="fullEditor = true" ng-class="{'active': fullEditor}">On</button>
+				<button type="button" class="btn btn-sm btn-primary" ng-click="fullEditor = false" ng-class="{'active': !fullEditor}">Off</button>
+			</div> -->
 		</div>
 	</div>
+	<hr>
 	<div class="row">
-		<aside id="setting-template" class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+		<aside id="setting-template" class="col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-hide="fullEditor">
 			<!-- templates -->
 			<div id="templates" ng-class="animation.templates" ng-hide="showEditor">
 				<h4 style="margin-left:15px">Default Templates</h4>
@@ -38,253 +92,16 @@
 					</ul>
 				</div>
 			</div>
-			<!-- button -->
-			<button type="button" class="btn btn-sm btn-block"
-				style="{{ showEditor ? 'margin-top:15px' : '' }}" 
-				ng-class="showEditor ? 'btn-primary' : 'btn-success' "
-				ng-click="doSetting()">
-				<i ng-class="showEditor ? 'fa fa-bars' : 'fa fa-gear' "></i> 
-				{{ showEditor? 'Templates' : 'Settings' }}
-			</button>
-			<!-- settings -->
-			<div id="settings" class="margin-top-bottom" ng-class="animation.settings" ng-hide="!showEditor">
-				<accordion close-others="accordion.closeOthers">
-					<!-- Background -->
-			        <accordion-group heading="Background" is-open="accordion.isFirstOpen" class="panel-primary">
-					   	<div class="form-horizontal">
-						    <div class="form-group">
-						      	<label for="inputLogo" class="col-md-12 control-label">Overlay</label>
-							    <div class="col-md-12 field-top">
-								    <div class="btn-group btn-block">
-								    	<button class="btn btn-default btn-sm"
-								    		ng-click="setBgOverlay(true)"
-								    		ng-class="{'active': banner.background.overlay}">Yes</button>
-								    	<button class="btn btn-default btn-sm"
-								    		ng-click="setBgOverlay(false)"
-								    		ng-class="{'active': !banner.background.overlay}">No</button>
-								    </div>
-							    </div>
-						    </div>
-
-						    <div class="form-group">
-						      	<label for="inputLogo" class="col-md-12 control-label">Type</label>
-							    <div class="col-md-12 field-top">
-								    <div class="btn-group btn-block">
-								    	<button class="col-md-3 btn btn-default btn-sm" 
-								    		ng-click="setBgType(0)"
-								    		ng-class="{'active':banner.background.type == 0}">Upload</button>
-								    	<button class="col-md-3 btn btn-default btn-sm" 
-								    		ng-click="setBgType(1)"
-								    		ng-class="{'active':banner.background.type == 1}">Feris</button>
-								    	<button class="col-md-3 btn btn-default btn-sm" 
-								    		ng-click="setBgType(2)"
-								    		ng-class="{'active':banner.background.type == 2}">Grass</button>
-								    	<button class="col-md-3 btn btn-default btn-sm" 
-								    		ng-click="setBgType(3)"
-								    		ng-class="{'active':banner.background.type == 3}">Young</button>
-								    </div>
-							    </div>
-							    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 field-top" ng-show="banner.background.type == 0">
-				                    <upload-image upload-image-class="btn-primary btn-block" upload-image-options="uploadOptions.background" ng-model="banner.background.image"></upload-image>
-				                </div>
-						    </div>
-
-						    <div class="form-group">
-						      	<label for="inputLogo" class="col-md-12 control-label">FB Logo</label>
-							    <div class="btn-group col-md-12 btn-images field-top">
-							        <button class="btn btn-default btn-sm col-md-4" style="background: transparent" 
-							        	ng-repeat="img in templates.facebook"
-							        	ng-class="{'active':banner.fb.selected == $index}"
-							        	ng-click="setFbLogo($index)">
-							        	<img ng-src="{{img}}" width="100%">
-							        </button>
-							    </div>
-						    </div>
-
-						    <div class="form-group">
-						      	<label for="inputLogo" class="col-md-12 control-label">FB Size</label>
-							    <div class="col-md-12 field-top">
-							      	<div class="col-md-5">
-							            <input type="number" class="form-control input-sm" ng-model="banner.fb.dimension.w">
-							        </div>
-							      	<div class="col-md-1">x</div>
-							        <div class="col-md-5">
-							             <input type="number" class="form-control input-sm" ng-model="banner.fb.dimension.h" disabled="disabled">
-							        </div>
-							    </div>
-						    </div>
-						</div>
-			        </accordion-group>
-
-			        <!-- Logo -->
-			        <accordion-group heading="Logo" class="panel-primary">
-			            <div class="form-horizontal">
-						    <div class="form-group">
-						      	<label class="col-md-3 control-label">Hide</label>
-						    	<div class="col-md-8">
-						            <div class="checkbox">
-									    <input type="checkbox" ng-model="banner.logo.hide">
-									</div>
-								</div>
-						    </div>
-						    <div class="form-group" ng-hide="banner.logo.hide">
-						      	<label for="inputLogo" class="col-md-3 control-label">Upload</label>
-						      	<div class="col-md-8">
-						        	<button class="btn btn-primary btn-sm">Select an image</button>
-						      	</div>
-						    </div>
-						    <div class="form-group" ng-hide="banner.logo.hide">
-						      	<label for="inputLogo" class="col-md-3 control-label">Size</label>
-						      	<div class="col-md-5">
-						            <input type="number" class="form-control input-sm" ng-model="banner.logo.w" ng-disabled="banner.logo.w == 0">
-						        </div>
-						        <div class="col-md-4">
-						             <input type="number" class="form-control input-sm" ng-model="banner.logo.h" disabled="disabled">
-						        </div>
-						    </div>
-						</div>
-			        </accordion-group>
-
-			        <!-- Badge -->
-			        <accordion-group heading="Bagde" class="panel-primary">
-					    <div class="btn-group">
-					        <button class="btn btn-default btn-sm" 
-					        	ng-class="{'active':!banner.badge.hide}"
-					        	ng-click="setBadgeHide(false)"> On
-					        </button>
-					        <button class="btn btn-default btn-sm" 
-					        	ng-class="{'active':banner.badge.hide}"
-					        	ng-click="setBadgeHide(true)"> Off
-					        </button>
-					    </div>
-					    <div class="field-top btn-group" ng-hide="banner.badge.hide">
-					        <button class="btn btn-default btn-sm col-md-3" 
-					        	ng-repeat="img in templates.badges"
-					        	ng-class="{'active':banner.badge.selected == $index}"
-					        	ng-click="setBadgeSelected($index)">
-					        	<img ng-src="{{img}}" width="100%">
-					        </button>
-					    </div>
-			        </accordion-group>
-
-			        <!-- Prizes -->
-			        <accordion-group heading="Prizes" class="panel-primary" ng-hide="banner.prize.selected == 0">
-					    <div class="form-horizontal">
-					    	<div class="form-group" ng-show="banner.prize.selected >= 1">
-					    		<label class="col-md-5 control-label">Prize 1</label>
-					    		<div class="col-md-7">
-					    			<upload-image upload-image-class="btn-primary btn-block" upload-image-options="uploadOptions.prize[1]" ng-model="banner.prize.images[1]"></upload-image>
-					    		</div>
-					    	</div>
-					    	<div class="form-group" ng-show="banner.prize.selected >= 2">
-					    		<label class="col-md-5 control-label">Prize 2</label>
-					    		<div class="col-md-7">
-					    			<upload-image upload-image-class="btn-primary btn-block" upload-image-options="uploadOptions.prize[2]" ng-model="banner.prize.images[2]"></upload-image>
-				    			</div>
-					    	</div>
-					    	<div class="form-group" ng-show="banner.prize.selected >= 3">
-					    		<label class="col-md-5 control-label">Prize 3</label>
-					    		<div class="col-md-7">
-					    			<upload-image upload-image-class="btn-primary btn-block" upload-image-options="uploadOptions.prize[3]" ng-model="banner.prize.images[3]"></upload-image>
-				    			</div>
-					    	</div>
-					    	<div class="form-group">
-					    		<label class="col-md-4 control-label">Position</label>
-					    		<div class="col-md-4">
-					    			<input type="range" min="0" max="10" step="1" ng-model="banner.prize.position" class="form-control input-sm">
-					    		</div>
-					    		<div class="col-md-4">
-					    			<input type="number" min="0" max="10" step="1" ng-model="banner.prize.position" class="form-control input-sm">
-					    		</div>
-					    	</div>
-					    </div>
-			        </accordion-group>
-
-			        <!-- Text -->
-			        <accordion-group heading="Text" class="panel-primary">
-			            <div class="form-group">
-						    <label for="textTitle">Title</label>
-						    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title" tooltip="Add a new line by comma" ng-model="banner.mtitle.text">
-					  	</div>
-					  	<div class="form-group">
-						    <label for="textDescription">Description</label>
-						    <textarea class="form-control input-sm" id="textDescription" placeholder="Description" 
-						    	msd-elastic="\n"
-						    	ng-model="banner.mdescription.text"></textarea>
-					  	</div>
-
-					  	<div ng-if="banner.prize.selected > 0">
-					  		<fieldset>
-					  			<legend>Header</legend>
-					            <div class="form-group">
-								    <label for="textTitle">Prize Header Title</label>
-								    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title"
-								    	ng-model="banner.prize.header.title">
-							  	</div>
-					            <div class="form-group">
-								    <label for="textTitle">Prize Header Description</label>
-								    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title"
-								    	ng-model="banner.prize.header.description.like">
-								    <input type="email" class="form-control input-sm" id="textTitle" placeholder="Enter title"
-								    	ng-model="banner.prize.header.title"
-								    	ng-model="banner.prize.header.description.enter">
-							  	</div>
-					  		</fieldset>
-					  		<fieldset>
-					  			<legend>Description</legend>
-							  	<div class="form-group" ng-show="banner.prize.selected >= 1">
-								    <label for="textPrizeDescription-1">Prize 1</label>
-								    <textarea class="form-control input-sm" id="textPrizeDescription-1" placeholder="Enter prize 1 description"
-								    	ng-model="banner.prize.text[1]"></textarea>
-							  	</div>
-							  	<div class="form-group" ng-show="banner.prize.selected >= 2">
-								    <label for="textPrizeDescription-2">Prize 2</label>
-								    <textarea class="form-control input-sm" id="textPrizeDescription-2" placeholder="Enter prize 2 description"
-								    	ng-model="banner.prize.text[2]"></textarea>
-							  	</div>
-							  	<div class="form-group" ng-show="banner.prize.selected >= 3">
-								    <label for="textPrizeDescription-3">Prize 3</label>
-								    <textarea class="form-control input-sm" id="textPrizeDescription-3" placeholder="Enter prize 3 description"
-								    	ng-model="banner.prize.text[3]"></textarea>
-							  	</div>
-					  		</fieldset>
-					  	</div>
-			        </accordion-group>
-			    </accordion>
-			</div>
+			<div ng-include="'views/banner-settings.html'"></div>
 		</aside>
-		<section id="editor" class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
-			<h3 style="text-align:center; margin:10px auto 15px; {{ showEditor ? 'visibility:visible' : 'visibility:hidden'}}">{{title}}</h3>
-			<div class="tab-content text-center">
-	         	<div class="tab-pane active" id="0-prize">
-				    <img src="http://placehold.it/810x381&text=Template+Empty+Prize">
-				</div>
-				<div class="tab-pane" id="1-1prize">
-				    <img src="http://placehold.it/810x381&text=Template+1-1+Prize">
-				</div>
-				<div class="tab-pane" id="1-2prizes">
-				    <img src="http://placehold.it/810x381&text=Template+1-2+Prizes">
-				</div>
-				<div class="tab-pane" id="1-3prizes">
-				    <img src="http://placehold.it/810x381&text=Template+1-3+Prizes">
-				</div>
-				<div class="tab-pane" id="2-1prize">
-				    <img src="http://placehold.it/810x381&text=Template+2-1+Prize">
-				</div>
-				<div class="tab-pane" id="2-2prizes">
-				    <img src="http://placehold.it/810x381&text=Template+2-2+Prizes">
-				</div>
-				<div class="tab-pane" id="2-3prizes">
-				    <img src="http://placehold.it/810x381&text=Template+2-3+Prize">
-				</div>
-
-	        </div>
+		<section id="editor" ng-class="{'col-xs-9 col-sm-9 col-md-9 col-lg-9':!fullEditor, 'col-xs-12 col-sm-12 col-md-12 col-lg-12':fullEditor}">
+			<div ng-include="'views/banner-editor.html'"></div>
 		</section>
 	</div>
 	<div class="row">
-		<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-hide="!showEditor">
+		<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-hide="!showEditor || fullEditor">
 			<div class="btn-group btn-block">
-				<button type="button" class="btn col-lg-10 btn-sm btn-success" ng-click="generate()"><i class="fa fa-gear"></i> Generate Image</button>
+				<button type="button" class="btn col-lg-10 btn-sm btn-success" ng-click="doGenerate()"><i class="fa fa-gear"></i> Generate Image</button>
 				<button type="button" class="btn col-lg-2 btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
 					<span class="caret"></span>
 					<span class="sr-only">Toggle Dropdown</span>

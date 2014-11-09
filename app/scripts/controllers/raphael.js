@@ -3,8 +3,8 @@ define(['angular', 'angular-font-select', 'raphael', 'raphael-filter', 'raphael-
     'use strict';
 
     angular.module('bannerAppApp.controllers.RaphaelCtrl', ['jdFontselect'])
-        .controller('RaphaelCtrl', ['$scope', '$rootScope', '$compile', '$timeout', 'Banner',
-            function($scope, $rootScope, $compile, $timeout, Banner) {
+        .controller('RaphaelCtrl', ['$scope', '$rootScope', '$compile', '$timeout', 'BannerData',
+            function($scope, $rootScope, $compile, $timeout, BannerData) {
                 window.$scope = $scope;
 
                 $scope.isFirstOpen = true;
@@ -18,7 +18,7 @@ define(['angular', 'angular-font-select', 'raphael', 'raphael-filter', 'raphael-
                     template: '<div style="padding-top: 60px;"><ul class="list-group"><li class="list-group-item" ng-repeat="item in menus.left.model">{{item}}</li></ul></div>'
                 };
 
-                $scope.banner = Banner.dummy;
+                $scope.banner = BannerData.dummy;
 
                 /**
                  * convert SVG to Image

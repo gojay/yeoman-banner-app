@@ -126,7 +126,7 @@ define([
 				$scope.showDimension = true;
 			};
 			$scope.submitRect = function(){
-				$scope.fabric.addRect( $scope.rectDimension.width, $scope.rectDimension.height );
+				$scope.fabric.addRect( $scope.rectDimension );
 				$scope.fabric.setDirty(true);
 				delete $scope.showDimension;
 			};
@@ -192,7 +192,6 @@ define([
 			// Init
 			// ================================================================
 			$scope.init = function() {
-				alert('canvas:created')
 				$scope.fabric = new Fabric({
 					JSONExportProperties: FabricConstants.JSONExportProperties,
 					textDefaults: FabricConstants.textDefaults,

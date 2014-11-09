@@ -31,7 +31,8 @@
     "angular-elastic": "~2.4.0",
     "imgareaselect": "~0.9.10",
     "blockui": "*",
-    "angular-cropme": "~0.2.8"
+    "underscore.string": "~2.3.3",
+    "angular-toggle-switch": "~1.0.0"
   },
   "devDependencies": {
     "angular-mocks": "1.2.11",

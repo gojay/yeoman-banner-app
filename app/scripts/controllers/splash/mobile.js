@@ -46,7 +46,7 @@ define([
 
 	    	'Fabric', 
 	    	'FabricConstants', 
-	    	'Keypress',
+	    	// 'Keypress',
 
 	    	'mobile'
 	    ],
@@ -54,6 +54,7 @@ define([
 	        fabric: {},
 	        screenshotUploadOptions: {
             	data: {
+            		id 	   : null,
                 	name   : 'screenshot',
                 	width  : null,
                 	height : null
@@ -351,37 +352,37 @@ define([
 				onChangeCanvasSize	: 	this._onChangeCanvasSize
 			});
 
-			this.Keypress.onSave(function(){  this.$.save() });
-			this.Keypress.onControls({
-				up: function(){
-					if( self.$.fabric.selectedObject ) {
-						self.$.fabric.controls.top -= 1;
-						self.$.$apply();
-						self.$log.debug('up', self.$.fabric.controls.top);
-					}
-				},
-				down: function(){
-					if( self.$.fabric.selectedObject ) {
-						self.$.fabric.controls.top += 1;
-						self.$.$apply();
-						self.$log.debug('down', self.$.fabric.controls.top);
-					}
-				},
-				left: function(){
-					if( self.$.fabric.selectedObject ) {
-						self.$.fabric.controls.left -= 1;
-						self.$.$apply();
-						self.$log.debug('left', self.$.fabric.controls.left);
-					}
-				},
-				right: function(){
-					if( self.$.fabric.selectedObject ) {
-						self.$.fabric.controls.left += 1;
-						self.$.$apply();
-						self.$log.debug('right', self.$.fabric.controls.left);
-					}
-				}
-			});
+			// this.Keypress.onSave(function(){  this.$.save() });
+			// this.Keypress.onControls({
+			// 	up: function(){
+			// 		if( self.$.fabric.selectedObject ) {
+			// 			self.$.fabric.controls.top -= 1;
+			// 			self.$.$apply();
+			// 			self.$log.debug('up', self.$.fabric.controls.top);
+			// 		}
+			// 	},
+			// 	down: function(){
+			// 		if( self.$.fabric.selectedObject ) {
+			// 			self.$.fabric.controls.top += 1;
+			// 			self.$.$apply();
+			// 			self.$log.debug('down', self.$.fabric.controls.top);
+			// 		}
+			// 	},
+			// 	left: function(){
+			// 		if( self.$.fabric.selectedObject ) {
+			// 			self.$.fabric.controls.left -= 1;
+			// 			self.$.$apply();
+			// 			self.$log.debug('left', self.$.fabric.controls.left);
+			// 		}
+			// 	},
+			// 	right: function(){
+			// 		if( self.$.fabric.selectedObject ) {
+			// 			self.$.fabric.controls.left += 1;
+			// 			self.$.$apply();
+			// 			self.$log.debug('right', self.$.fabric.controls.left);
+			// 		}
+			// 	}
+			// });
 
             // is edit, load configuration from JSON
             if( this.$.fromJSON ){
@@ -420,39 +421,6 @@ define([
 					$scope.$watch('fabric.controls.scale', function(value){
 						$scope.fabric.scaleControl();
 					});
-
-		       //      $scope.$watch('mobile.images.screenshot', function(newval, oldval){
-		       //      	if(newval){
-			      //           self.$log.debug('mobile.images.screenshot', newval);
-	        //         		self._setObjectImage('app-screenshot', newval);
-					    // }
-		       //      });
-		       //      $scope.$watch('mobile.text.app', function(newVal){
-		       //          if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'app-name') {
-		       //              $scope.fabric.setText(newVal);
-		       //              $scope.fabric.render();
-		       //              $scope.fabric.centerH();
-		       //          }
-		       //      });
-		       //      $scope.$watch('mobile.text.left', function(newVal){
-		       //          if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-left') {
-		       //              $scope.fabric.setText(newVal);
-		       //              $scope.fabric.render();
-		       //          }
-		       //      });
-		       //      $scope.$watch('mobile.text.right', function(newVal){
-		       //          if (typeof newVal === 'string' && $scope.fabric.selectedObject && $scope.fabric.selectedObject.name == 'testimoni-text-right') {
-		       //              $scope.fabric.setText(newVal);
-		       //              $scope.fabric.render();
-		       //          }
-		       //      });
-		            // $scope.$watchCollection('mobile.dimensions.app', function(dimension){
-		            //     self.$log.debug('mobile.dimensions.app', dimension);
-		            //     if( !dimension ) return;
-		            //     // $scope.screenshotUploadOptions.data.name  += '_' + $scope.fabric.presetSize.type;
-		            //     $scope.screenshotUploadOptions.data.width = dimension.width;
-		            //     $scope.screenshotUploadOptions.data.height = dimension.height;
-		            // });
                 }
             );
 		},
@@ -462,6 +430,8 @@ define([
 			_fabric.clearCanvas();
 
 			if( _fabric.presetSize && _fabric.presetSize.hasOwnProperty('type') ){
+
+				var $fabric = this.$.fabric;
 
 				// if is paper a4 / a5, set canvas scale
 				var initialCanvasScale = _fabric.canvasScale = 0.3;
@@ -478,108 +448,47 @@ define([
 				var ppi  = _fabric.presetSize.ppi;
 				var CustomAttributes = _fabric.CustomAttributes[type];
 
-				var ss = CustomAttributes[ppi]['ss'];
-				var qr = CustomAttributes[ppi]['qr'];
-                var testimoniDimension = CustomAttributes[ppi]['people']['left'];
-				var textAttribute = CustomAttributes[ppi]['text'];
-
-				var callbackImage = function( object, name, type, index ){
-					var attributes = CustomAttributes[ppi][type][index];
-					object.name   = name;
-					object.width  = attributes.width;
-					object.height = attributes.height;
-					object.left   = attributes.left;
-					object.top    = attributes.top;
-					object.hasControls = false;
-				}
-
-                // set model mobile dimension
-                this.$.mobile.dimensions = {
-                    app: { width : ss.width, height: ss.height },
-                    testimonial: { width : testimoniDimension.width, height: testimoniDimension.height },
-                    qr: { width: qr.iphone.width, height: qr.iphone.height }
-                };
+				var screenshotOptions 	= CustomAttributes[ppi]['ss'];
+				var qrOptions 			= CustomAttributes[ppi]['qr'];
+                var testimonialOptions 	= CustomAttributes[ppi]['people'];
+				var textOptions 		= CustomAttributes[ppi]['text'];
 
 				// screenshot
-                var screenshot = this.$.mobile.images.screenshot ? 
-                                    this.$.mobile.images.screenshot :
-                                    'images/'+ ss.width +'x'+ ss.height +'.jpg' ;
-
-                this.$.fabric.addImage(screenshot, function(object){
-                    object.name = 'app-screenshot';
-                    object.set({
-                        width  : ss.width,
-                        height : ss.height,
-                        left   : ss.left,
-                        top    : ss.top,
-                    });
-                });
+                var screenshotImage = this.$.mobile.images.screenshot ? 
+                                    	this.$.mobile.images.screenshot :
+                                    	'images/'+ screenshotOptions.width +'x'+ screenshotOptions.height +'.jpg' ;
+                $fabric.addImage(screenshotImage, screenshotOptions);
 
 				// add text name app
 				// =================================
-				this.$.fabric.addText(this.$.mobile.text.app, function(object){
-					var attribute = textAttribute['app'];
-					object.set({
-						name: 'app-name',
-						fill: '#434343',
-						stroke: '#434343',
-						fontSize: attribute.size,
-						left: attribute.left,
-						top: attribute.top,
-						textAlign: 'center',
-					});
-				});
+				$fabric.addText(this.$.mobile.text.app, textOptions['app']);
 				// add qr images
 				// =================================
-				var qrIphone = qr['iphone'];
-				this.$.fabric.addImage('images/'+ qrIphone.width +'x'+ qrIphone.height +'.jpg', function(object){
-                    callbackImage( object, 'qr-iphone', 'qr', 'iphone' );
-                });
-                var qrAndroid = qr['android'];
-                this.$.fabric.addImage('images/'+ qrAndroid.width +'x'+ qrAndroid.height +'.jpg', function(object){
-                    callbackImage( object, 'qr-android', 'qr', 'android' );
-                });
+				var qrIphone = qrOptions['iphone'];
+				$fabric.addImage('images/'+ qrIphone.width +'x'+ qrIphone.height +'.jpg', qrIphone);
+                var qrAndroid = qrOptions['android'];
+                $fabric.addImage('images/'+ qrAndroid.width +'x'+ qrAndroid.height +'.jpg', qrAndroid);
 
 				// add testimoni image-cirlcle & text Left
 				// =================================
-                var imgTestimonialLeft = this.$.mobile.images.testimonials.left ? 
-                                    this.$.mobile.images.testimonials.left :
-                                    'images/'+ testimoniDimension.width +'x'+ testimoniDimension.height +'.jpg' ;
-                this.$.fabric.addImageCircle(imgTestimonialLeft, function(object){
-                    callbackImage( object, 'testimoni-pic-left', 'people', 'left' );
-                });
-                this.$.fabric.addIText(this.$.mobile.text.left, function(object){
-                    var attribute = textAttribute['people']['left'];
-                    object.set({
-                        name: 'testimoni-text-left',
-                        fill: '#313131',
-                        stroke: '#313131',
-                        fontSize: attribute.size,
-                        left: attribute.left,
-                        top: attribute.top,
-                        opacity: 0.5
-                    });
-                });
+                var tLeftImg = this.$.mobile.images.testimonials.left ? this.$.mobile.images.testimonials.left :
+                        		'images/'+ testimonialOptions.left.width +'x'+ testimonialOptions.left.height +'.jpg' ;
+                $fabric.addImageCircle(tLeftImg, testimonialOptions.left);
+                $fabric.addIText(this.$.mobile.text.left, textOptions['people']['left']);
                 // add testimoni image-cirlcle & text Right
 				// =================================
-                var imgTestimonialRight = this.$.mobile.images.testimonials.right ? 
-                                    this.$.mobile.images.testimonials.right :
-                                    'images/'+ testimoniDimension.width +'x'+ testimoniDimension.height +'.jpg' ;
-                this.$.fabric.addImageCircle(imgTestimonialRight, function(object){
-                    callbackImage( object, 'testimoni-pic-right', 'people', 'right' );
-                });
-                this.$.fabric.addIText(this.$.mobile.text.right, function(object){
-                    var attribute = textAttribute['people']['right'];
-                    object.set({
-                        name: 'testimoni-text-right',
-                        fill: '#313131',
-                        stroke: '#313131',
-                        fontSize: attribute.size,
-                        left: attribute.left,
-                        top: attribute.top,
-                        opacity: 0.5
-                    });
-                });
+                var tRightImg = this.$.mobile.images.testimonials.right ? this.$.mobile.images.testimonials.right :
+                                'images/'+ testimonialOptions.right.width +'x'+ testimonialOptions.right.height +'.jpg' ;
+                $fabric.addImageCircle(tRightImg, testimonialOptions.right);
+                $fabric.addIText(this.$.mobile.text.right, textOptions['people']['right']);
+
+                // set model mobile dimension
+				// =================================
+                this.$.mobile.dimensions = {
+                    app: { width : screenshotOptions.width, height: screenshotOptions.height },
+                    qr : { width : qrOptions.iphone.width, height: qrOptions.iphone.height },
+                    testimonial: { width : testimonialOptions.left.width, height: testimonialOptions.left.height }
+                };
 
                 // generate QR
 				// =================================

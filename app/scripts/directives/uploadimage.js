@@ -24,31 +24,209 @@ define([
                 replace: true,
                 controller: ['$scope', '$http', '$log', '$timeout', '$window', '$compile', '$upload', 'API',
                     function($scope, $http, $log, $timeout, $window, $compile, $upload, API) {
-
+                        var self = this;
                         var uploadURL = API.URL + '/upload';
 
-                        var $tempImg = null, 
-                            cropSelection = {};
+                        this.cropController = {
+                            parentEl : '.blockUI.blockPage',
+                            imgEl    : null,
+                            mime     : null,
+                            selection: {},
+                            init     : function(file) {
+                                var _this = this;
 
-                        function dataURItoBlob(dataURI) {
-                            // convert base64/URLEncoded data component to raw binary data held in a string
-                            var byteString;
-                            if (dataURI.split(',')[0].indexOf('base64') >= 0)
-                                byteString = atob(dataURI.split(',')[1]);
-                            else
-                                byteString = unescape(dataURI.split(',')[1]);
+                                var fileReader = new FileReader();
+                                fileReader.readAsDataURL(file);
+                                fileReader.onload = (function(file) {
+                                    return function(e) {
+                                        var image = new Image();
+                                        image.src = e.target.result;
+                                        image.onload = function() {
+                                            $scope.dataUrls[0] = image.src;
+                                            $scope.progress[0] = -1;
+                                            _this.open(image);
+                                        };
+                                    }
+                                })(file);
+                            },
+                            open: function(image) {
+                                var _this = this;
+                                
+                                _this.imgEl = angular.element(image);
 
-                            // separate out the mime component
-                            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+                                var top  = ($window.innerHeight - image.height) / 2, 
+                                    left = ($window.innerWidth - image.width) / 2;
+                                $.blockUI({
+                                    message   : _this.imgEl,
+                                    overlayCSS:{
+                                        cursor : 'default'
+                                    },
+                                    css: {
+                                        cursor : 'default',
+                                        border : 'none',
+                                        top    : 60  + 'px',
+                                        left   : left + 'px',
+                                        width  : image.width + 'px'
+                                    },
+                                    onBlock: function(){
+                                        // disable body scroll
+                                        angular.element('body')
+                                            .css('overflow', 'hidden')
+                                            .on('mousewheel', function(e) {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            });
 
-                            // write the bytes of the string to a typed array
-                            var ia = new Uint8Array(byteString.length);
-                            for (var i = 0; i < byteString.length; i++) {
-                                ia[i] = byteString.charCodeAt(i);
+                                        var cropSelection = _this._position(image);
+                                        _this.imgEl.imgAreaSelect({
+                                            x1 : cropSelection.x1,
+                                            y1 : cropSelection.y1,
+                                            x2 : cropSelection.x2,
+                                            y2 : cropSelection.y2,
+                                            parent    : _this.parentEl,
+                                            resizable : false,
+                                            handles   : true,
+                                            onInit    : function(img, selection){ 
+                                                _this.selection = selection;
+                                                // init config handle template
+                                                var template = _this._handleTemplate({
+                                                    width: image.width,
+                                                    left : left
+                                                });
+                                                // append into body, then compile it
+                                                angular.element('body').append($compile(template)($scope));
+                                            },
+                                            onSelectEnd : function(img, selection){
+                                                _this.selection = selection;
+                                            }
+                                        });
+                                    },
+                                    onUnblock: function() {
+                                        // enable body scroll
+                                        angular.element('body')
+                                            .css('overflow', 'inherit')
+                                            .unbind('mousewheel');
+                                    }
+                                });
+                            },
+                            close: function() {
+                                this.imgEl.remove();
+                                angular.element('[class^=imgareaselect]').remove();
+                                $.unblockUI();
+                            },
+                            toBlob: function (dataURI) {
+                                // convert base64/URLEncoded data component to raw binary data held in a string
+                                var byteString;
+                                if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+                                    byteString = atob(dataURI.split(',')[1]);
+                                } else {
+                                    byteString = unescape(dataURI.split(',')[1]);
+                                }
+
+                                // separate out the mime component
+                                var mimeString = this.mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+                                // write the bytes of the string to a typed array
+                                var ia = new Uint8Array(byteString.length);
+                                for (var i = 0; i < byteString.length; i++) {
+                                    ia[i] = byteString.charCodeAt(i);
+                                }
+
+                                return new Blob([ia], {type:mimeString});
+                            },
+                            getBlob: function() {
+                                var canvas = document.createElement('canvas');
+                                canvas.width  = this.selection.width;
+                                canvas.height = this.selection.height;
+                                canvas.getContext('2d').drawImage(
+                                    this.imgEl[0],
+                                    this.selection.x1, 
+                                    this.selection.y1, 
+                                    this.selection.width, 
+                                    this.selection.height,
+                                    0, 0, 
+                                    this.selection.width, 
+                                    this.selection.height
+                                );
+
+                                var dataURI = canvas.toDataURL();
+                                return this.toBlob(dataURI);
+                            },
+                            handle: function ( act ) {
+                                var _this = this;
+                                switch(act) {
+                                    case 'crop':
+                                        var blob = this.getBlob();
+                                        $log.debug('blob', blob);
+
+                                        $scope.selectedFiles[0] = blob;
+                                        $scope.start(0);
+
+                                        $scope.$on('uploadimage:completed', function(data, percent){
+                                            _this.close();
+                                        });
+                                        break;
+
+                                    case 'ratio':
+                                    case 'fit':
+                                        var ratio = (act == 'ratio') ? 1 : 0 ;
+                                        angular.extend($scope.uploadOptions.data, { ratio: ratio }); 
+
+                                        $log.log('[data]', $scope.uploadOptions.data);
+                                        $scope.start(0);
+                                        $scope.$on('uploadimage:completed', function(data, percent){
+                                            _this.close();
+                                        });
+                                        break;
+
+                                    default:
+                                        this.close();
+                                        break;
+                                }
+                            },
+                            _position: function(image) {
+                                if(!image) return {};
+
+                                var blockEl = angular.element(this.parentEl);
+                                var options = $scope.uploadOptions.data;
+
+                                var x1 = parseInt((blockEl.width() - options.width) / 2),
+                                    y1 = parseInt((blockEl.height() - options.height) / 2) - 60;
+
+                                return {
+                                    x1: x1,
+                                    y1: y1,
+                                    x2 : parseInt(x1 + options.width),
+                                    y2 : parseInt(y1 + options.height)
+                                };
+                            },
+                            _styles: function(style) {
+                                var styles = [
+                                    'width: 100%',
+                                    'position: fixed',
+                                    'top: 0',
+                                    'z-index: 2000',
+                                    'padding: 10px 0',
+                                    'background-color: rgba(0, 0, 0, 0.2)',
+                                    'text-align: center',
+                                ];
+
+                                return styles.join(';');
+                            },
+                            _handleTemplate: function(styles) {
+                                var styles = this._styles();
+                                return '<div class="imgareaselect-crop-wrapper" style="'+ styles +'"><div class="btn-group">'+
+                                    '<button type="button" class="btn btn-success" ng-click="cropHandle(\'crop\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="Ok, crop it! :)"><i class="fa fa-crop"></i> Crop</button>'+
+                                    '<button type="button" class="btn btn-info" ng-click="cropHandle(\'ratio\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="resize this image with ratio"><i class="fa fa-expand"></i> Aspect Ratio</button>'+
+                                    '<button type="button" class="btn btn-default" ng-click="cropHandle(\'fit\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="resize this image with auto fit"><i class="fa fa-arrows-alt"></i> Auto Fit</button>'+
+                                    '<button type="button" class="btn btn-danger" ng-click="cropHandle(\'cancel\')" ng-disabled="loadingProgress > 0">Cancel</button>'+
+                                '</div></div>';
                             }
+                        };
 
-                            return new Blob([ia], {type:mimeString});
-                        }
+                        $scope.cropHandle = function(act) {
+                            return self.cropController.handle(act);
+                        };
 
                         if( angular.isUndefined($scope.uploadOptions) ) $scope.uploadOptions = { headers:{}, data:{} };
 
@@ -63,29 +241,6 @@ define([
                         $scope.abort = function(index) {
                             $scope.upload[index].abort();
                             $scope.upload[index] = null;
-                        };
-
-                        $scope.cropHandle = function(act) {
-                            if(act == 'cancel') {
-                                $tempImg.remove();
-                                $('.imgareaselect-outer').remove();
-                                $('#crop-wrapper').remove();
-                                $.unblockUI();
-                            } else if (act == 'crop') {
-                                $log.log('dataUrls', $scope.dataUrls);
-                                var crop_canvas;
-
-                                crop_canvas = document.createElement('canvas');
-                                crop_canvas.width  = cropSelection.width;
-                                crop_canvas.height = cropSelection.height;
-                                 
-                                crop_canvas.getContext('2d').drawImage($tempImg[0], cropSelection.x1, cropSelection.y1, cropSelection.width, cropSelection.height, 0, 0, cropSelection.width, cropSelection.height);
-                                var dataURI = crop_canvas.toDataURL("image/jpeg");
-                                var blob = dataURItoBlob(dataURI);
-
-                                $log.debug('blob', blob);
-                                window.open(dataURI);
-                            }
                         };
 
                         $scope.onFileSelect = function($files) {
@@ -103,94 +258,33 @@ define([
                             $scope.selectedFiles = $files;
                             $scope.dataUrls = [];
 
-                            $log.debug('$window', $window)
-
-                            var file = $files[0];
-
-                            var fr = new FileReader();
-                            fr.readAsDataURL(file);
-                            fr.onload = (function(file) {
-                                return function(e) {
-                                    var image = new Image();
-                                    image.src = e.target.result;
-                                    image.onload = function() {
-                                        $scope.dataUrls[0] = image.src;
-                                        $scope.progress[0] = -1;
-                                        var x1 = parseInt((image.width - 810) / 2),
-                                            y1 = parseInt((image.height - 381) / 2);
-                                        var pos = {
-                                            x1: x1,
-                                            y1: y1,
-                                            x2 : parseInt(x1 + 810),
-                                            y2 : parseInt(y1 + 381)
-                                        };
-                                        $tempImg = angular.element(image);
-                                        var leftPosition = ($window.innerWidth - image.width) / 2;
-                                        $.blockUI({
-                                            message   : $tempImg,
-                                            overlayCSS:{
-                                                cursor : 'default'
-                                            },
-                                            css: {
-                                                cursor : 'default',
-                                                border : 'none',
-                                                top    : '60px',
-                                                left   : leftPosition + 'px',
-                                                width  : image.width + 'px'
-                                            },
-                                            onBlock: function(){
-                                                $tempImg.imgAreaSelect({
-                                                    x1 : pos.x1,
-                                                    y1 : pos.y1,
-                                                    x2 : pos.x2,
-                                                    y2 : pos.y2,
-                                                    resizable : false,
-                                                    handles   : true,
-                                                    onInit    : function(img, selection){
-                                                        console.log('imgAreaSelect init', selection);
-                                                        cropSelection = selection;
-                                                        // set cropSelection
-                                                        var $handle = $('.imgareaselect-handle').parent();
-                                                        $handle.parent().append($compile('<div id="crop-wrapper" style="width:'+image.width+'px; left:'+leftPosition+'px"><div class="btn-group">'+
-                                                            '<button type="button" class="btn btn-success" ng-click="cropHandle(\'crop\')"><i class="fa fa-crop"></i> Crop</button>'+
-                                                            '<button type="button" class="btn btn-info" ng-click="cropHandle(\'ratio\')"><i class="fa fa-expand"></i> Aspect Ratio</button>'+
-                                                            '<button type="button" class="btn btn-default" ng-click="cropHandle(\'fit\')"><i class="fa fa-arrows-alt"></i> Auto Fit</button>'+
-                                                            '<button type="button" class="btn btn-danger" ng-click="cropHandle(\'cancel\')">Cancel</button>'+
-                                                        '</div></div>')($scope));
-                                                    },
-                                                    onSelectEnd : function(img, selection){
-                                                        console.log('imgAreaSelect end', selection);
-                                                        cropSelection = selection;
-                                                    }
+                            // if crop is enabled, only single file
+                            if( $scope.enableCrop ) {
+                                var file = $files[0];
+                                self.cropController.init(file);
+                            } else {
+                                for (var i = 0; i < $files.length; i++) {
+                                    var $file = $files[i];
+                                    if (window.FileReader && $file.type.indexOf('image') > -1) {
+                                        var fileReader = new FileReader();
+                                        fileReader.readAsDataURL($files[i]);
+                                        var loadFile = function(fileReader, index) {
+                                            fileReader.onload = function(e) {
+                                                $timeout(function() {
+                                                    $scope.dataUrls[index] = e.target.result;
                                                 });
                                             }
-                                        });
-                                    };
+                                        }(fileReader, i);
+                                    }
+                                    $scope.progress[i] = -1;
+                                    if ($scope.uploadRightAway) {
+                                        $scope.start(i);
+                                    }
                                 }
-                            })(file);
-
-                            // for (var i = 0; i < $files.length; i++) {
-                            //     var $file = $files[i];
-                            //     if (window.FileReader && $file.type.indexOf('image') > -1) {
-                            //         var fileReader = new FileReader();
-                            //         fileReader.readAsDataURL($files[i]);
-                            //         var loadFile = function(fileReader, index) {
-                            //             fileReader.onload = function(e) {
-                            //                 $log.debug('[uploadImage]onload', e);
-                            //                 $timeout(function() {
-                            //                     $scope.dataUrls[index] = e.target.result;
-                            //                 });
-                            //             }
-                            //         }(fileReader, i);
-                            //     }
-                            //     $scope.progress[i] = -1;
-                            //     if ($scope.uploadRightAway) {
-                            //         $scope.start(i);
-                            //     }
-                            // }
+                            }
                         };
 
-                        $scope.start = function(index) {
+                        $scope.start = function(index, done) {
                             $scope.progress[index] = 0;
                             $scope.errorMsg = null;
                             if ($scope.howToSend == 1) {
@@ -208,14 +302,16 @@ define([
                                     $scope.loadingProgress = 0;
                                     $scope.uploadResult.push(response.data);
                                     $scope.text = 'Change Image'; 
-                                    $log.debug('$scope.image', $scope.image)
+
                                     if( angular.isArray($scope.image) )
                                         $scope.image.push(response.data.url);
                                     else {
                                         $scope.image = response.data.url + '?r=' + Math.random().toString(36).substring(7);
                                     }
+                                    
                                     $log.debug('[uploadImage]image', $scope.image);
-                                    $.unblockUI();
+                                    
+                                    if(done) done();
                                 }, function(response) {
                                     if (response.status > 0) {
                                         $scope.errorMsg = response.status + ': ' + JSON.stringify(response.data);
@@ -251,7 +347,6 @@ define([
                                 fileReader.readAsArrayBuffer($scope.selectedFiles[index]);
                             }
                         };
-
                     }
                 ],
                 link: function(scope, element, attrs, ctrl) {
@@ -262,7 +357,10 @@ define([
 
                     if (angular.isUndefined(scope.text)) scope.text = 'Browse';
                     if (attrs.uploadImageClass) button.addClass(attrs.uploadImageClass);
-                    var multiple = ( angular.isDefined(attrs.multiple) && attrs.multiple === "true" );
+
+                    scope.enableCrop = angular.isDefined(attrs.uploadImageEnableCrop) ? attrs.uploadImageEnableCrop : false;
+
+                    var multiple = ( !scope.enableCrop && angular.isDefined(attrs.multiple) && attrs.multiple === "true" );
                     input.prop('multiple', multiple);
 
                     button.unbind('click').bind('click', function(){ input.trigger('click') });

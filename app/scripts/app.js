@@ -1,7 +1,7 @@
 /*jshint unused: vars */
-define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/postermobile', 'services/jwthelper', 'services/helpers'] /*deps*/ , function(angular) /*invoke*/ {
+define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/mobile', 'services/jwthelper', 'services/helpers'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
-
+    
     return angular.module('bannerAppApp', [
             'bannerAppApp.controllers.MainCtrl',
             'bannerAppApp.controllers.BootstrapCtrl',
@@ -28,10 +28,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
 
             'bannerAppApp.services.AuthResource',
             'bannerAppApp.services.Banner',
-            'bannerAppApp.services.Postermobile',
+            'bannerAppApp.services.Mobile',
             'bannerAppApp.services.Jwthelper',
             'bannerAppApp.services.Helpers',
-/*angJSDeps*/
+            /*angJSDeps*/
             'ngRoute',
             'ngCookies',
             'ngResource',
@@ -45,17 +45,13 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'ui.bootstrap',
             'ui.utils',
             'angularSpinkit',
-            // 'snap',
-            // 'jdFontselect',
             'slidePushMenu',
+            'toggle-switch',
 
             'chieffancypants.loadingBar'
         ])
-        // .constant('jdFontselectConfig', {
-        //     googleApiKey: 'AIzaSyDmr0hhRfQxivG5Hh4aD8SSd9yXvkZz8HQ'
-        // })
         .constant('API', {
-            'URL'   : 'http://api.local/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
+            'URL'   : 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
             'GRANT' : 'user', // grant type : user (user credentials) or jwt
             'CLIENT': {
                 'ID'    : '1413098344',
@@ -158,9 +154,6 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
 
                                 RecentMobiles().then(function(data){
                                     $rootScope.isLoading = false;
-
-                                    $log.debug('resolve recent mobiles', data);
-
                                     deferred.resolve({
                                         all: data
                                     });
@@ -302,7 +295,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                     $rootScope.isDownwards = isDownwards;
                 });
-                $rootScope.$on('cfpLoadingBar:completed', function(data, percent){
+                $rootScope.$on('cfpLoadingBar:completed', function(){
                     $rootScope.loading = false;
                 });
                 // $rootScope.$on('cfpLoadingBar:progress', function(data, percent){

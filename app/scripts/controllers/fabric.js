@@ -37,7 +37,7 @@ define(['angular', 'fabric', 'fabricUtils'], function(angular) {
                         getter = 'get' + prop,
                         setter = 'set' + prop;
 
-                    $element.on('change keyup select', function() {
+                    $element.on('change keyup select', function(e) {
                         $scope[setter] && $scope[setter](this.value);
                     });
 
@@ -78,7 +78,7 @@ define(['angular', 'fabric', 'fabricUtils'], function(angular) {
     function setActiveStyle(styleName, value, object) {
         object = object || canvas.getActiveObject();
         if (!object) return;
-
+        
         if (object.setSelectionStyles && object.isEditing) {
             var style = {};
             style[styleName] = value;
