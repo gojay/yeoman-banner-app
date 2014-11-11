@@ -29,13 +29,12 @@ define(['angular'], function(angular) {
                 model: {
                     text: {
                         contest: {
-                            title: 'Company Name, Contest Name, Contest Description',
-                            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum'
+                            title: 'Company Name\nCompany Contest\nContest',
+                            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.\nSit, fugit hic tempora dolorem non sunt incidunt velit quam\ndistinctio cum'
                         },
                         prize: {
                             header: {
-                                title: 'This Month\'s Prizes',
-                                description: 'Like our page to win!'
+                                content: 'This Month\'s Prizes\nLike our page to win!',
                             },
                             content: {
                                 1: 'Enter prize 1 description',
@@ -110,32 +109,31 @@ define(['angular'], function(angular) {
                             },
                             {
                                 type: 'text',
-                                text: 'Company Name\nCompany Contest\nContest',
+                                text: '',
                                 options: {
                                     name: 'contest-title',
                                     top: 150,
                                     left: 30,
+                                    width: 364,
                                     fill: '#fff',
                                     fontSize: 27,
                                     fontFamily: 'Rockwell',
                                     fontWeight: 'normal',
-                                    strokeWidth: 0,
                                 }
                             },
                             {
                                 type: 'text',
-                                text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.\nSit, fugit hic tempora dolorem non sunt incidunt velit quam\ndistinctio cum',
+                                text: '',
                                 options: {
                                     name: 'contest-description',
-                                    top: 278,
+                                    top: 270,
                                     left: 30,
+                                    width: 364,
                                     fill: '#fff',
                                     fontSize: 13,
                                     fontFamily: 'Rockwell',
                                     fontWeight: 'normal',
                                     lineHeight: 1.5,
-                                    strokeWidth: 0,
-                                    textAlign: 'left',
                                 }
                             }
                         ]

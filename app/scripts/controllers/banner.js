@@ -139,12 +139,10 @@ define([
             'banner.config.badge.enable': '_onBadgeEnable',
             'banner.config.badge.type': '_onBadgeType',
 
-            // 'banner.config.prize.type' 			: '_onPrizeType',
             '{object}banner.text.prize.header': '_onChangePrizeHeader',
             '{object}banner.text.prize.content': '_onChangePrizeContent',
             '{object}banner.images.prize': '_onChangePrizeImages',
 
-            '{object}banner.text.contest': '_onChangeTextContest',
         },
         _watchAsync: function($scope) {
             this.$log.log("$evalAsync", $scope);
@@ -195,7 +193,10 @@ define([
                 $scope.fabric.render();
             });
 
-            $scope.$watch('banner.config.prize.type', self._onPrizeType);
+            $scope.$watch('banner.config.prize.type', this._onPrizeType);
+
+            $scope.$watchCollection('banner.text.contest', this._onChangeTextContest);
+            $scope.$watch('banner.text.prize.header.content', this._onChangeTextPrizeHeader);
         },
         _onCanvasCreated: function() {
             var self = this;
@@ -212,7 +213,7 @@ define([
                 canvasOriginalHeight: 380,
                 canvasScale: 0.8
             });
-
+/*
             this.Keypress.onControls({
                 up: function() {
                     if (self.$.fabric.selectedObject) {
@@ -243,7 +244,7 @@ define([
                     }
                 }
             });
-
+*/
             var fabric = this.$.fabric;
             fabric.setbackgroundImage('images/810x380.jpeg');
             fabric.addImagePolaroid('http://placehold.it/122x80', {
@@ -298,13 +299,13 @@ define([
 
             fabric.addRect({
                 name: 'prize-header-placeholder',
-                top: 138,
+                top : 138,
                 left: 504,
                 width: 232,
                 height: 38,
                 fill: 'rgba(0,0,0,0.75)'
             });
-            fabric.addTextBox('This Month\'s Prize\nLike our page to win!', {
+            fabric.addTextBox('This Month\'s Prizes\nLike our page to win!', {
                 name: 'prize-header-content',
                 top: 145,
                 left: 504,
@@ -316,12 +317,8 @@ define([
                 fontFamily: 'Rockwell',
                 strokeWidth: 0,
                 textAlign: 'center',
-                lockUniScaling: true,
+                minWidth: 1,
                 styles: {
-                    "0": {
-                        "fontSize": 18,
-                        // "fontWeight": "bold"
-                    },
                     "1": {
                         "0": {
                             "fontSize": 12
@@ -385,8 +382,7 @@ define([
                         },
                         "20": {
                             "fontSize": 12
-                        },
-                        "fontSize": 12
+                        }
                     }
                 }
             });
@@ -394,7 +390,7 @@ define([
             fabric.addRect({
                 name: 'prize-description-placeholder-1',
                 top: 308,
-                left: 451,
+                left: 450,
                 width: 340,
                 height: 50,
                 fill: 'rgba(0,0,0,0.75)'
@@ -408,8 +404,7 @@ define([
                 fill: '#fff',
                 fontSize: 13,
                 fontFamily: 'Rockwell',
-                textAlign: 'center',
-                lockUniScaling: true
+                textAlign: 'center'
             });
 
             var objects = fabric.getObjects();
@@ -494,7 +489,12 @@ define([
             var intialScale = fabric.canvasScale;
             var canvasOriginalHeight = fabric.canvasOriginalHeight;
             var contestObject = fabric.getObjectByName('contest-group');
-            var canvasHeight, contestTop;
+            var pHeaderRectObject = fabric.getObjectByName('prize-header-placeholder');
+            var pHeaderContentObject = fabric.getObjectByName('prize-header-content');
+            var pImageObject = fabric.getObjectByName('prize-polaroid');
+            var pImageDescRectObject = fabric.getObjectByName('prize-description-placeholder-1');
+            var pImageDescContentObject = fabric.getObjectByName('prize-description-1');
+            var canvasHeight, contestTop, pHeaderTop, pImageTop, pImageRectTop, pImageDescTop;
 
             // reset scale
             fabric.resetZoom();
@@ -503,20 +503,41 @@ define([
             if( newVal ) {
             	canvasHeight = dimension.height;
             	contestTop = 138;
+            	pHeaderTop = 145;
+            	pImageTop  = 195;
+            	pImageRectTop = 308;
+            	pImageDescTop = 320;
+	            contestObject.item(0).visible = true;
+	            contestObject.item(1).fill = '#fff';
+	            contestObject.item(2).fill = '#fff';
+	            pHeaderRectObject.visible = true;
+	            pHeaderRectObject.visible = true;
+	            pHeaderContentObject.fill = '#fff';
             // non overlay
             } else {
 	            // canvasOriginalHeight + contestObject.height + padding top + padding bottom
 	            // example: 380+232+10+10 = 632
 	            canvasHeight = canvasOriginalHeight + contestObject.height + 20;
             	contestTop = canvasOriginalHeight + 10;
+            	pHeaderTop = canvasOriginalHeight + 20;
+            	pImageTop     = contestTop + 57;
+            	pImageRectTop = pImageTop + 113;
+            	pImageDescTop = pImageRectTop + 12;
+	            contestObject.item(0).visible = false;
+	            contestObject.item(1).fill = 'rgb(51, 51, 51)';
+	            contestObject.item(2).fill = 'rgb(51, 51, 51)';
+	            pHeaderRectObject.visible = false;
+	            pHeaderContentObject.fill = 'rgb(51, 51, 51)';
             }
-            // render top objects
+            // set top contestgroup
             contestObject.originalTop = contestTop;
+            pHeaderContentObject.originalTop = pHeaderTop;
+            pImageObject.originalTop = pImageTop;
+            pImageDescRectObject.originalTop = pImageRectTop;
+            pImageDescContentObject.originalTop = pImageDescTop;
             // set canvas height
             fabric.canvasOriginalHeight = canvasHeight;
-            fabric.setCanvasHeight(canvasHeight);
-            // set previous scale, not in 1
-            if(intialScale == 1) return;
+            // set previous scale
             fabric.canvasScale = intialScale;
             fabric.setZoom();
         },
@@ -587,6 +608,16 @@ define([
 
         _onChangeTextContest: function(newVal, oldVal) {
             this.$log.log('_onChangeTextContest', newVal, oldVal);
+
+            var fabric = this.$.fabric;
+            var constestObj = fabric.getObjectByName('contest-group');
+
+            constestObj.item(1).text = newVal.title;
+            constestObj.item(2).text = newVal.description;
+
+            fabric.render();
+        },
+        _onChangeTextPrizeHeader: function(newVal, oldVal) {
         },
 
         _onChangeCanvasSize: function(_fabric) {

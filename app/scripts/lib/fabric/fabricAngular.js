@@ -87,7 +87,6 @@ angular.module('common.fabric', [
 
                 function getActiveProp(name) {
                     var object = canvas.getActiveObject();
-
                     return typeof object === 'object' && object !== null ? object[name] : '';
                 }
 
@@ -339,7 +338,7 @@ angular.module('common.fabric', [
                     str = str || 'New Text';
 
                     var textDefaults = angular.extend(self.textDefaults, options);
-                    var object = new fabric.NamedIText(str, self.textDefaults);
+                    var object = new fabric.NamedIText(str, textDefaults);
                     object.id = self.createId();
                     self.addObjectToCanvas(object, true);
                     self.render();
@@ -352,6 +351,7 @@ angular.module('common.fabric', [
                 self.getSelectionStyle = function() {
                     var object = canvas.getActiveObject();
                     if (!object && !object.getSelectionStyles) return;
+                    return object.getSelectionStyles();
                 }
                 self.setSelectionStyle = function(styleName, value) {
                     var object = canvas.getActiveObject();

@@ -31,9 +31,20 @@ angular.module('common.fabric.directive', [
 				}
 			});
 
-			$scope.$watch('fabric.selectedObject.text', function(newVal) {
+			$scope.$watch('fabric.selectedObject.text', function(newVal, oldVal) {
+				var obj = $scope.fabric.selectedObject;
 				if (typeof newVal === 'string') {
-					$scope.fabric.setText(newVal);
+					var _newVal = newVal;
+					var s = _newVal.split('\n');
+					angular.forEach(s, function(value, key){
+						var llength = value.length;
+						var startIndex = _newVal.indexOf(value);
+						var endIndex   = startIndex + llength;
+						var currStyles = obj.getCurrentCharStyle(key, 0);
+						obj.setSelectionStart(startIndex);
+						obj.setSelectionEnd(endIndex);
+						obj.setSelectionStyles(currStyles);
+					});
 					$scope.fabric.render();
 				}
 			});
@@ -75,7 +86,7 @@ angular.module('common.fabric.directive', [
 
 			$scope.$watch('fabric.selectedObject.fill', function(newVal) {
 				if (typeof newVal === 'string') {
-					$scope.fabric.setFill(newVal);
+					// $scope.fabric.setFill(newVal);
 					$scope.fabric.render();
 				}
 			});

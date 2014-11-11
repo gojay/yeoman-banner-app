@@ -36,7 +36,7 @@ require.config({
 
         'jquery': '../bower_components/jquery/dist/jquery.min',
         'bootstrap': '../bower_components/bootstrap/dist/js/bootstrap.min',
-        // 'snap': 'lib/snap.min',
+
         'jquery-qrcode': 'lib/jquery.qrcode.min',
         'jquery-imgareaselect': '../bower_components/imgareaselect/jquery.imgareaselect.dev',
         'jquery-blockui': '../bower_components/blockui/jquery.blockUI',
@@ -48,10 +48,9 @@ require.config({
         'raphael-json': 'lib/raphael/raphael.json',
         // 'raphael-svg-import': '../bower_components/raphael-svg-import-classic/raphael-svg-import.min',
 
-        // 'fabric': 'lib/fabric/fabric',
-        'fabric': 'lib/fabric/fabric.1.4.12',
+        'fabric': 'lib/fabric/fabric',
         'fabricUtils': 'lib/fabric/utils',
-
+        'fabric-1_4_12': 'lib/fabric/fabric.1.4.12',
         'fabricAngular': 'lib/fabric/fabricAngular',
         'fabricCanvas': 'lib/fabric/fabricCanvas',
         'fabricConstants': 'lib/fabric/fabricConstants',
@@ -116,14 +115,14 @@ require.config({
 
         'fabric': ['jquery'],
         'fabricUtils': ['fabric'],
-
-        'fabricAngular': ['fabric'],
-        'fabricCanvas': ['fabric'],
-        'fabricConstants': ['fabric'],
-        'fabricDirective': ['fabric'],
-        'fabricDirtyStatus': ['fabric'],
-        'fabricUtilities': ['fabric'],
-        'fabricWindow': ['fabric'],
+        
+        'fabricAngular': ['fabric-1_4_12'],
+        'fabricCanvas': ['fabric-1_4_12'],
+        'fabricConstants': ['fabric-1_4_12'],
+        'fabricDirective': ['fabric-1_4_12'],
+        'fabricDirtyStatus': ['fabric-1_4_12'],
+        'fabricUtilities': ['fabric-1_4_12'],
+        'fabricWindow': ['fabric-1_4_12'],
 
         'jwt': ['jsrsasign', 'json'],
 
