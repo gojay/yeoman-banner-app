@@ -19,8 +19,9 @@
 	</div>
 	<tabset class="col-md-12" ng-show="showConfig">
 		<!-- object -->
-	    <tab heading="{{fabric.selectedObject.type}}">
+	    <tab heading="{{getObjectTitle('type')}}">
 		 	<div ng-switch='fabric.selectedObject.type'>
+
 	            <div ng-switch-when="text">
 	            	<div class="col-md-12 tf">
 		            	<div class="col-md-6">
@@ -341,16 +342,16 @@
 						<div class="form-group">
 					        <label for="inputTint" class="col-sm-2">Shadow</label>
 					        <div class="col-sm-10">
-					        	<toggle-switch ng-model="fabric.selectedObject.shadow"><toggle-switch>
+					        	<toggle-switch ng-model="fabric.selectedObject.hasShadow"><toggle-switch>
 					        </div>
 				      	</div>
 						<div class="form-group">
 					        <label for="inputTint" class="col-sm-2">Placeholder</label>
 					        <div class="col-sm-10">
-					        	<toggle-switch ng-model="fabric.selectedObject.placeholder"><toggle-switch>
+					        	<toggle-switch ng-model="fabric.selectedObject.hasPlaceholder"><toggle-switch>
 					        </div>
 				      	</div>
-						<div class="form-group" ng-show="fabric.selectedObject.placeholder">
+						<div class="form-group" ng-show="fabric.selectedObject.hasPlaceholder">
 					        <label for="inputTint" class="col-sm-2">Placeholder Color</label>
 					        <div class="col-sm-2">
                                 <input type="color" class='form-control input-sm' ng-model='fabric.selectedObject.fill' />
@@ -359,7 +360,7 @@
                                 <input type="text" class='form-control input-sm' ng-model='fabric.selectedObject.fill' />
 					        </div>
 				      	</div>
-				      	<div class="form-group" ng-show="fabric.selectedObject.placeholder">
+				      	<div class="form-group" ng-show="fabric.selectedObject.hasPlaceholder">
 			            	<div class="col-sm-2"><label for="">Horizontal Padding</label></div>
 			                <div class="col-sm-8">
 			                    <input type="range" min="0" max="10" step="1" ng-model="fabric.selectedObject.H_PADDING" />
@@ -368,7 +369,7 @@
 								<input type="number" ng-model="fabric.selectedObject.H_PADDING" class="input-sm form-control">
 			            	</div>
 			            </div>
-				      	<div class="form-group" ng-show="fabric.selectedObject.placeholder">
+				      	<div class="form-group" ng-show="fabric.selectedObject.hasPlaceholder">
 			            	<div class="col-sm-2"><label for="">Vertical Padding</label></div>
 			                <div class="col-sm-8">
 			                    <input type="range" min="0" max="10" step="1" ng-model="fabric.selectedObject.V_PADDING" />
@@ -526,19 +527,33 @@
 	</div>
 </div>
 <!-- canvas -->
-	<div class="col-xs-12 col-md-12 margin-top-bottom image-builder">
-		<!-- <div class="btn-group" style="position: absolute; left: 0;">
-			<button type="button" class="btn btn-sm btn-default">Left</button>
-			<button type="button" class="btn btn-sm btn-default">Middle</button>
-			<button type="button" class="btn btn-sm btn-default">Right</button>
-		</div> -->
-		<div class="btn-group" style="position: absolute; right: 0;">
-			<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"><toggle-switch>
-		</div>
-	    <div id="canvas-banner" class="fabric-container">
-	        <canvas fabric="fabric"></canvas>
-	    </div>
+<div class="col-xs-12 col-md-12 margin-top-bottom image-builder">
+	<!-- <div class="btn-group" style="position: absolute; left: 0;">
+		<button type="button" class="btn btn-sm btn-default">Left</button>
+		<button type="button" class="btn btn-sm btn-default">Middle</button>
+		<button type="button" class="btn btn-sm btn-default">Right</button>
+	</div> -->
+	<div class="btn-group" style="position: absolute; right: 0;">
+		<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"><toggle-switch>
 	</div>
+    <div id="canvas-banner" class="fabric-container">
+        <canvas fabric="fabric" template="1"></canvas>
+    </div>
+    <div id="canvas-banner" class="fabric-container">
+        <canvas fabric="fabricEnter" template="1"></canvas>
+    </div>
+</div>
+<div class="col-xs-12 col-md-12 margin-top-bottom image-builder">
+	<div class="btn-group" style="position: absolute; right: 0;">
+		<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"><toggle-switch>
+	</div>
+    <div id="canvas-banner" class="fabric-container">
+        <canvas fabric="fabric1" template="2"></canvas>
+    </div>
+    <div id="canvas-banner" class="fabric-container">
+        <canvas fabric="fabricEnter1" template="2"></canvas>
+    </div>
+</div>
 <!-- JSON -->
 <div class="row margin-top-bottom">
 	<div class="col-md-12">

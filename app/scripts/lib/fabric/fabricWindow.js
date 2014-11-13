@@ -38,10 +38,11 @@ angular.module('common.fabric.window', [])
 		type: 'polaroid',
 	    H_PADDING: 10,
 	    V_PADDING: 10,
-	    placeholder: true,
+	    hasPlaceholder: true,
+	    hasShadow: false,
 	    initialize: function(src, options) {
 	        this.callSuper('initialize', options);
-	        if(this.placeholder) {
+	        if(this.hasPlaceholder) {
 	        	this.left += this.H_PADDING;
 	        	this.top += this.V_PADDING;
 	        }
@@ -55,20 +56,30 @@ angular.module('common.fabric.window', [])
 	            this.fire('image:loaded');
 	        }).bind(this);
 	    },
+	    setShadow: function() {
+	    	console.log('setShadow', this);
+	    },
+	    setPlaceholder: function(value) {
+	        this.hasPlaceholder = value;
+	    },
 	    _render: function(ctx) {
-	    	// ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
-		    // ctx.globalCompositeOperation = 'destination-in';
-		    // ctx.beginPath();
-		    // var radius = this.width < this.height ? (this.width / 2) : (this.height / 2);
-		    // ctx.arc(0, 0, radius, 0, 2*Math.PI, true);
-		    // ctx.fill();
 	        if (this.loaded) {
-	            if (!this.placeholder) {
-	                ctx.fillStyle = "transparent";
-	            } else {
+
+	            if (this.hasPlaceholder) {
 	                ctx.fillStyle = this.fill;
+                	ctx.strokeStyle = "rgba(0,0,0,0.3)";
+	            } else {
+	                ctx.fillStyle = "transparent";
+                	ctx.strokeStyle = "transparent";
 	            }
+
 	            ctx.fillRect(
+	            	-(this.width / 2) - this.H_PADDING, 
+	            	-(this.height / 2) - this.H_PADDING,
+	                this.width + this.H_PADDING * 2,
+	                this.height + this.H_PADDING * 2
+	            );
+	            ctx.strokeRect(
 	            	-(this.width / 2) - this.H_PADDING, 
 	            	-(this.height / 2) - this.H_PADDING,
 	                this.width + this.H_PADDING * 2,
@@ -76,90 +87,7 @@ angular.module('common.fabric.window', [])
 	            );
 	            ctx.drawImage(this.image, -this.width / 2, -this.height / 2);
 	        }
-	    },
-	    toggleFrame: function() {
-	        this.placeholder = !this.placeholder;
 	    }
-	});
-
-    //
-    // NamedImage
-    // ================================================================
-	fabric.NamedImage = fabric.util.createClass(fabric.Image, {
-	  	type: 'image',
-	  	initialize: function(element, options) {
-		    this.callSuper('initialize', element, options);
-		    options && this.set('name', options.name);
-	  	},
-	  	toObject: function() {
-	    	return fabric.util.object.extend(this.callSuper('toObject'), { name: this.name });
-	  	}
-	});
-	fabric.NamedImage.fromURL = function(url, callback, imgOptions) {
-	    fabric.util.loadImage(url, function(img) {
-	      callback(new fabric.NamedImage(img, imgOptions));
-	    }, null, imgOptions && imgOptions.crossOrigin);
-	};
-	fabric.NamedImage.fromObject = function(object, callback) {
-	  fabric.util.loadImage(object.src, function(img) {
-	    callback && callback(new fabric.NamedImage(img, object));
-	  });
-	};
-	fabric.NamedImage.async = true;
-
-    //
-    // ImageCircle
-    // ================================================================
-	fabric.ImageCircle = fabric.util.createClass(fabric.Image, {
-	  	type: 'image',
-	  	initialize: function(element, options) {
-		    this.callSuper('initialize', element, options);
-		    options && this.set('name', options.name);
-	  	},
-	  	toObject: function() {
-	    	return fabric.util.object.extend(this.callSuper('toObject'), { name: this.name });
-	  	},
-		clipTo: function(ctx) {
-		    ctx.arc(0, 0, this.width / 2 , 0, 2*Math.PI, true);
-		}
-	});
-	fabric.ImageCircle.fromURL = function(url, callback, imgOptions) {
-	    fabric.util.loadImage(url, function(img) {
-	      callback(new fabric.ImageCircle(img, imgOptions));
-	    }, null, imgOptions && imgOptions.crossOrigin);
-	};
-	fabric.ImageCircle.fromObject = function(object, callback) {
-	  fabric.util.loadImage(object.src, function(img) {
-	    callback && callback(new fabric.ImageCircle(img, object));
-	  });
-	};
-	fabric.ImageCircle.async = true;
-
-    //
-    // NamedText
-    // ================================================================
-	fabric.NamedText = fabric.util.createClass(fabric.Text, {
-	  	type: 'text',
-	  	initialize: function(element, options) {
-		    this.callSuper('initialize', element, options);
-		    options && this.set('name', options.name);
-	  	},
-	  	toObject: function() {
-	    	return fabric.util.object.extend(this.callSuper('toObject'), { name: this.name });
-	  	}
-	});
-    //
-    // NamedIText
-    // ================================================================
-	fabric.NamedIText = fabric.util.createClass(fabric.IText, {
-	  	type: 'i-text',
-	  	initialize: function(element, options) {
-		    this.callSuper('initialize', element, options);
-		    options && this.set('name', options.name);
-	  	},
-	  	toObject: function() {
-	    	return fabric.util.object.extend(this.callSuper('toObject'), { name: this.name });
-	  	}
 	});
 
 	return $window.fabric;

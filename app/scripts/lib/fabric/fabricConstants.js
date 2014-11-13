@@ -8,10 +8,10 @@ angular.module('common.fabric.constants', [])
 		borderColor: 'EEF6FC',
 		cornerColor: 'rgba(64, 159, 221, 1)',
 		cornerSize: 10,
-		transparentCorners: false,
+		transparentCorners: true,
 		hasRotatingPoint: true,
 		centerTransform: true,
-		hasControls: false
+		hasControls: true
 	};
 
 	return {
@@ -211,8 +211,6 @@ angular.module('common.fabric.constants', [])
 			fontSize: 40,
 			fill: '#434343',
 			textAlign: 'left',
-			// strokeWidth: 1,
-			// stroke: '#454545',
 			keepCenterH: false
 		}, objectDefaults)
 

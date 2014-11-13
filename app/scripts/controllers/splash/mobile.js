@@ -339,12 +339,12 @@ define([
         },
         // Prefix the function name with an underscore 
         // and Classy wont add it to the $scope.
-	    _onCanvasCreated: function() {
+	    _onCanvasCreated: function(event, args) {
 	    	var self = this;
 
-			this.$log.info('initialize canvas:created');
+			this.$log.info('initialize canvas:created', args);
 			
-			this.$.fabric = new this.Fabric({
+			this.$.fabric = new this.Fabric(args.canvasId, {
 				JSONExportProperties: 	this.FabricConstants.JSONExportProperties,
 				textDefaults		: 	this.FabricConstants.textDefaults,
 				shapeDefaults		: 	this.FabricConstants.shapeDefaults,

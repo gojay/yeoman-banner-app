@@ -534,14 +534,9 @@
 					    		ng-click="setBgType(0)"
 					    		ng-class="{'active':banner.config.background.type == 0}">Upload</button>
 					    	<button class="col-md-3 btn btn-default btn-sm" 
-					    		ng-click="setBgType(1)"
-					    		ng-class="{'active':banner.config.background.type == 1}">Feris</button>
-					    	<button class="col-md-3 btn btn-default btn-sm" 
-					    		ng-click="setBgType(2)"
-					    		ng-class="{'active':banner.config.background.type == 2}">Grass</button>
-					    	<button class="col-md-3 btn btn-default btn-sm" 
-					    		ng-click="setBgType(3)"
-					    		ng-class="{'active':banner.config.background.type == 3}">Young</button>
+					    		ng-repeat="(key, value) in templates.background[0]"
+					    		ng-click="setBgType(key)"
+					    		ng-class="{'active':banner.config.background.type == key}">{{key}}</button>
 					    </div>
 				    </div>
 				    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 field-top" ng-show="banner.config.background.type == 0">
@@ -685,48 +680,46 @@
         <!-- Text -->
         <accordion-group heading="Text" class="panel-primary">
             <div class="form-group">
-			    <label for="textTitle">Contest</label>
-			    <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter contest title" tooltip="Add a new line by comma" ng-model="banner.text.contest.title">
+			    <label for="textTitle">Contest Title</label>
+			    <textarea class="form-control input-sm" id="textDescription" placeholder="Enter contest title" 
+			    	msd-elastic="\n"
+			    	ng-model="banner.text.contest.title"></textarea>
+			    <!-- <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter contest title" tooltip="Add a new line by comma" ng-model="banner.text.contest.title"> -->
 		  	</div>
 		  	<div class="form-group">
-			    <label for="textDescription">Description</label>
+			    <label for="textDescription">Contest Description</label>
 			    <textarea class="form-control input-sm" id="textDescription" placeholder="Enter contest description" 
 			    	msd-elastic="\n"
 			    	ng-model="banner.text.contest.description"></textarea>
 		  	</div>
 
-		  	<div ng-if="banner.config.prize.type > 0">
-		  		<fieldset>
-		  			<legend>Header</legend>
-		            <div class="form-group">
-					    <label for="textTitle">Prize Header Title</label>
-					    <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter prize header title"
-					    	ng-model="banner.text.prize.header.title">
-				  	</div>
-		            <div class="form-group">
-					    <label for="textTitle">Prize Header Description</label>
-					    <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter prize header description"
-					    	ng-model="banner.text.prize.header.description">
-				  	</div>
-		  		</fieldset>
-		  		<fieldset>
-		  			<legend>Description</legend>
-				  	<div class="form-group" ng-show="banner.config.prize.type >= 1">
-					    <label for="textPrizeDescription-1">Prize 1</label>
-					    <textarea class="form-control input-sm" id="textPrizeDescription-1" placeholder="Enter prize 1 description"
-					    	ng-model="banner.text.prize.content[1]"></textarea>
-				  	</div>
-				  	<div class="form-group" ng-show="banner.config.prize.type >= 2">
-					    <label for="textPrizeDescription-2">Prize 2</label>
-					    <textarea class="form-control input-sm" id="textPrizeDescription-2" placeholder="Enter prize 2 description"
-					    	ng-model="banner.text.prize.content[2]"></textarea>
-				  	</div>
-				  	<div class="form-group" ng-show="banner.config.prize.type >= 3">
-					    <label for="textPrizeDescription-3">Prize 3</label>
-					    <textarea class="form-control input-sm" id="textPrizeDescription-3" placeholder="Enter prize 3 description"
-					    	ng-model="banner.text.prize.content[3]"></textarea>
-				  	</div>
-		  		</fieldset>
+		  	<!-- <div ng-if="banner.config.prize.type > 0"> -->
+		  	<div>
+	            <!-- <div class="form-group">
+				    <label for="textTitle">Prize Header Title</label>
+				    <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter prize header title"
+				    	ng-model="banner.text.prize.header.title">
+			  	</div>
+	            <div class="form-group">
+				    <label for="textTitle">Prize Header Description</label>
+				    <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter prize header description"
+				    	ng-model="banner.text.prize.header.description">
+			  	</div> -->
+			  	<div class="form-group">
+				    <label for="textPrizeDescription-1">Prize 1</label>
+				    <textarea class="form-control input-sm" id="textPrizeDescription-1" placeholder="Enter prize 1 description"
+				    	ng-model="banner.text.prize.content[1]"></textarea>
+			  	</div>
+			  	<div class="form-group">
+				    <label for="textPrizeDescription-2">Prize 2</label>
+				    <textarea class="form-control input-sm" id="textPrizeDescription-2" placeholder="Enter prize 2 description"
+				    	ng-model="banner.text.prize.content[2]"></textarea>
+			  	</div>
+			  	<div class="form-group">
+				    <label for="textPrizeDescription-3">Prize 3</label>
+				    <textarea class="form-control input-sm" id="textPrizeDescription-3" placeholder="Enter prize 3 description"
+				    	ng-model="banner.text.prize.content[3]"></textarea>
+			  	</div>
 		  	</div>
         </accordion-group>
     </accordion>

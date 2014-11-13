@@ -8,11 +8,14 @@ angular.module('common.fabric.directive', [
 		scope: {
 			fabric: '='
 		},
-		controller: function($scope, $element) {
-			console.log('directive', $scope);
+		controller: function($scope, $attrs, $element) {
+			console.log('fabric:directive', $attrs, $element[0]);
+
+			var id = $attrs.fabric;
+			var template = $attrs.template;
 			
-			FabricCanvas.setElement($element);
-			FabricCanvas.createCanvas();
+			FabricCanvas.setElement(id, $element);
+			FabricCanvas.createCanvas(id, template);
 
 			// Continue rendering the canvas until the user clicks
 			// to avoid the "calcOffset" bug upon load.
@@ -34,6 +37,11 @@ angular.module('common.fabric.directive', [
 			$scope.$watch('fabric.selectedObject.text', function(newVal, oldVal) {
 				var obj = $scope.fabric.selectedObject;
 				if (typeof newVal === 'string') {
+					if($scope.fabric.selectedObject.type != 'itext' || $scope.fabric.selectedObject.type != 'textbox') {
+						$scope.fabric.render();
+						return;
+					} 
+					
 					var _newVal = newVal;
 					var s = _newVal.split('\n');
 					angular.forEach(s, function(value, key){

@@ -1,7 +1,7 @@
 /*jshint unused: vars */
 define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/banner', 'controllers/conversation', 'controllers/raphael', 'controllers/fabric', 'controllers/fabric2', 'controllers/upload', 'controllers/splash/mobile', 'controllers/splash/facebook', 'controllers/splash/custom', 'controllers/login', 'controllers/pusher', 'controllers/test', 'controllers/test2', 'filters/comatonewline', 'filters/splitintolines', 'directives/authapplication', 'directives/bannercreator', 'directives/uploadimage', 'services/authresource', 'services/banner', 'services/mobile', 'services/jwthelper', 'services/helpers'] /*deps*/ , function(angular) /*invoke*/ {
     'use strict';
-    
+
     return angular.module('bannerAppApp', [
             'bannerAppApp.controllers.MainCtrl',
             'bannerAppApp.controllers.BootstrapCtrl',
@@ -51,10 +51,10 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'chieffancypants.loadingBar'
         ])
         .constant('API', {
-            'URL'   : 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
-            'GRANT' : 'user', // grant type : user (user credentials) or jwt
+            'URL': 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
+            'GRANT': 'user', // grant type : user (user credentials) or jwt
             'CLIENT': {
-                'ID'    : '1413098344',
+                'ID': '1413098344',
                 'SECRET': '66a3eb9d8de587d82e951fbaa69bdb080543a2208'
             },
             'USER': {
@@ -68,7 +68,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 appSecret: 'fb0125d8a8073f280f4e',
             },
             channel: {
-                private : 'private-messages',
+                private: 'private-messages',
                 presence: 'presence-messages'
             }
         })
@@ -111,7 +111,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 var pingResolver = {
                     delay: function($q, $timeout, $rootScope, authResource) {
                         var deferred = $q.defer();
-                        $rootScope.$broadcast('event:auth-ping', function(){
+                        $rootScope.$broadcast('event:auth-ping', function() {
                             deferred.resolve();
                         });
                         return deferred.promise;
@@ -130,12 +130,13 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         controller: 'BannerCtrl',
                         resolve: {
                             data: function($q, $log, Banner) {
-                                return Banner.get({ id: 'templates' }).$promise.then(function(templates) {
-                                    $log.debug('templates', templates);
-                                    return {
+                                var deferred = $q.defer();
+                                Banner.get({ id: 'templates' }, function(templates) {
+                                    deferred.resolve({
                                         templates: templates.data
-                                    };
+                                    });
                                 });
+                                return deferred.promise;
                             }
                         }
                     })
@@ -152,7 +153,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                             mobile: function($rootScope, $q, $log, RecentMobiles) {
                                 var deferred = $q.defer();
 
-                                RecentMobiles().then(function(data){
+                                RecentMobiles().then(function(data) {
                                     $rootScope.isLoading = false;
                                     deferred.resolve({
                                         all: data
@@ -167,13 +168,13 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         templateUrl: 'views/mobile.html',
                         controller: 'SplashMobileCtrl',
                         resolve: {
-                            mobile: function($rootScope, RecentMobiles, DetailMobile){
+                            mobile: function($rootScope, RecentMobiles, DetailMobile) {
                                 $rootScope.isLoading = true;
-                                return RecentMobiles().then(function(all){
-                                    return DetailMobile().then(function(detail){
+                                return RecentMobiles().then(function(all) {
+                                    return DetailMobile().then(function(detail) {
                                         $rootScope.isLoading = false;
                                         return {
-                                            all   : all,
+                                            all: all,
                                             detail: detail
                                         };
                                     });
@@ -182,12 +183,12 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         }
                     })
                     .when('/splash/facebook', {
-                      templateUrl: 'views/splash/facebook.html',
-                      controller: 'SplashFacebookCtrl'
+                        templateUrl: 'views/splash/facebook.html',
+                        controller: 'SplashFacebookCtrl'
                     })
                     .when('/splash/custom', {
-                      templateUrl: 'views/splash/custom.html',
-                      controller: 'SplashCustomCtrl'
+                        templateUrl: 'views/splash/custom.html',
+                        controller: 'SplashCustomCtrl'
                     })
                     .when('/svg/raphael', {
                         templateUrl: 'views/raphael.html',
@@ -207,16 +208,16 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         controller: 'FabricCtrl'
                     })
                     .when('/svg/fabric2', {
-                      templateUrl: 'views/fabric2.html',
-                      controller: 'Fabric2Ctrl'
+                        templateUrl: 'views/fabric2.html',
+                        controller: 'Fabric2Ctrl'
                     })
                     .when('/module/ng-file-upload', {
-                      templateUrl: 'views/upload.html',
-                      controller: 'UploadCtrl'
+                        templateUrl: 'views/upload.html',
+                        controller: 'UploadCtrl'
                     })
                     .when('/login', {
-                      templateUrl: 'views/login.html',
-                      controller: 'LoginCtrl'
+                        templateUrl: 'views/login.html',
+                        controller: 'LoginCtrl'
                     })
                     .when('/pusher', {
                         templateUrl: 'views/pusher.html',
@@ -228,12 +229,12 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                         controller: 'BootstrapCtrl'
                     })
                     .when('/test', {
-                      templateUrl: 'views/test.html',
-                      controller: 'TestCtrl'
+                        templateUrl: 'views/test.html',
+                        controller: 'TestCtrl'
                     })
                     .when('/test2', {
-                      templateUrl: 'views/test2.html',
-                      controller: 'Test2Ctrl'
+                        templateUrl: 'views/test2.html',
+                        controller: 'Test2Ctrl'
                     })
                     .otherwise({
                         redirectTo: '/'
@@ -241,19 +242,19 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             }
         ])
         .run(['$rootScope', '$cookieStore', '$window', '$timeout', 'slidePush',
-            function($rootScope, $cookieStore, $window, $timeout , slidePush ) {
+            function($rootScope, $cookieStore, $window, $timeout, slidePush) {
 
                 // global close all menus
-                var closeMenu = function(){
+                var closeMenu = function() {
                     slidePush.pushForceCloseAll();
                 };
 
                 // safe applying scope
                 var safeApply = function(fn) {
                     var phase = this.$root.$$phase;
-                    if(phase == '$apply' || phase == '$digest') {
-                        if(fn && (typeof(fn) === 'function')) {
-                        fn();
+                    if (phase == '$apply' || phase == '$digest') {
+                        if (fn && (typeof(fn) === 'function')) {
+                            fn();
                         }
                     } else {
                         this.$apply(fn);
@@ -261,9 +262,9 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                 };
 
                 angular.extend($rootScope, {
-                    loading : false,
-                    user    : angular.fromJson(localStorage.getItem('user')) || false,
-                    menus   : {
+                    loading: false,
+                    user: angular.fromJson(localStorage.getItem('user')) || false,
+                    menus: {
                         top: {
                             model: null,
                             template: null
@@ -295,7 +296,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     }
                     $rootScope.isDownwards = isDownwards;
                 });
-                $rootScope.$on('cfpLoadingBar:completed', function(){
+                $rootScope.$on('cfpLoadingBar:completed', function() {
                     $rootScope.loading = false;
                 });
                 // $rootScope.$on('cfpLoadingBar:progress', function(data, percent){

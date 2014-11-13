@@ -30,7 +30,7 @@ define(['angular'], function(angular) {
                     text: {
                         contest: {
                             title: 'Company Name\nCompany Contest\nContest',
-                            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.\nSit, fugit hic tempora dolorem non sunt incidunt velit quam\ndistinctio cum'
+                            description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum'
                         },
                         prize: {
                             header: {
@@ -44,7 +44,7 @@ define(['angular'], function(angular) {
                         }
                     },
                     images: {
-                        background : BannerImages.bg[0],
+                        background : null,
                         logo: BannerImages.logo[0],
                         prize: {
                             1: null,
@@ -65,8 +65,8 @@ define(['angular'], function(angular) {
                             type: 0
                         },
                         badge: {
-                            enable: true,
-                            type: 0,
+                            enable: false,
+                            type: -1,
                         },
                         prize: {
                             type: 0,
@@ -74,133 +74,461 @@ define(['angular'], function(angular) {
                         }
                     }
                 },
-                attributes: {
-                    background: 'images/810x380.jpeg',
-                    logo: {
-                        type : 'polaroid',
-                        image: 'images/122x80.png',
-                        options: { 
-                            name: 'logo', 
-                            top : 10, 
-                            left: 10
-                        }
-                    },
-                    facebook: {
-                        type: 'image',
-                        image: 'images/facebook/fb-like1.png',
-                        options: {
-                            name: 'facebook',
-                            top : 10,
-                            left: 593
-                        }
-                    },
-                    contest: {
-                        group: [
-                            {
-                                type: 'rect',
-                                options: {
-                                    name: 'contest-placeholder',
-                                    top: 138,
-                                    left: 10,
-                                    width: 404,
-                                    height: 232,
-                                    fill: 'rgba(0,0,0,0.75)'
-                                }
-                            },
-                            {
-                                type: 'text',
-                                text: '',
-                                options: {
-                                    name: 'contest-title',
-                                    top: 150,
-                                    left: 30,
-                                    width: 364,
-                                    fill: '#fff',
-                                    fontSize: 27,
-                                    fontFamily: 'Rockwell',
-                                    fontWeight: 'normal',
-                                }
-                            },
-                            {
-                                type: 'text',
-                                text: '',
-                                options: {
-                                    name: 'contest-description',
-                                    top: 270,
-                                    left: 30,
-                                    width: 364,
-                                    fill: '#fff',
-                                    fontSize: 13,
-                                    fontFamily: 'Rockwell',
-                                    fontWeight: 'normal',
-                                    lineHeight: 1.5,
-                                }
+                objects: [
+
+                    /* template 0 */
+
+                    [],
+
+                    /* template 1 */
+
+                    [
+                        {
+                            type : 'background',
+                            image: 'http://placehold.it/810x380'
+                        },
+                        {
+                            type: 'polaroid',
+                            image: 'http://placehold.it/122x80',
+                            options: {
+                                name: 'logo-polaroid',
+                                top: 10,
+                                left: 10
                             }
-                        ]
-                    },
-                    prize: {
-                        header: {
-                            group: {
-                                placeholder: {
-                                    type: 'rect',
-                                    options: { 
-                                        name: 'prize-header-placeholder',
-                                        top: 128, 
-                                        left: 504,
-                                        width: 232, 
-                                        height: 38, 
-                                        fill: 'rgba(0,0,0,0.75)' 
-                                    }
-                                },
-                                title: {
-                                    type: 'text',
-                                    text: 'This Month\'s Prize',
-                                    options: { 
-                                        name: 'prize-header-title',
-                                        top: 127, 
-                                        left: 541,
-                                        fill: '#fff',
-                                        fontSize: 18,
-                                        fontFamily: 'Rockwell',
-                                        fontWeight: 'normal',
-                                        strokeWidth: 0,
-                                        textAlign: 'center',
-                                    }
-                                },
-                                description: {
-                                    type: 'text',
-                                    text: 'Like our page to win!',
-                                    options: { 
-                                        name: 'prize-header-description',
-                                        width: 232, 
-                                        top: 148, 
-                                        left: 558,
-                                        fill: '#fff',
-                                        fontSize: 12,
-                                        fontFamily: 'Rockwell',
-                                        fontWeight: 'normal',
-                                        strokeWidth: 0,
-                                        textAlign: 'center',
+                        },
+                        {
+                            type: 'polaroid',
+                            image: 'http://placehold.it/340x163',
+                            options: {
+                                name: 'prize-polaroid',
+                                top : 185,
+                                left: 440
+                            }
+                        },
+                        {
+                            type: 'image',
+                            image: 'images/facebook/fb-like1.png',
+                            options: {
+                                name: 'facebook',
+                                top : 10,
+                                left: 593
+                            }
+                        },
+                        /* Prize */
+                        {
+                            type: 'rect',
+                            options: {
+                                name: 'prize-header-placeholder',
+                                top : 138,
+                                left: 504,
+                                width: 232,
+                                height: 38,
+                                fill: 'rgba(0,0,0,0.75)'
+                            }
+                        },
+                        {
+                            type: 'textbox',
+                            text: 'This Month\'s Prizes\nLike our page to win!',
+                            options: {
+                                name: 'prize-header-content',
+                                top: 145,
+                                left: 504,
+                                width: 232,
+                                height: 38,
+                                fill: '#fff',
+                                fontSize: 18,
+                                lineHeight: 0.8,
+                                fontFamily: 'Rockwell',
+                                strokeWidth: 0,
+                                textAlign: 'center',
+                                minWidth: 1,
+                                styles: {
+                                    "1": {
+                                        "0": {
+                                            "fontSize": 12
+                                        },
+                                        "1": {
+                                            "fontSize": 12
+                                        },
+                                        "2": {
+                                            "fontSize": 12
+                                        },
+                                        "3": {
+                                            "fontSize": 12
+                                        },
+                                        "4": {
+                                            "fontSize": 12
+                                        },
+                                        "5": {
+                                            "fontSize": 12
+                                        },
+                                        "6": {
+                                            "fontSize": 12
+                                        },
+                                        "7": {
+                                            "fontSize": 12
+                                        },
+                                        "8": {
+                                            "fontSize": 12
+                                        },
+                                        "9": {
+                                            "fontSize": 12
+                                        },
+                                        "10": {
+                                            "fontSize": 12
+                                        },
+                                        "11": {
+                                            "fontSize": 12
+                                        },
+                                        "12": {
+                                            "fontSize": 12
+                                        },
+                                        "13": {
+                                            "fontSize": 12
+                                        },
+                                        "14": {
+                                            "fontSize": 12
+                                        },
+                                        "15": {
+                                            "fontSize": 12
+                                        },
+                                        "16": {
+                                            "fontSize": 12
+                                        },
+                                        "17": {
+                                            "fontSize": 12
+                                        },
+                                        "18": {
+                                            "fontSize": 12
+                                        },
+                                        "19": {
+                                            "fontSize": 12
+                                        },
+                                        "20": {
+                                            "fontSize": 12
+                                        }
                                     }
                                 }
                             }
                         },
-                        content: {
-                            group: {
-                                background: {
-                                    type : 'polaroid',
-                                    image: 'images/340x183.png',
-                                    options: { 
-                                        name: 'prize-polaroid',
-                                        top : 166, 
-                                        left: 442, 
-                                        height: 173
+                        {
+                            type: 'rect',
+                            options: {
+                                name: 'prize-description-placeholder-1',
+                                top: 308,
+                                left: 450,
+                                width: 340,
+                                height: 50,
+                                fill: 'rgba(0,0,0,0.75)'
+                            }
+                        },
+                        {
+                            type: 'textbox',
+                            text: 'Enter description prize 1',
+                            options: {
+                                name: 'prize-description-1',
+                                top: 320,
+                                left: 450,
+                                width: 340,
+                                height: 50,
+                                fill: '#fff',
+                                fontSize: 13,
+                                fontFamily: 'Rockwell',
+                                textAlign: 'center'
+                            }
+                        },
+                        /* contest */
+                        // {
+                        //     type: 'group',
+                        //     name: 'contest-group',
+                        //     objects: [
+                                {
+                                    type: 'rect',
+                                    options: {
+                                        name: 'contest-placeholder',
+                                        top: 138,
+                                        left: 10,
+                                        width: 404,
+                                        height: 232,
+                                        fill: 'rgba(0,0,0,0.75)'
+                                    }
+                                },
+                                {
+                                    type: 'text',
+                                    text: 'Company Name\nCompany Contest\nContest',
+                                    options: {
+                                        name: 'contest-title',
+                                        top: 150,
+                                        left: 30,
+                                        fill: '#fff',
+                                        fontSize: 27,
+                                        fontFamily: 'Rockwell',
+                                        fontWeight: 'normal',
+                                        lineHeight: 1.3
+                                    }
+                                },
+                                {
+                                    type: 'textbox',
+                                    text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum',
+                                    options: {
+                                        name: 'contest-description',
+                                        top: 270,
+                                        left: 30,
+                                        width: 364,
+                                        height: 50,
+                                        fill: '#fff',
+                                        fontSize: 12,
+                                        fontFamily: 'Rockwell',
+                                        fontWeight: 'normal',
+                                        lineHeight: 1.5
+                                    }
+                                }
+                        //     ]
+                        // }
+                    ],
+
+                    /* template 2 */
+
+                    [
+                        {
+                            type : 'background',
+                            image: 'http://placehold.it/810x340'
+                        },
+                        {
+                            type: 'polaroid',
+                            image: 'http://placehold.it/122x80',
+                            options: {
+                                name: 'logo-polaroid',
+                                top: 10,
+                                left: 10
+                            }
+                        },
+                        {
+                            type: 'polaroid',
+                            image: 'http://placehold.it/193x120',
+                            options: {
+                                name: 'prize-polaroid',
+                                top : 190,
+                                left: 365
+                            }
+                        },
+                        {
+                            type: 'polaroid',
+                            image: 'http://placehold.it/193x120',
+                            options: {
+                                name: 'prize-polaroid-2',
+                                top : 190,
+                                left: 588
+                            }
+                        },
+                        {
+                            type: 'image',
+                            image: 'images/facebook/fb-like1.png',
+                            options: {
+                                name: 'facebook',
+                                top : 10,
+                                left: 593
+                            }
+                        },
+                        /* Prize */
+                        {
+                            type: 'rect',
+                            options: {
+                                name: 'prize-header-placeholder',
+                                top : 135,
+                                left: 447,
+                                width: 272,
+                                height: 50,
+                                fill: 'rgba(0,0,0,0.75)'
+                            }
+                        },
+                        {
+                            type: 'textbox',
+                            text: 'This Month\'s Prizes\nLike our page to win!',
+                            options: {
+                                name: 'prize-header-content',
+                                top: 146,
+                                left: 447,
+                                width: 272,
+                                height: 50,
+                                fill: '#fff',
+                                fontSize: 20,
+                                lineHeight: 0.8,
+                                fontFamily: 'Rockwell',
+                                strokeWidth: 0,
+                                textAlign: 'center',
+                                minWidth: 1,
+                                styles: {
+                                    "1": {
+                                        "0": {
+                                            "fontSize": 12
+                                        },
+                                        "1": {
+                                            "fontSize": 12
+                                        },
+                                        "2": {
+                                            "fontSize": 12
+                                        },
+                                        "3": {
+                                            "fontSize": 12
+                                        },
+                                        "4": {
+                                            "fontSize": 12
+                                        },
+                                        "5": {
+                                            "fontSize": 12
+                                        },
+                                        "6": {
+                                            "fontSize": 12
+                                        },
+                                        "7": {
+                                            "fontSize": 12
+                                        },
+                                        "8": {
+                                            "fontSize": 12
+                                        },
+                                        "9": {
+                                            "fontSize": 12
+                                        },
+                                        "10": {
+                                            "fontSize": 12
+                                        },
+                                        "11": {
+                                            "fontSize": 12
+                                        },
+                                        "12": {
+                                            "fontSize": 12
+                                        },
+                                        "13": {
+                                            "fontSize": 12
+                                        },
+                                        "14": {
+                                            "fontSize": 12
+                                        },
+                                        "15": {
+                                            "fontSize": 12
+                                        },
+                                        "16": {
+                                            "fontSize": 12
+                                        },
+                                        "17": {
+                                            "fontSize": 12
+                                        },
+                                        "18": {
+                                            "fontSize": 12
+                                        },
+                                        "19": {
+                                            "fontSize": 12
+                                        },
+                                        "20": {
+                                            "fontSize": 12
+                                        }
                                     }
                                 }
                             }
-                        }
-                    }
-                },
+                        },
+                        {
+                            type: 'rect',
+                            options: {
+                                name: 'prize-description-placeholder-1',
+                                top: 290,
+                                left: 374,
+                                width: 193,
+                                height: 30,
+                                fill: 'rgba(0,0,0,0.75)'
+                            }
+                        },
+                        {
+                            type: 'textbox',
+                            text: 'Enter description prize 1',
+                            options: {
+                                name: 'prize-description-1',
+                                top: 296,
+                                left: 374,
+                                width: 193,
+                                height: 30,
+                                fill: '#fff',
+                                fontSize: 12,
+                                fontFamily: 'Rockwell',
+                                textAlign: 'center'
+                            }
+                        },
+                        {
+                            type: 'rect',
+                            options: {
+                                name: 'prize-description-placeholder-2',
+                                top: 290,
+                                left: 598,
+                                width: 193,
+                                height: 30,
+                                fill: 'rgba(0,0,0,0.75)'
+                            }
+                        },
+                        {
+                            type: 'textbox',
+                            text: 'Enter description prize 2',
+                            options: {
+                                name: 'prize-description-2',
+                                top: 296,
+                                left: 598,
+                                width: 193,
+                                height: 30,
+                                fill: '#fff',
+                                fontSize: 12,
+                                fontFamily: 'Rockwell',
+                                textAlign: 'center'
+                            }
+                        },
+                        /* contest */
+                        // {
+                        //     type: 'group',
+                        //     name: 'contest-group',
+                        //     objects: [
+                                {
+                                    type: 'rect',
+                                    options: {
+                                        name: 'contest-placeholder',
+                                        top: 135,
+                                        left: 10,
+                                        width: 332,
+                                        height: 195,
+                                        fill: 'rgba(0,0,0,0.75)'
+                                    }
+                                },
+                                {
+                                    type: 'text',
+                                    text: 'Company Name\nCompany Contest\nContest',
+                                    options: {
+                                        name: 'contest-title',
+                                        top: 150,
+                                        left: 30,
+                                        fill: '#fff',
+                                        fontSize: 24,
+                                        fontFamily: 'Rockwell',
+                                        fontWeight: 'normal',
+                                        lineHeight: 1.2
+                                    }
+                                },
+                                {
+                                    type: 'textbox',
+                                    text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, fugit hic tempora dolorem non sunt incidunt velit quam distinctio cum',
+                                    options: {
+                                        name: 'contest-description',
+                                        top: 247,
+                                        left: 30,
+                                        width: 292,
+                                        height: 50,
+                                        fill: '#fff',
+                                        fontSize: 14,
+                                        fontFamily: 'Rockwell',
+                                        fontWeight: 'normal',
+                                        lineHeight: 1.3
+                                    }
+                                }
+                        //     ]
+                        // }
+                    ]
+                ],
                 data: {
                     ID: null,
                     title: '',
@@ -303,42 +631,19 @@ define(['angular'], function(angular) {
                 dimensions : {
                     0 : {
                         logo : {
-                            pos : {
-                                placeholder:{
-                                    x:20,
-                                    y:5
-                                },
-                                image:{
-                                    x:25,
-                                    y:10
-                                }
-                            },
-                            image : {
-                                width:122,
-                                height:100
-                            }
+                            width:122,
+                            height:100
                         },
                         background : {
                             width:810,
                             height:380
-                        }
+                        },
+                        overlay: 138,
                     },
                     1 : {
                         logo : {
-                            pos : {
-                                placeholder:{
-                                    x:20,
-                                    y:5
-                                },
-                                image:{
-                                    x:25,
-                                    y:10
-                                }
-                            },
-                            image : {
-                                width:122,
-                                height:80
-                            }
+                            width:122,
+                            height:80
                         },
                         background : {
                             width:810,
@@ -347,50 +652,28 @@ define(['angular'], function(angular) {
                         prize : {
                             width:340,
                             height:183
-                        }
+                        },
+                        overlay: 138,
                     },
                     2 : {
                         logo : {
-                            pos : {
-                                placeholder:{
-                                    x:20,
-                                    y:5
-                                },
-                                image:{
-                                    x:25,
-                                    y:10
-                                }
-                            },
-                            image : {
-                                width:122,
-                                height:80
-                            }
+                            width:122,
+                            height:80
                         },
                         background : {
                             width:810,
-                            height:339
+                            height:340
                         },
                         prize : {
                             width:203,
                             height:130
-                        }
+                        },
+                        overlay: 135,
                     },
                     3 : {
                         logo : {
-                            pos : {
-                                placeholder:{
-                                    x:20,
-                                    y:5
-                                },
-                                image:{
-                                    x:45,
-                                    y:10
-                                }
-                            },
-                            image : {
-                                width:122,
-                                height:80
-                            }
+                            width:122,
+                            height:80
                         },
                         background : {
                             width:770,
@@ -399,24 +682,13 @@ define(['angular'], function(angular) {
                         prize : {
                             width:250,
                             height:250
-                        }
+                        },
+                        overlay: 138,
                     },
                     4 : {
                         logo : {
-                            pos : {
-                                placeholder:{
-                                    x:129,
-                                    y:9
-                                },
-                                image:{
-                                    x:134,
-                                    y:14
-                                }
-                            },
-                            image : {
-                                width:226,
-                                height:56
-                            }
+                            width:226,
+                            height:56
                         },
                         background : {
                             width:810,
@@ -429,20 +701,8 @@ define(['angular'], function(angular) {
                     },
                     5 : {
                         logo : {
-                            pos : {
-                                placeholder:{
-                                    x:79,
-                                    y:9
-                                },
-                                image:{
-                                    x:84,
-                                    y:14
-                                }
-                            },
-                            image : {
-                                width:226,
-                                height:56
-                            }
+                            width:226,
+                            height:56
                         },
                         background : {
                             width:810,
@@ -455,20 +715,8 @@ define(['angular'], function(angular) {
                     },
                     6 : {
                         logo : {
-                            pos : {
-                                placeholder:{
-                                    x:129,
-                                    y:9
-                                },
-                                image:{
-                                    x:134,
-                                    y:14
-                                }
-                            },
-                            image : {
-                                width:226,
-                                height:56
-                            }
+                            width:226,
+                            height:56
                         },
                         background : {
                             width:810,

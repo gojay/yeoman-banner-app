@@ -7,8 +7,9 @@ angular.module('common.fabric', [
     .factory('Fabric', [
         'FabricWindow', '$timeout', '$window', 'FabricCanvas', 'FabricDirtyStatus',
         function(FabricWindow, $timeout, $window, FabricCanvas, FabricDirtyStatus) {
+            var canvases = [];
 
-            return function(options) {
+            return function(canvasID, options) {
 
                 var canvas;
                 var JSONObject;
@@ -210,6 +211,77 @@ angular.module('common.fabric', [
                 };
 
                 //
+                // Canvas Zoom
+                // ==============================================================
+                self.resetZoom = function() {
+                    self.canvasScale = 1;
+                    self.setZoom();
+                };
+
+                self.setZoom = function(scale) {
+                    if(scale) self.canvasScale = scale;
+                    var objects = canvas.getObjects();
+                    for (var i in objects) {
+                        objects[i].originalScaleX = objects[i].originalScaleX ? objects[i].originalScaleX : objects[i].scaleX;
+                        objects[i].originalScaleY = objects[i].originalScaleY ? objects[i].originalScaleY : objects[i].scaleY;
+                        objects[i].originalLeft = objects[i].originalLeft ? objects[i].originalLeft : objects[i].left;
+                        objects[i].originalTop = objects[i].originalTop ? objects[i].originalTop : objects[i].top;
+                        self.setObjectZoom(objects[i]);
+                    }
+
+                    self.setCanvasZoom();
+                    self.render();
+                };
+
+                self.setObjectZoom = function(object) {
+                    var scaleX = object.originalScaleX;
+                    var scaleY = object.originalScaleY;
+                    var left = object.originalLeft;
+                    var top = object.originalTop;
+
+                    var tempScaleX = scaleX * self.canvasScale;
+                    var tempScaleY = scaleY * self.canvasScale;
+                    var tempLeft = left * self.canvasScale;
+                    var tempTop = top * self.canvasScale;
+
+                    object.scaleX = tempScaleX;
+                    object.scaleY = tempScaleY;
+                    object.left = tempLeft;
+                    object.top = tempTop;
+
+                    object.setCoords();
+                };
+
+                self.setCanvasZoom = function() {
+                    var width = self.canvasOriginalWidth;
+                    var height = self.canvasOriginalHeight;
+
+                    var tempWidth = width * self.canvasScale;
+                    var tempHeight = height * self.canvasScale;
+
+                    canvas.setWidth(tempWidth);
+                    canvas.setHeight(tempHeight);
+
+                    if (canvas.backgroundImage) {
+                        canvas.backgroundImage.set({
+                            scaleX: self.canvasScale,
+                            scaleY: self.canvasScale
+                        });
+                    }
+                    self.updateControls();
+                };
+
+                self.updateActiveObjectOriginals = function() {
+                    var object = canvas.getActiveObject();
+                    if (object) {
+                        object.originalScaleX = object.scaleX / self.canvasScale;
+                        object.originalScaleY = object.scaleY / self.canvasScale;
+                        object.originalLeft = object.left / self.canvasScale;
+                        object.originalTop = object.top / self.canvasScale;
+                    }
+                };
+
+                //
                 // Creating Objects
                 // ==============================================================
                 self.addObjectToCanvas = function(object, notCenter) {
@@ -218,8 +290,9 @@ angular.module('common.fabric', [
                     object.originalLeft = object.left;
                     object.originalTop = object.top;
 
-                    canvas.add(object);
                     self.setObjectZoom(object);
+
+                    canvas.add(object);
                     canvas.setActiveObject(object);
                     object.bringToFront();
 
@@ -248,6 +321,76 @@ angular.module('common.fabric', [
                     return object.text;
                 };
 
+                self.buildObjects = function (options) {
+                    angular.forEach(options, function(data, key){
+                        switch(data.type) {
+                            case 'background':
+                                canvas.setBackgroundImage(data.image);
+                                break;
+                            case 'text':
+                                var options = angular.extend(self.textDefaults, data.options);
+                                var text = new fabric.Text(data.text, options);
+                                canvas.add(text);
+                                break;
+                            case 'itext':
+                                var options = angular.extend(self.textDefaults, data.options);
+                                var itext = new fabric.IText(data.text, options);
+                                canvas.add(itext);
+                                break;
+                            case 'textbox':
+                                var textBox = new fabric.Textbox(data.text, data.options);
+                                canvas.add(textBox);
+                                break;
+                            case 'rect':
+                                var rect = new fabric.Rect(data.options);
+                                canvas.add(rect);
+                                break;
+                            case 'image':
+                                var options = angular.extend({
+                                    crossOrigin: 'anonymous'
+                                }, data.options);
+                                
+                                fabric.Image.fromURL(data.image, function(object) {
+                                    canvas.add(object);
+                                }, options);
+                                break;
+                            case 'polaroid':
+                                var polaroid = new fabric.PolaroidPhoto(data.image, data.options);
+                                canvas.add(polaroid);
+                                break;
+                            case 'group':
+                                var objects = [];
+                                angular.forEach(data.objects, function(_data, key){
+                                    switch(_data.type) {
+                                        case 'text':
+                                            var textDefaults = angular.extend(self.textDefaults, _data.options);
+                                            var text = new fabric.Text(_data.text, textDefaults);
+                                            objects.push(text);
+                                            break;
+                                        case 'itext':
+                                            var options = angular.extend(self.textDefaults, _data.options);
+                                            var itext = new fabric.IText(_data.text, options);
+                                            objects.push(itext);
+                                            break;
+                                        case 'textbox':
+                                            var textBox = new fabric.Textbox(_data.text, _data.options);
+                                            objects.push(textBox);
+                                            break;
+                                        case 'rect':
+                                            var rect = new fabric.Rect(_data.options);
+                                            objects.push(rect);
+                                            break;
+                                    }
+                                });
+                                var group = new fabric.Group(objects, { name: data.name });
+                                canvas.add(group);
+                                break;
+                        }
+                    });
+                    
+                    self.setZoom();
+                }
+
                 //
                 // Image
                 // ==============================================================
@@ -257,7 +400,7 @@ angular.module('common.fabric', [
                         crossOrigin: 'anonymous'
                     }, options);
                     var image = fabric.Image.fromURL(imageURL, function(object) {
-                        self.addObjectToCanvas(object, true);
+                        self.addObjectToCanvas(object);
                     }, options);
                 };
 
@@ -276,11 +419,14 @@ angular.module('common.fabric', [
                         id: self.createId()
                     }, options);
                     var polaroid = new fabric.PolaroidPhoto(imageURL, options);
-                    // polaroid.toggleFrame();
                     self.addObjectToCanvas(polaroid, true);
                 };
 
-                self.setPadding = function() {
+                self.setImageObject = function (objectName, image) {
+                    var object = self.getObjectByName(objectName);
+                    if ( !object ) return;
+
+                    object.getElement().src = image;
                     self.render();
                 };
 
@@ -395,35 +541,7 @@ angular.module('common.fabric', [
                 //
                 // Group
                 // ==============================================================
-                self.addGroup = function() {
-                    var circle1 = new fabric.Circle({
-                        name: 'circle1',
-                        radius: 50,
-                        fill: 'red',
-                        left: 0
-                    });
-                    var circle2 = new fabric.Circle({
-                        name: 'circle2',
-                        radius: 50,
-                        fill: 'green',
-                        left: 100
-                    });
-                    var circle3 = new fabric.Circle({
-                        name: 'circle3',
-                        radius: 50,
-                        fill: 'blue',
-                        left: 200
-                    });
-                    var group = new fabric.Group([circle1, circle2, circle3], {
-                        name: 'group',
-                        left: 0,
-                        top: 0
-                    });
-
-                    self.addObjectToCanvas(group);
-                };
-
-                self.addGroups = function(name, child) {
+                self.addGroup = function(name, child) {
                     var objects = [];
                     angular.forEach(child, function(data, key){
                         switch(data.type) {
@@ -442,19 +560,6 @@ angular.module('common.fabric', [
                         name: name
                     });
                     self.addObjectToCanvas(group, true);
-                };
-                self.isGroupHidden = function(index) {
-                    var object = canvas.getActiveObject();
-                    if (!object || object.name != 'group') return false;
-
-                    index -= 1;
-                    return object.item(index).visible;
-                };
-                self.toggleHidden = function(index) {
-                    var group = self.getObjectByName('group');
-                    var circle = self.getObjectByName('circle' + index, group);
-                    circle.visible = !circle.visible;
-                    self.render();
                 };
                 //
                 // Circle
@@ -804,78 +909,6 @@ angular.module('common.fabric', [
                 };
 
                 //
-                // Canvas Zoom
-                // ==============================================================
-                self.resetZoom = function() {
-                    self.canvasScale = 1;
-                    self.setZoom();
-                };
-
-                self.setZoom = function() {
-                    var objects = canvas.getObjects();
-                    for (var i in objects) {
-                        objects[i].originalScaleX = objects[i].originalScaleX ? objects[i].originalScaleX : objects[i].scaleX;
-                        objects[i].originalScaleY = objects[i].originalScaleY ? objects[i].originalScaleY : objects[i].scaleY;
-                        objects[i].originalLeft = objects[i].originalLeft ? objects[i].originalLeft : objects[i].left;
-                        objects[i].originalTop = objects[i].originalTop ? objects[i].originalTop : objects[i].top;
-                        self.setObjectZoom(objects[i]);
-                    }
-
-                    self.setCanvasZoom();
-                    self.render();
-                };
-
-                self.setObjectZoom = function(object) {
-                    var scaleX = object.originalScaleX;
-                    var scaleY = object.originalScaleY;
-                    var left = object.originalLeft;
-                    var top = object.originalTop;
-
-                    var tempScaleX = scaleX * self.canvasScale;
-                    var tempScaleY = scaleY * self.canvasScale;
-                    var tempLeft = left * self.canvasScale;
-                    var tempTop = top * self.canvasScale;
-
-                    object.scaleX = tempScaleX;
-                    object.scaleY = tempScaleY;
-                    object.left = tempLeft;
-                    object.top = tempTop;
-
-                    object.setCoords();
-                };
-
-                self.setCanvasZoom = function() {
-                    // console.log('setCanvasZoom', self.canvasScale);
-
-                    var width = self.canvasOriginalWidth;
-                    var height = self.canvasOriginalHeight;
-
-                    var tempWidth = width * self.canvasScale;
-                    var tempHeight = height * self.canvasScale;
-
-                    canvas.setWidth(tempWidth);
-                    canvas.setHeight(tempHeight);
-
-                    if (canvas.backgroundImage) {
-                        canvas.backgroundImage.set({
-                            scaleX: self.canvasScale,
-                            scaleY: self.canvasScale
-                        });
-                    }
-                    self.updateControls();
-                };
-
-                self.updateActiveObjectOriginals = function() {
-                    var object = canvas.getActiveObject();
-                    if (object) {
-                        object.originalScaleX = object.scaleX / self.canvasScale;
-                        object.originalScaleY = object.scaleY / self.canvasScale;
-                        object.originalLeft = object.left / self.canvasScale;
-                        object.originalTop = object.top / self.canvasScale;
-                    }
-                };
-
-                //
                 // Active Object Lock
                 // ==============================================================
                 self.toggleLockActiveObject = function() {
@@ -905,7 +938,6 @@ angular.module('common.fabric', [
                         self.render();
                     }
                 };
-
                 self.toggleControlObject = function(value) {
                     var activeObject = canvas.getActiveObject();
                     if (activeObject) {
@@ -924,19 +956,18 @@ angular.module('common.fabric', [
                         return;
                     }
 
-                    console.log('selectActiveObject:type', activeObject.type);
                     console.log('selectActiveObject', activeObject);
 
                     self.selectedObject = activeObject;
-                    self.selectedObject.text = self.getText();
-                    self.selectedObject.fontSize = self.getFontSize();
-                    self.selectedObject.lineHeight = self.getLineHeight();
-                    self.selectedObject.textAlign = self.getTextAlign();
-                    self.selectedObject.opacity = self.getOpacity();
-                    self.selectedObject.fontFamily = self.getFontFamily();
-                    self.selectedObject.fill = self.getFill();
-                    self.selectedObject.tint = self.getTint();
-                    self.selectedObject.stroke = self.getStroke();
+                    // self.selectedObject.text = self.getText();
+                    // self.selectedObject.fontSize = self.getFontSize();
+                    // self.selectedObject.lineHeight = self.getLineHeight();
+                    // self.selectedObject.textAlign = self.getTextAlign();
+                    // self.selectedObject.opacity = self.getOpacity();
+                    // self.selectedObject.fontFamily = self.getFontFamily();
+                    // self.selectedObject.fill = self.getFill();
+                    // self.selectedObject.tint = self.getTint();
+                    // self.selectedObject.stroke = self.getStroke();
                 };
 
                 self.deselectActiveObject = function() {
@@ -1139,11 +1170,10 @@ angular.module('common.fabric', [
                 };
 
                 self.setWindowDefaults = function() {
-                    FabricWindow.Object.prototype.transparentCorners = self.windowDefaults.transparentCorners;
-                    FabricWindow.Object.prototype.rotatingPointOffset = self.windowDefaults.rotatingPointOffset;
-                    FabricWindow.Object.prototype.padding = self.windowDefaults.padding;
-
-                    FabricWindow.Object.prototype.hasControls = self.windowDefaults.hasControls;
+                    // FabricWindow.Object.prototype.transparentCorners = self.windowDefaults.transparentCorners;
+                    // FabricWindow.Object.prototype.rotatingPointOffset = self.windowDefaults.rotatingPointOffset;
+                    // FabricWindow.Object.prototype.padding = self.windowDefaults.padding;
+                    // FabricWindow.Object.prototype.hasControls = self.windowDefaults.hasControls;
                 };
 
                 self.updateBounding = function() {
@@ -1251,48 +1281,50 @@ angular.module('common.fabric', [
                 };
 
                 self.setbackgroundImage = function(imageURL) {
-                        canvas.setBackgroundImage(imageURL, canvas.renderAll.bind(canvas));
-                    },
+                    canvas.setBackgroundImage(imageURL, canvas.renderAll.bind(canvas));
+                },
 
-                    //
-                    // Constructor
-                    // ==============================================================
-                    self.init = function() {
-                        self.canvas = canvas = FabricCanvas.getCanvas();
-                        self.canvasId = FabricCanvas.getCanvasId();
-                        canvas.clear();
-                        canvas.hoverCursor = 'pointer';
+                //
+                // Constructor
+                // ==============================================================
+                self.init = function() {
+                    self.canvas = canvas = FabricCanvas.getCanvas(canvasID);
+                    canvases.push(canvas);
+                    canvas.clear();
+                    canvas.hoverCursor = 'pointer';
 
-                        // For easily accessing the json
-                        // JSONObject = angular.fromJson(self.json);
-                        // self.loadJSON(self.json);
+                    console.log('init',canvases)
 
-                        // JSONObject = JSONObject || {};
+                    // For easily accessing the json
+                    // JSONObject = angular.fromJson(self.json);
+                    // self.loadJSON(self.json);
 
-                        // self.canvasScale = 1;
+                    // JSONObject = JSONObject || {};
 
-                        // JSONObject.background = JSONObject.background || '#ffffff';
-                        // self.setCanvasBackgroundColor(JSONObject.background);
+                    // self.canvasScale = 1;
 
-                        // // Set the size of the canvas
-                        // JSONObject.width = JSONObject.width || 300;
-                        // self.canvasOriginalWidth = JSONObject.width;
+                    // JSONObject.background = JSONObject.background || '#ffffff';
+                    // self.setCanvasBackgroundColor(JSONObject.background);
 
-                        // JSONObject.height = JSONObject.height || 300;
-                        // self.canvasOriginalHeight = JSONObject.height;
+                    // // Set the size of the canvas
+                    // JSONObject.width = JSONObject.width || 300;
+                    // self.canvasOriginalWidth = JSONObject.width;
 
-                        self.setCanvasSize(self.canvasOriginalWidth, self.canvasOriginalHeight);
+                    // JSONObject.height = JSONObject.height || 300;
+                    // self.canvasOriginalHeight = JSONObject.height;
 
-                        self.render();
-                        self.setDirty(false);
-                        self.setInitalized(true);
+                    self.setCanvasSize(self.canvasOriginalWidth, self.canvasOriginalHeight);
 
-                        self.setCanvasDefaults();
-                        self.setWindowDefaults();
-                        self.startCanvasListeners();
-                        self.startContinuousRendering();
-                        FabricDirtyStatus.startListening();
-                    };
+                    self.render();
+                    self.setDirty(false);
+                    self.setInitalized(true);
+
+                    self.setCanvasDefaults();
+                    self.setWindowDefaults();
+                    self.startCanvasListeners();
+                    self.startContinuousRendering();
+                    FabricDirtyStatus.startListening();
+                };
 
                 self.init();
 
