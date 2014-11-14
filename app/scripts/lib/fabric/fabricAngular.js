@@ -325,7 +325,8 @@ angular.module('common.fabric', [
                     angular.forEach(options, function(data, key){
                         switch(data.type) {
                             case 'background':
-                                canvas.setBackgroundImage(data.image);
+                                var options = data.options ? data.options : {} ;
+                                canvas.setBackgroundImage(data.image, null, options);
                                 break;
                             case 'text':
                                 var options = angular.extend(self.textDefaults, data.options);
@@ -1280,8 +1281,8 @@ angular.module('common.fabric', [
                     });
                 };
 
-                self.setbackgroundImage = function(imageURL) {
-                    canvas.setBackgroundImage(imageURL, canvas.renderAll.bind(canvas));
+                self.setbackgroundImage = function(imageURL, options) {
+                    canvas.setBackgroundImage(imageURL, canvas.renderAll.bind(canvas), options);
                 },
 
                 //

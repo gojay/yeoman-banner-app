@@ -70,12 +70,12 @@ define([
                                     },
                                     onBlock: function(){
                                         // disable body scroll
-                                        angular.element('body')
-                                            .css('overflow', 'hidden');
-                                            // .on('mousewheel', function(e) {
-                                            //     e.preventDefault();
-                                            //     e.stopPropagation();
-                                            // });
+                                        // angular.element('body')
+                                        //     .css('overflow', 'hidden')
+                                        //     .on('mousewheel', function(e) {
+                                        //         e.preventDefault();
+                                        //         e.stopPropagation();
+                                        //     });
 
                                         var cropSelection = _this._position(image);
                                         _this.imgEl.imgAreaSelect({
@@ -103,9 +103,9 @@ define([
                                     },
                                     onUnblock: function() {
                                         // enable body scroll
-                                        angular.element('body')
-                                            .css('overflow', 'inherit');
-                                            // .unbind('mousewheel');
+                                        // angular.element('body')
+                                        //     .css('overflow', 'inherit')
+                                        //     .unbind('mousewheel');
                                     }
                                 });
                             },

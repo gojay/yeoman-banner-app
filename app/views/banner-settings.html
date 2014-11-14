@@ -41,7 +41,14 @@
 					    </div>
 				    </div>
 				    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 field-top" ng-show="banner.config.background.type == 0">
-				    	<button type="button" class="btn btn-sm btn-block btn-success" ng-click="setRandomImage($event)">Random Image</button>
+				    	<button type="button" class="btn btn-sm btn-block btn-success" ng-click="setRandomImage()" ng-disabled="loadRandomImage">
+				    		<span ng-if="loadRandomImage">
+				    			<i class="fa fa-circle-o-notch fa-spin"></i> Loading... 
+				    		</span>
+				    		<span ng-if="!loadRandomImage">
+				    			Random Image
+				    		</span>
+			    		</button>
 	                    <upload-image ng-model="banner.images.background"
 	                    	upload-image-enable-crop="true" 
 	                    	upload-image-class="btn-primary btn-block" 

@@ -97,7 +97,8 @@ define([
                         }
                     }
                 }
-            }
+            },
+            loadRandomImage: false
         },
         init: function() {
             var self = this;
@@ -286,28 +287,26 @@ define([
         setRandomImage: function(e) {
         	var self = this;
 
-        	var el = angular.element(e.target);
-        	var defaultText = el.text();
-
-        	var canvasSize = this.$.canvasSize;
-        	var type = ['abstract', 'business', 'cats', 'city', 'nightlife', 'fashion', 'nature', 'sports', 'technics', 'transport'];
+        	var backgroundSize = this._getSelected('backgroundSize');
         	var imageURL = 'http://lorempixel.com/';
-        	imageURL += canvasSize.width + '/' + canvasSize.height + '/';
+            var type = ['abstract', 'business', 'cats', 'city', 'fashion', 'nature', 'technics'];
 
         	var tRandom = _.sample(type);
         	var nRandom = _.random(1, 10);
+
+            imageURL += backgroundSize.width + '/' + backgroundSize.height + '/';
         	imageURL += tRandom + '/' + nRandom;
 
-        	this.$log.log('getRandomImage', imageURL);
+            this.$log.log('getRandomImage', imageURL);
 
-        	el.text('Please wait..');
-        	el.prop('disabled', true);
+        	this.$.loadRandomImage = true;
+
         	var img = new Image();
         	img.src = imageURL;
         	img.onload = function() {
-        		el.text(defaultText);
-        		el.prop('disabled', false);
-        		self.$.banner.images.background = imageURL;
+        		self.$.banner.images.background = this.src;
+                self.$.loadRandomImage = false;
+                self.$.$digest();
         	};
         },
 
@@ -315,17 +314,22 @@ define([
             this.$.banner.config.background.overlay = overlay;
         },
         setBgType: function(type) {
-        	var self = this;
-
             this.$.banner.config.background.type = type;
-            var bg = this.$.templates.background[0];
-            var imageURL = type === 0 ? 
-                this.$.banner.images.background ? this.$.banner.images.background : 'http://placehold.it/810x380' : 
-                bg[type];
+
+            var selected = this._getSelected();
+
+            var prizeTemplate = selected.prize;
+            var objBgTemplate = selected.objects[0];
+            var objBgOptions  = objBgTemplate.options || {} ;
+            var defaultImg    = selected.background || objBgTemplate['image'];
+
+            var imageURL = type === 0 ? defaultImg : selected.backgroundTemplates[type];
+
+            this.$log.log('setBgType', imageURL, defaultImg, objBgOptions);
 
             this._applyCanvas('*', function(fabric){
-            	if(fabric.canvasOriginal.prizeTemplate == self.$.banner.config.prize.type) {
-            		fabric.setbackgroundImage(imageURL);
+            	if(fabric.canvasOriginal.prizeTemplate == prizeTemplate) {
+            		fabric.setbackgroundImage(imageURL, objBgOptions);
             	}
         	});
         },
@@ -345,6 +349,7 @@ define([
         },
         setBadgeType: function(type) {
             this.$.banner.config.badge.type = type;
+
             var image = this.$.templates.badges[type];
             var fabric = this.$.fabric;
             var obj = fabric.getObjectByName('badge');
@@ -356,9 +361,6 @@ define([
             } else {
                 fabric.setImageObject('badge', image);
             }
-        },
-        setPrizeFigure: function(figure) {
-            this.$.banner.config.prize.figure = figure;
         },
 
         doSetting: function() {
@@ -382,7 +384,8 @@ define([
             this.$log.log('uploadOptions', this.$.uploadOptions.background.data);
 
             var dimensions = this.$.dimensions[newVal],
-                background = this.$.canvasSize = dimensions.background;
+                canvas = this.$.canvasSize = dimensions.canvas,
+                background = dimensions.background;
 
             _.extend(this.$.uploadOptions.background.data, background);
             _.extend(this.$.uploadOptions.logo.data, dimensions.logo.image);
@@ -398,9 +401,9 @@ define([
             this.$log.debug('uploadOptions', this.$.uploadOptions);
 
             var fabric = this.$.fabric;
-            if (fabric && fabric.canvasOriginalWidth != background.width && fabric.canvasOriginalHeight != background.height) {
+            if (fabric && fabric.canvasOriginalWidth != canvas.width && fabric.canvasOriginalHeight != canvas.height) {
                 // this.$log.info('change canvas size...');
-                fabric.setCanvasSize(background.width, background.height);
+                fabric.setCanvasSize(canvas.width, canvas.height);
             }
 
         },
@@ -420,12 +423,12 @@ define([
                 textDefaults        : this.FabricConstants.textDefaults,
                 shapeDefaults       : this.FabricConstants.shapeDefaults,
                 CustomAttributes    : this.FabricConstants.CustomAttributes,
-                canvasOriginalWidth : dimensions.background.width,
-                canvasOriginalHeight: dimensions.background.height,
-                canvasScale         : 0.8,
+                canvasOriginalWidth : dimensions.canvas.width,
+                canvasOriginalHeight: dimensions.canvas.height,
+                // canvasScale         : 0.8,
                 canvasOriginal      : {
-                    width        : dimensions.background.width,
-                    height       : dimensions.background.height,
+                    width        : dimensions.canvas.width,
+                    height       : dimensions.canvas.height,
                     overlay      : dimensions.overlay,
                     prizeTemplate: canvasTemplate
                 }
@@ -445,7 +448,7 @@ define([
 	                prizeHeader.text = 'This Month\'s Prizes\nEnter to win!';
 	                var styles = [];
 	                for (var i = 0; i < prizeHeader.text.split('\n')[1].length ; i++) {
-	                    styles[i] = { fontSize:12 };
+	                    styles[i] = prizeHeader.options.styles[1][0];
 	                };
 	                prizeHeader.options.styles[1] = styles;
 	            } else {
@@ -472,12 +475,10 @@ define([
         },
 
         _onChangeBackgroundOverlay: function(newVal, oldVal) {
-            var self = this;
-
             this.$log.log('_onChangeBackgroundOverlay', newVal, oldVal);
             if( newVal == oldVal ) return;
-
-            this.$log.log('canvasSize', this.$.canvasSize);
+            
+            var self = this;
 
             var canvases = _.filter(this.$scope, function(scope, key) {
                 return /fabric/.test(key);
@@ -492,62 +493,107 @@ define([
         _doBackgroundOverlay: function(fabric, value) {
             this.$log.log('_doBackgroundOverlay', fabric);
 
-            var canvasOriginal = fabric.canvasOriginal;
+            var self = this;
 
-            var intialScale = fabric.canvasScale;
+            var canvasOriginal       = fabric.canvasOriginal;
+            var intialScale          = fabric.canvasScale;
             var canvasOriginalHeight = fabric.canvasOriginalHeight;
-            var contestObject = fabric.getObjectByName('contest-placeholder');
-            var canvasHeight, contestTop;
+            var contestObject        = fabric.getObjectByName('contest-placeholder');
+            var canvasHeight;
 
             if( value ) {
                 canvasHeight = canvasOriginal.height;
             } else {
-                canvasHeight = canvasOriginalHeight + contestObject.height + 20;
+                canvasHeight = canvasOriginalHeight + contestObject.height;
+                if(fabric.canvasOriginal.prizeTemplate != 3) {
+                    canvasHeight += 20;
+                }
             }
 
             fabric.canvasOriginalHeight = canvasHeight;
 
             _.forEach(fabric.getObjects(), function(obj){
-                if(/^contest/.test(obj.name)) {
-                    if(obj.type == 'rect') {
-                        obj.visible = value;
+
+                if(fabric.canvasOriginal.prizeTemplate == 3) 
+                {
+                    var background = self.$.dimensions[3].background;
+
+                    if(/^contest/.test(obj.name)) {
+                        if(obj.type == 'rect') {
+                            obj.visible = value;
+                        }
+
+                        // overlay
+                        if( value ) {
+                            if(/text/.test(obj.type)) {
+                                obj.fill = '#fff';
+                            }
+                            obj.originalTop = (obj.originalTop - (background.height + 40)) + canvasOriginal.overlay;
+                        } 
+                        // non overlay
+                        else {
+                            if(/text/.test(obj.type)) {
+                                obj.fill = 'rgb(51, 51, 51)';
+                            }
+                            obj.originalTop = obj.originalTop - canvasOriginal.overlay + background.height + 40;
+                        }
                     }
 
-                    // overlay
-                    if( value ) {
-                        if(/text/.test(obj.type)) {
-                            obj.fill = '#fff';
+                    if(/^prize/.test(obj.name)) {
+
+                        // overlay
+                        if( value ) {
+                            obj.originalTop -= contestObject.height;
+                        } 
+                        // non overlay
+                        else {
+                            obj.originalTop += contestObject.height;
                         }
-                        obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + canvasOriginal.overlay;
-                    } 
-                    // non overlay
-                    else {
-                        if(/text/.test(obj.type)) {
-                            obj.fill = 'rgb(51, 51, 51)';
-                        }
-                        obj.originalTop = obj.originalTop - canvasOriginal.overlay + canvasOriginalHeight + 10;
                     }
 
-                }
+                } else {
 
-                if(/^prize/.test(obj.name)) {
-                    if(obj.name == 'prize-header-placeholder') {
-                        obj.visible = value;
+                    if(/^contest/.test(obj.name)) {
+                        if(obj.type == 'rect') {
+                            obj.visible = value;
+                        }
+
+                        // overlay
+                        if( value ) {
+                            if(/text/.test(obj.type)) {
+                                obj.fill = '#fff';
+                            }
+                            obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + canvasOriginal.overlay;
+                        } 
+                        // non overlay
+                        else {
+                            if(/text/.test(obj.type)) {
+                                obj.fill = 'rgb(51, 51, 51)';
+                            }
+                            obj.originalTop = obj.originalTop - canvasOriginal.overlay + canvasOriginalHeight + 10;
+                        }
+
                     }
 
-                    // overlay
-                    if( value ) {
-                        if(/text/.test(obj.type) && !/description/.test(obj.name)) {
-                            obj.fill = '#fff';
+                    if(/^prize/.test(obj.name)) {
+                        if(obj.name == 'prize-header-placeholder') {
+                            obj.visible = value;
                         }
-                        obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + canvasOriginal.overlay;
-                    } 
-                    // non overlay
-                    else {
-                        if(/text/.test(obj.type) && !/description/.test(obj.name)) {
-                            obj.fill = 'rgb(51, 51, 51)';
+
+                        // overlay
+                        if( value ) {
+                            if(/text/.test(obj.type) && !/description/.test(obj.name)) {
+                                obj.fill = '#fff';
+                            }
+                            obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + canvasOriginal.overlay;
+                        } 
+                        // non overlay
+                        else {
+                            if(/text/.test(obj.type) && !/description/.test(obj.name)) {
+                                obj.fill = 'rgb(51, 51, 51)';
+                            }
+                            obj.originalTop = obj.originalTop - canvasOriginal.overlay + canvasOriginalHeight + 10;
                         }
-                        obj.originalTop = obj.originalTop - canvasOriginal.overlay + canvasOriginalHeight + 10;
                     }
                 }
             });
@@ -556,14 +602,17 @@ define([
         },
 
         _onChangeBackgroundImage: function(newVal, oldVal) {
-        	var self = this;
             this.$log.log('_onChangeBackgroundImage', newVal, oldVal);
             if(!newVal || newVal == oldVal) return;
-            this.$.banner.images.background = newVal;
+
+        	var selected = this._getSelected();
+
+            var objBgTemplate = selected.objects[0];
+            var objBgOptions  = objBgTemplate.options || {} ;
 
             this._applyCanvas('*', function(fabric){
-            	if(fabric.canvasOriginal.prizeTemplate == self.$.banner.config.prize.type) {
-            		fabric.setbackgroundImage(newVal);
+            	if(fabric.canvasOriginal.prizeTemplate == selected.prize) {
+            		fabric.setbackgroundImage(newVal, objBgOptions);
             	}
         	});
             this.$rootScope.$broadcast('uploadimage:completed');
@@ -584,7 +633,6 @@ define([
             // this.$log.log('_onBadgeType', newVal, oldVal);
         },
 
-        
         _onChangePrizeImages: function(newVal, oldVal) {
             this.$log.log('_onChangePrizeImages', newVal, oldVal);
             this.$rootScope.$broadcast('uploadimage:completed');
@@ -604,6 +652,23 @@ define([
             this._applyCanvas('prize-description-3', { text:newVal[3] });
         },
 
+        _getSelected: function(key) {
+            var prize = this.$.banner.config.prize.type;
+            var objects = this.BannerData.objects[prize];
+            var backgroundTemplates = this.$.templates.background[prize - 1];
+            var backgroundSize = this.$.dimensions[prize].background;
+            var canvasSize = this.$.canvasSize;
+
+            var options = {
+                prize : prize,
+                objects: objects,
+                backgroundTemplates: backgroundTemplates,
+                backgroundSize: backgroundSize,
+                canvasSize: canvasSize
+            };
+
+            return key ? options[key] : options ;
+        },
         _applyCanvas: function(objectName, args) {
             var self = this;
         	var log = this.$log;
