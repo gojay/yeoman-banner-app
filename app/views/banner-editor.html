@@ -451,64 +451,72 @@
 	    </tab>
 		<!-- position -->
 	    <tab heading="Position">
-			<div class="form-horizontal tf col-md-12">
-				<!-- Flip -->
-	            <div class="form-group mbm" style="padding-top:0px">
-	                <div class="col-sm-12">
-	                    <button class='btn btn-sm btn-block' ng-class="{ 'btn-default': fabric.getFlipX() }" ng-click="{ 'btn-default': fabric.toggleFlipX() }">
-	                        <i class='fa fa-exchange'></i> Flip
-	                    </button>
-	                </div>
-	            </div>
-				<!-- Centering -->
-	            <div class="form-group">
-	                <div class="btn-group col-xs-12 btn-group-vertical">
-	                    <button ng-click='fabric.center()' class='btn btn-sm btn-block'>
-	                        Center
-	                    </button>
+			<div class="tf col-md-12">
+				<div class="col-md-6">
+					<div class="form-horizontal">
+						<!-- Flip -->
+			            <div class="form-group mbm" style="padding-top:0px">
+			                <div class="col-sm-12">
+			                    <button class='btn btn-sm btn-block' ng-class="{ 'btn-default': fabric.getFlipX() }" ng-click="{ 'btn-default': fabric.toggleFlipX() }">
+			                        <i class='fa fa-exchange'></i> Flip
+			                    </button>
+			                </div>
+			            </div>
+						<!-- Movement -->
+			            <div class="form-group">
+			                <div class="btn-group col-xs-12 btn-group-vertical">
+			                    <button ng-click='fabric.toggleLockMovementXActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementX }" class='btn btn-sm btn-block'>
+			                        Lock Movement X
+			                    </button>
+			                    <button ng-click='fabric.toggleLockMovementYActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementY }" class='btn btn-sm btn-block'>
+			                        Lock Movement Y
+			                    </button>
+			                    <button ng-click='fabric.toggleLockActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockObject }" class='btn btn-sm btn-block'>
+			                        Lock All
+			                    </button>
+			                </div>
+			            </div>
+		            </div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-horizontal">
+						<!-- Centering -->
+			            <div class="form-group">
+			                <div class="btn-group col-xs-12 btn-group-vertical">
+			                    <button ng-click='fabric.center()' class='btn btn-sm btn-block'>
+			                        Center
+			                    </button>
 
-	                    <button ng-click='fabric.centerH()' class='btn btn-sm btn-block'>
-	                        Center Horizontally
-	                    </button>
+			                    <button ng-click='fabric.centerH()' class='btn btn-sm btn-block'>
+			                        Center Horizontally
+			                    </button>
 
-	                    <button ng-click='fabric.centerV()' class='btn btn-sm btn-block'>
-	                        Center Vertically
-	                    </button>
-	                </div>
-	            </div>
-				<!-- Z Index -->
-	            <div class="form-group">
-	                <div class="btn-group col-xs-12 btn-group-vertical">
-	                    <button ng-click='fabric.bringToFront(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
-	                        Bring to front
-	                    </button>
+			                    <button ng-click='fabric.centerV()' class='btn btn-sm btn-block'>
+			                        Center Vertically
+			                    </button>
+			                </div>
+			            </div>
+						<!-- Z Index -->
+			            <div class="form-group">
+			                <div class="btn-group col-xs-12 btn-group-vertical">
+			                    <button ng-click='fabric.bringToFront(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+			                        Bring to front
+			                    </button>
 
-	                    <button ng-click='fabric.bringForward(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
-	                        Bring forwards
-	                    </button>
+			                    <button ng-click='fabric.bringForward(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+			                        Bring forwards
+			                    </button>
 
-	                    <button ng-click='fabric.sendBackwards(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
-	                        Send backwards
-	                    </button>
+			                    <button ng-click='fabric.sendBackwards(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+			                        Send backwards
+			                    </button>
 
-	                    <button ng-click='fabric.sendToBack(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
-	                        Send to back
-	                    </button>
-	                </div>
-	            </div>
-				<!-- Movement -->
-	            <div class="form-group">
-	                <div class="btn-group col-xs-12 btn-group-vertical">
-	                    <button ng-click='fabric.toggleLockMovementXActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementX }" class='btn btn-sm btn-block'>
-	                        Lock Movement X
-	                    </button>
-	                    <button ng-click='fabric.toggleLockMovementYActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementY }" class='btn btn-sm btn-block'>
-	                        Lock Movement Y
-	                    </button>
-	                    <button ng-click='fabric.toggleLockActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockObject }" class='btn btn-sm btn-block'>
-	                        Lock All
-	                    </button>
-	                </div>
+			                    <button ng-click='fabric.sendToBack(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+			                        Send to back
+			                    </button>
+			                </div>
+			            </div>
+		            </div>
 	            </div>
 			</div>
 	    </tab>
@@ -544,9 +552,6 @@
     </div>
 </div>
 <div class="col-xs-12 col-md-12 margin-top-bottom image-builder">
-	<div class="btn-group" style="position: absolute; right: 0;">
-		<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"><toggle-switch>
-	</div>
     <div id="canvas-banner" class="fabric-container">
         <canvas fabric="fabric1" template="2"></canvas>
     </div>

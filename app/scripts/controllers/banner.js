@@ -42,7 +42,6 @@ define([
             'data'
         ],
         initScope: {
-            canvases: [],
             fabric: {},
             fullEditor: false,
             showEditor: true,
@@ -159,32 +158,28 @@ define([
         watch: {
             'fullEditor': '_onFullEditor',
 
-            'banner.config.background.overlay': '_onBackgroundOverlay',
-            'banner.images.background': '_onBackgroundImage',
+            'banner.config.background.overlay'  : '_onChangeBackgroundOverlay',
+            'banner.images.background'          : '_onChangeBackgroundImage',
 
-            'banner.config.facebook.type': '_onFacebookType',
+            'banner.config.logo.enable'         : '_onLogoEnable',
+            'banner.images.logo'                : '_onLogoImage',
 
-            'banner.config.logo.enable': '_onLogoEnable',
-            'banner.images.logo': '_onLogoImage',
+            'banner.config.badge.enable'        : '_onBadgeEnable',
+            'banner.config.badge.type'          : '_onBadgeType',
 
-            'banner.config.badge.enable': '_onBadgeEnable',
-            'banner.config.badge.type': '_onBadgeType',
-
-            '{object}banner.text.prize.header': '_onChangePrizeHeader',
-            '{object}banner.text.prize.content': '_onChangePrizeContent',
-            '{object}banner.images.prize': '_onChangePrizeImages',
-
+            '{object}banner.images.prize'       : '_onChangePrizeImages',
         },
         _watchAsync: function($scope) {
         	var self = this,
         		log  = this.$log;
+
             log.log("$evalAsync", $scope);
 
             $scope.$watch('fabric.selectedObject', function(obj) {
             	log.log("[selectedObject]", obj);
             	if(!obj) return;
 
-            	self._bindCanvas(null, function(fabric){
+            	self._applyCanvas(null, function(fabric){
             		fabric.setActiveObjectByName(obj.name);
             	});
             });
@@ -193,7 +188,7 @@ define([
             	log.log("fabric.canvasScale", scale);
             	if(!scale) return;
 
-            	self._bindCanvas(null, function(fabric){
+            	self._applyCanvas(null, function(fabric){
             		fabric.setZoom(scale);
             	});
             });
@@ -202,7 +197,7 @@ define([
             	if(!angle) return;
         		$scope.fabric.angleControl();
 
-            	self._bindCanvas(null, function(fabric){
+            	self._applyCanvas(null, function(fabric){
             		fabric.controls.angle = angle;
             		fabric.angleControl();
             	});
@@ -212,7 +207,7 @@ define([
             	if(!scale) return;
         		$scope.fabric.scaleControl();
 
-            	self._bindCanvas(null, function(fabric){
+            	self._applyCanvas(null, function(fabric){
             		fabric.controls.scale = scale;
             		fabric.scaleControl();
             	});
@@ -222,7 +217,7 @@ define([
             	if(!left) return;
         		$scope.fabric.leftControl();
 
-            	self._bindCanvas(null, function(fabric){
+            	self._applyCanvas(null, function(fabric){
             		fabric.controls.left = left;
             		fabric.leftControl();
             	});
@@ -232,7 +227,7 @@ define([
             	if(!top) return;
         		$scope.fabric.topControl();
 
-            	self._bindCanvas(null, function(fabric){
+            	self._applyCanvas(null, function(fabric){
             		fabric.controls.top = top;
             		fabric.topControl();
             	});
@@ -249,13 +244,12 @@ define([
                         offsetY: 10
                     };
                 }
-
-            	self._bindCanvas('logo-polaroid', { shadow:shadow });
+            	self._applyCanvas('logo-polaroid', { shadow:shadow });
             });
             $scope.$watch('fabric.selectedObject.hasPlaceholder', function(hasPlaceholder) {
                 log.log("fabric.controls.hasPlaceholder", hasPlaceholder);
                 if (!$scope.fabric.selectedObject || _.isUndefined(hasPlaceholder)) return;
-            	self._bindCanvas('logo-polaroid', function(object){
+            	self._applyCanvas('logo-polaroid', function(object){
             		object.setPlaceholder(hasPlaceholder);
             	});
             });
@@ -270,7 +264,7 @@ define([
                 // $scope.fabric.render();
             });
 
-            $scope.$watch('banner.config.prize.type', this._onPrizeType);
+            $scope.$watch('banner.config.prize.type', this._onChangePrizeType);
 
             $scope.$watchCollection('banner.text.contest', this._onChangeTextContest);
             $scope.$watchCollection('banner.text.prize.content', this._onChangeTextPrizeContent);
@@ -289,12 +283,6 @@ define([
             return this.$.fabric.getActiveStyle('fontSize');
         },
 
-        setFill: function(value) {
-            this.$.fabric.setActiveStyle('fill', value);
-        },
-        setFontSize: function(value) {
-            this.$.fabric.setActiveStyle('fontSize', parseInt(value, 10));
-        },
         setBgOverlay: function(overlay) {
             this.$.banner.config.background.overlay = overlay;
         },
@@ -308,8 +296,11 @@ define([
         },
         setFbType: function(type) {
             this.$.banner.config.facebook.type = type;
-            var image = this.$.templates.facebook[type];
-            this.$.fabric.setImageObject('facebook', image);
+            var imageURL = this.$.templates.facebook[type];
+
+            this._applyCanvas('facebook', function(obj) {
+                obj.getElement().setAttribute('src', imageURL); 
+            });
         },
         setLogoEnable: function(enable) {
             this.$.banner.config.logo.enable = enable;
@@ -349,28 +340,59 @@ define([
         },
 
         /** private **/
+
+        _onChangePrizeType: function(newVal, oldVal) {
+            this.$log.log('_onChangePrizeType', newVal, oldVal);
+            this.$log.log('dimensions', this.$.dimensions);
+
+            var dimensions = this.$.dimensions[newVal],
+                background = this.$.canvasSize = dimensions.background;
+
+            _.extend(this.$.uploadOptions.background.data, background);
+            _.extend(this.$.uploadOptions.logo.data, dimensions.logo.image);
+
+            if (dimensions.prize) {
+                _.map(this.$.uploadOptions.prize, function(item) {
+                    item = _.extend(item.data, dimensions.prize);
+                    return item;
+                });
+            }
+
+            this.$log.debug('canvasSize', this.$.canvasSize);
+            this.$log.debug('uploadOptions', this.$.uploadOptions);
+
+            var fabric = this.$.fabric;
+            if (fabric && fabric.canvasOriginalWidth != background.width && fabric.canvasOriginalHeight != background.height) {
+                // this.$log.info('change canvas size...');
+                fabric.setCanvasSize(background.width, background.height);
+            }
+
+        },
         
         _onCanvasCreated: function(event, args) {
             var self = this;
 
             this.$log.log('initialize canvas:created', args);
-            this.$log.log('initialize canvas:created', this.$.dimensions);
 
-            var canvasFabric = args.canvasId;
-            var canvasTemplate = args.template;
+            var canvasFabric   = args.canvasId;
+            var canvasTemplate = args.canvasTemplate;
 
             var dimensions = this.$.dimensions[canvasTemplate];
 
             var fabric = this.$scope[canvasFabric] = new this.Fabric(canvasFabric, {
                 JSONExportProperties: this.FabricConstants.JSONExportProperties,
-                textDefaults: this.FabricConstants.textDefaults,
-                shapeDefaults: this.FabricConstants.shapeDefaults,
-                CustomAttributes: this.FabricConstants.CustomAttributes,
-                onChangeCanvasSize: this._onChangeCanvasSize,
+                textDefaults        : this.FabricConstants.textDefaults,
+                shapeDefaults       : this.FabricConstants.shapeDefaults,
+                CustomAttributes    : this.FabricConstants.CustomAttributes,
                 canvasOriginalWidth : dimensions.background.width,
                 canvasOriginalHeight: dimensions.background.height,
-                canvasScale: 0.8,
-                canvasTemplate: canvasTemplate
+                canvasScale         : 0.8,
+                canvasOriginal      : {
+                    width        : dimensions.background.width,
+                    height       : dimensions.background.height,
+                    overlay      : dimensions.overlay,
+                    prizeTemplate: canvasTemplate
+                }
             });
 
             var objects = this.BannerData.objects[canvasTemplate];
@@ -411,10 +433,10 @@ define([
             fabric.setZoom();
         },
 
-        _onBackgroundOverlay: function(newVal, oldVal) {
+        _onChangeBackgroundOverlay: function(newVal, oldVal) {
             var self = this;
 
-            this.$log.log('_onBackgroundOverlay', newVal, oldVal);
+            this.$log.log('_onChangeBackgroundOverlay', newVal, oldVal);
             if( newVal == oldVal ) return;
 
             this.$log.log('canvasSize', this.$.canvasSize);
@@ -432,7 +454,7 @@ define([
         _doBackgroundOverlay: function(fabric, value) {
             this.$log.log('_doBackgroundOverlay', fabric);
 
-            var dimensions = this.$.dimensions[fabric.canvasTemplate];
+            var canvasOriginal = fabric.canvasOriginal;
 
             var intialScale = fabric.canvasScale;
             var canvasOriginalHeight = fabric.canvasOriginalHeight;
@@ -440,7 +462,7 @@ define([
             var canvasHeight, contestTop;
 
             if( value ) {
-                canvasHeight = dimensions.background.height;
+                canvasHeight = canvasOriginal.height;
             } else {
                 canvasHeight = canvasOriginalHeight + contestObject.height + 20;
             }
@@ -458,14 +480,14 @@ define([
                         if(/text/.test(obj.type)) {
                             obj.fill = '#fff';
                         }
-                        obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + dimensions.overlay;
+                        obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + canvasOriginal.overlay;
                     } 
                     // non overlay
                     else {
                         if(/text/.test(obj.type)) {
                             obj.fill = 'rgb(51, 51, 51)';
                         }
-                        obj.originalTop = obj.originalTop - dimensions.overlay + canvasOriginalHeight + 10;
+                        obj.originalTop = obj.originalTop - canvasOriginal.overlay + canvasOriginalHeight + 10;
                     }
 
                 }
@@ -480,14 +502,14 @@ define([
                         if(/text/.test(obj.type) && !/description/.test(obj.name)) {
                             obj.fill = '#fff';
                         }
-                        obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + dimensions.overlay;
+                        obj.originalTop = (obj.originalTop - (canvasHeight + 10)) + canvasOriginal.overlay;
                     } 
                     // non overlay
                     else {
                         if(/text/.test(obj.type) && !/description/.test(obj.name)) {
                             obj.fill = 'rgb(51, 51, 51)';
                         }
-                        obj.originalTop = obj.originalTop - dimensions.overlay + canvasOriginalHeight + 10;
+                        obj.originalTop = obj.originalTop - canvasOriginal.overlay + canvasOriginalHeight + 10;
                     }
                 }
             });
@@ -495,26 +517,19 @@ define([
             fabric.setZoom();
         },
 
-        _onBackgroundImage: function(newVal, oldVal) {
-            this.$log.log('_onBackgroundImage', newVal, oldVal);
+        _onChangeBackgroundImage: function(newVal, oldVal) {
+            this.$log.log('_onChangeBackgroundImage', newVal, oldVal);
             if(!newVal || newVal == oldVal) return;
             this.$.banner.images.background = newVal;
             this.$.fabric.setbackgroundImage(newVal);
             this.$rootScope.$broadcast('uploadimage:completed');
         },
 
-        _onFacebookType: function(newVal, oldVal) {
-            // this.$log.log('_onFacebookType', newVal, oldVal);
-        },
-        _onFacebookSize: function(newVal, oldVal) {
-            // this.$log.log('_onFacebookSize', newVal, oldVal);
-        },
-
         _onLogoEnable: function(newVal, oldVal) {
             // this.$log.log('_onLogoEnable', newVal, oldVal);
         },
         _onLogoImage: function(newVal, oldVal) {
-            // this.$log.log('_onLogoImage', newVal, oldVal);
+            this.$log.log('_onLogoImage', newVal, oldVal);
             this.$rootScope.$broadcast('uploadimage:completed');
         },
 
@@ -525,65 +540,27 @@ define([
             // this.$log.log('_onBadgeType', newVal, oldVal);
         },
 
-        _onPrizeType: function(newVal, oldVal) {
-            this.$log.log('_onPrizeType', newVal, oldVal);
-            this.$log.log('dimensions', this.$.dimensions);
-
-            var dimensions = this.$.dimensions[newVal],
-                background = this.$.canvasSize = dimensions.background;
-
-            // if(newVal == oldVal) return;
-
-            _.extend(this.$.uploadOptions.background.data, background);
-            _.extend(this.$.uploadOptions.logo.data, dimensions.logo.image);
-
-            if (dimensions.prize) {
-                _.map(this.$.uploadOptions.prize, function(item) {
-                    item = _.extend(item.data, dimensions.prize);
-                    return item;
-                });
-            }
-
-            this.$log.debug('canvasSize', this.$.canvasSize);
-            this.$log.debug('uploadOptions', this.$.uploadOptions);
-
-            var fabric = this.$.fabric;
-            if (fabric && fabric.canvasOriginalWidth != background.width && fabric.canvasOriginalHeight != background.height) {
-                // this.$log.info('change canvas size...');
-                this.$.fabric.setCanvasSize(background.width, background.height);
-            }
-
-        },
-        _onChangePrizeHeader: function(newVal, oldVal) {
-            // this.$log.log('_onChangePrizeHeader', newVal, oldVal);
-        },
-        _onChangePrizeContent: function(newVal, oldVal) {
-            // this.$log.log('_onChangePrizeContent', newVal, oldVal);
-        },
+        
         _onChangePrizeImages: function(newVal, oldVal) {
-            // this.$log.log('_onChangePrizeImages', newVal, oldVal);
+            this.$log.log('_onChangePrizeImages', newVal, oldVal);
             this.$rootScope.$broadcast('uploadimage:completed');
         },
 
         _onChangeTextContest: function(newVal, oldVal) {
             this.$log.log('_onChangeTextContest', newVal, oldVal);
 
-            this._bindCanvas('contest-title', { text:newVal.title });
-            this._bindCanvas('contest-description', { text:newVal.description });
+            this._applyCanvas('contest-title', { text:newVal.title });
+            this._applyCanvas('contest-description', { text:newVal.description });
         },
         _onChangeTextPrizeContent: function(newVal, oldVal) {
             this.$log.log('_onChangeTextPrizeContent', newVal, oldVal);
 
-            this._bindCanvas('prize-description-1', { text:newVal[1] });
-            this._bindCanvas('prize-description-2', { text:newVal[2] });
-            this._bindCanvas('prize-description-3', { text:newVal[3] });
+            this._applyCanvas('prize-description-1', { text:newVal[1] });
+            this._applyCanvas('prize-description-2', { text:newVal[2] });
+            this._applyCanvas('prize-description-3', { text:newVal[3] });
         },
 
-        _onChangeCanvasSize: function(_fabric) {
-            // this.$log.log('_onChangeCanvasSize', _fabric);
-        },
-
-        _bindCanvas: function(objectName, args) {
+        _applyCanvas: function(objectName, args) {
             var self = this;
         	var log = this.$log;
         	var canvases = _.filter(this.$scope, function(scope, key) {

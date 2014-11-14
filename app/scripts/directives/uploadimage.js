@@ -134,7 +134,7 @@ define([
 
                                 return new Blob([ia], {type:mimeString});
                             },
-                            getBlob: function() {
+                            getBlob: function(toURI) {
                                 var canvas = document.createElement('canvas');
                                 canvas.width  = this.selection.width;
                                 canvas.height = this.selection.height;
@@ -150,17 +150,20 @@ define([
                                 );
 
                                 var dataURI = canvas.toDataURL();
-                                return this.toBlob(dataURI);
+                                return toURI ? dataURI : this.toBlob(dataURI);
                             },
                             handle: function ( act ) {
                                 var _this = this;
                                 switch(act) {
                                     case 'crop':
-                                        var blob = this.getBlob();
+                                        var blob = this.getBlob(true);
                                         $log.debug('blob', blob);
 
-                                        $scope.selectedFiles[0] = blob;
-                                        $scope.start(0);
+                                        $scope.image = blob;
+
+                                        // upload
+                                        // $scope.selectedFiles[0] = blob;
+                                        // $scope.start(0);
 
                                         $scope.$on('uploadimage:completed', function(data, percent){
                                             _this.close();
@@ -284,7 +287,7 @@ define([
                             }
                         };
 
-                        $scope.start = function(index, done) {
+                        $scope.start = function(index) {
                             $scope.progress[index] = 0;
                             $scope.errorMsg = null;
                             if ($scope.howToSend == 1) {
@@ -310,8 +313,6 @@ define([
                                     }
                                     
                                     $log.debug('[uploadImage]image', $scope.image);
-                                    
-                                    if(done) done();
                                 }, function(response) {
                                     if (response.status > 0) {
                                         $scope.errorMsg = response.status + ': ' + JSON.stringify(response.data);

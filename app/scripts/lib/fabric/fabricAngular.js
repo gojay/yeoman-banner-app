@@ -422,11 +422,11 @@ angular.module('common.fabric', [
                     self.addObjectToCanvas(polaroid, true);
                 };
 
-                self.setImageObject = function (objectName, image) {
+                self.setImageObject = function (objectName, imageURL) {
                     var object = self.getObjectByName(objectName);
                     if ( !object ) return;
 
-                    object.getElement().src = image;
+                    object.getElement().setAttribute('src', imageURL);
                     self.render();
                 };
 
