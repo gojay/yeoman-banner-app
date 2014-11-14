@@ -18,12 +18,15 @@
 	    background: rgb(236, 240, 241);
 	    box-sizing: border-box;
 	    border: 1px solid #cacaca;
-	    min-height: 500px;
+	    min-height: 460px;
 	    text-align: center;
 	    position: relative;
 	    overflow-x: scroll;
 	    overflow-y: hidden;
 	    width: 100%;
+	}
+	.image-builder.selected {
+		background: #798D8F;
 	}
 	.image-cover {
 	    left: 0;
@@ -71,27 +74,24 @@
 				    knob-label="Editor">
 				<toggle-switch>
 			</div>
-			<!-- <div class="btn-group pull-right">
-				<button type="button" class="btn btn-sm btn-primary" ng-click="fullEditor = true" ng-class="{'active': fullEditor}">On</button>
-				<button type="button" class="btn btn-sm btn-primary" ng-click="fullEditor = false" ng-class="{'active': !fullEditor}">Off</button>
-			</div> -->
 		</div>
 	</div>
 	<hr>
 	<div class="row">
 		<aside id="setting-template" class="col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-hide="fullEditor">
 			<!-- templates -->
-			<div id="templates" ng-class="animation.templates" ng-hide="showEditor">
+			<!-- <div id="templates" ng-class="animation.templates" ng-hide="showEditor"> -->
+			<div id="templates" ng-class="animation.templates">
 				<h4 style="margin-left:15px">Default Templates</h4>
 				<div class="tabbable tabs-left">
 					<ul class="margin-top-bottom nav nav-tabs col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<li class="active"><a href="#0-prize" data-toggle="tab" data-prize="0">Template Empty Prize</a></li>
-						<li><a href="#1-1prize" data-toggle="tab" data-prize="1">Template 1 - 1 Prize</a></li>
+						<li class="disabled"><a href="#0-prize" data-toggle="tab" data-prize="0">Template Empty Prize</a></li>
+						<li class="active"><a href="#1-1prize" data-toggle="tab" data-prize="1">Template 1 - 1 Prize</a></li>
 						<li><a href="#1-2prizes" data-toggle="tab" data-prize="2">Template 1 - 2 Prizes</a></li>
 						<li><a href="#1-3prizes" data-toggle="tab" data-prize="3">Template 1 - 3 Prizes</a></li>
-						<li><a href="#2-1prize" data-toggle="tab" data-prize="1">Template 2 - 1 Prize</a></li>
-						<li><a href="#2-2prizes" data-toggle="tab" data-prize="2">Template 2 - 2 Prizes</a></li>
-						<li><a href="#2-3prizes" data-toggle="tab" data-prize="3">Template 2 - 3 Prizes</a></li>
+						<li class="disabled"><a href="#2-1prize" data-toggle="tab" data-prize="1">Template 2 - 1 Prize</a></li>
+						<li class="disabled"><a href="#2-2prizes" data-toggle="tab" data-prize="2">Template 2 - 2 Prizes</a></li>
+						<li class="disabled"><a href="#2-3prizes" data-toggle="tab" data-prize="3">Template 2 - 3 Prizes</a></li>
 					</ul>
 				</div>
 			</div>

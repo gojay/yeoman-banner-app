@@ -283,16 +283,51 @@ define([
             return this.$.fabric.getActiveStyle('fontSize');
         },
 
+        setRandomImage: function(e) {
+        	var self = this;
+
+        	var el = angular.element(e.target);
+        	var defaultText = el.text();
+
+        	var canvasSize = this.$.canvasSize;
+        	var type = ['abstract', 'business', 'cats', 'city', 'nightlife', 'fashion', 'nature', 'sports', 'technics', 'transport'];
+        	var imageURL = 'http://lorempixel.com/';
+        	imageURL += canvasSize.width + '/' + canvasSize.height + '/';
+
+        	var tRandom = _.sample(type);
+        	var nRandom = _.random(1, 10);
+        	imageURL += tRandom + '/' + nRandom;
+
+        	this.$log.log('getRandomImage', imageURL);
+
+        	el.text('Please wait..');
+        	el.prop('disabled', true);
+        	var img = new Image();
+        	img.src = imageURL;
+        	img.onload = function() {
+        		el.text(defaultText);
+        		el.prop('disabled', false);
+        		self.$.banner.images.background = imageURL;
+        	};
+        },
+
         setBgOverlay: function(overlay) {
             this.$.banner.config.background.overlay = overlay;
         },
         setBgType: function(type) {
+        	var self = this;
+
             this.$.banner.config.background.type = type;
             var bg = this.$.templates.background[0];
-            var image = type === 0 ? 
+            var imageURL = type === 0 ? 
                 this.$.banner.images.background ? this.$.banner.images.background : 'http://placehold.it/810x380' : 
                 bg[type];
-            this.$.fabric.setbackgroundImage(image);
+
+            this._applyCanvas('*', function(fabric){
+            	if(fabric.canvasOriginal.prizeTemplate == self.$.banner.config.prize.type) {
+            		fabric.setbackgroundImage(imageURL);
+            	}
+        	});
         },
         setFbType: function(type) {
             this.$.banner.config.facebook.type = type;
@@ -344,6 +379,7 @@ define([
         _onChangePrizeType: function(newVal, oldVal) {
             this.$log.log('_onChangePrizeType', newVal, oldVal);
             this.$log.log('dimensions', this.$.dimensions);
+            this.$log.log('uploadOptions', this.$.uploadOptions.background.data);
 
             var dimensions = this.$.dimensions[newVal],
                 background = this.$.canvasSize = dimensions.background;
@@ -396,28 +432,30 @@ define([
             });
 
             var objects = this.BannerData.objects[canvasTemplate];
-            if(/enter/i.test(canvasFabric)) {
-                // remove obj facebook
-                _.remove(objects, function(obj) {
-                    return obj.options && /^facebook/.test(obj.options.name);
-                });
-                // change text prize header content
-                var prizeHeader = _.find(objects, function(obj) {
-                    return obj.options && /prize-header-content/.test(obj.options.name);
-                });
-                prizeHeader.text = 'This Month\'s Prizes\nEnter to win!';
-                var styles = [];
-                for (var i = 0; i < prizeHeader.text.split('\n')[1].length ; i++) {
-                    styles[i] = { fontSize:12 };
-                };
-                prizeHeader.options.styles[1] = styles;
-            } else {
-                var objects = _.cloneDeep(this.BannerData.objects[canvasTemplate]);
-            }
-            fabric.buildObjects(objects);
+            if( objects ) {
+	            if(/enter/i.test(canvasFabric)) {
+	                // remove obj facebook
+	                _.remove(objects, function(obj) {
+	                    return obj.options && /^facebook/.test(obj.options.name);
+	                });
+	                // change text prize header content
+	                var prizeHeader = _.find(objects, function(obj) {
+	                    return obj.options && /prize-header-content/.test(obj.options.name);
+	                });
+	                prizeHeader.text = 'This Month\'s Prizes\nEnter to win!';
+	                var styles = [];
+	                for (var i = 0; i < prizeHeader.text.split('\n')[1].length ; i++) {
+	                    styles[i] = { fontSize:12 };
+	                };
+	                prizeHeader.options.styles[1] = styles;
+	            } else {
+	                var objects = _.cloneDeep(this.BannerData.objects[canvasTemplate]);
+	            }
 
-            var objects = fabric.getObjects();
-            this.$log.debug('objects', objects);
+	            fabric.buildObjects(objects);
+
+	            this.$log.debug('objects', fabric.getObjects());
+            }
 
             // Watchers
             // Executes the expression on the current scope at a later point in time.
@@ -518,10 +556,16 @@ define([
         },
 
         _onChangeBackgroundImage: function(newVal, oldVal) {
+        	var self = this;
             this.$log.log('_onChangeBackgroundImage', newVal, oldVal);
             if(!newVal || newVal == oldVal) return;
             this.$.banner.images.background = newVal;
-            this.$.fabric.setbackgroundImage(newVal);
+
+            this._applyCanvas('*', function(fabric){
+            	if(fabric.canvasOriginal.prizeTemplate == self.$.banner.config.prize.type) {
+            		fabric.setbackgroundImage(newVal);
+            	}
+        	});
             this.$rootScope.$broadcast('uploadimage:completed');
         },
 
@@ -567,13 +611,13 @@ define([
         		return /fabric/.test(key);
         	});
 
-        	if(!objectName) {
+        	if(!objectName && objectName != '*') {
         		canvases.shift();
         	}
 
         	if(canvases) {
         		_.forEach(canvases, function(fabric) {
-        			if( objectName ) {
+        			if( objectName && objectName != '*' ) {
 			            var obj = fabric.getObjectByName(objectName);
 			            if( obj ) {
 				            if(_.isFunction(args)) {

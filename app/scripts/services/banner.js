@@ -69,7 +69,7 @@ define(['angular'], function(angular) {
                             type: -1,
                         },
                         prize: {
-                            type: 0,
+                            type: 1,
                             figure: 0 
                         }
                     }

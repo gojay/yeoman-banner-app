@@ -535,30 +535,48 @@
 	</div>
 </div>
 <!-- canvas -->
-<div class="col-xs-12 col-md-12 margin-top-bottom image-builder">
-	<!-- <div class="btn-group" style="position: absolute; left: 0;">
-		<button type="button" class="btn btn-sm btn-default">Left</button>
-		<button type="button" class="btn btn-sm btn-default">Middle</button>
-		<button type="button" class="btn btn-sm btn-default">Right</button>
-	</div> -->
-	<div class="btn-group" style="position: absolute; right: 0;">
+<div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-init="bannerShow1 = 2" ng-class="{'selected': banner.config.prize.type == 1}">
+	<div class="btn-group" style="position: absolute; left: 0;">
+		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 1}" ng-click="bannerShow1 = 1">Like</button>
+		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 2}" ng-click="bannerShow1 = 2">Both</button>
+		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 3}" ng-click="bannerShow1 = 3">Enter</button>
+	</div>
+	<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 1</h3>
+	<div class="btn-group" style="position: absolute; top:0; right: 0;">
 		<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"><toggle-switch>
 	</div>
-    <div id="canvas-banner" class="fabric-container">
+    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow1 == 2 || bannerShow1 == 1">
         <canvas fabric="fabric" template="1"></canvas>
     </div>
-    <div id="canvas-banner" class="fabric-container">
+    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow1 == 2 || bannerShow1 == 3">
         <canvas fabric="fabricEnter" template="1"></canvas>
     </div>
 </div>
-<div class="col-xs-12 col-md-12 margin-top-bottom image-builder">
-    <div id="canvas-banner" class="fabric-container">
+<div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-init="bannerShow2 = 2" ng-class="{'selected': banner.config.prize.type == 2}">
+	<div class="btn-group" style="position: absolute; left: 0;">
+		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 1}" ng-click="bannerShow2 = 1">Like</button>
+		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 2}" ng-click="bannerShow2 = 2">Both</button>
+		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 3}" ng-click="bannerShow2 = 3">Enter</button>
+	</div>
+	<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 2</h3>
+    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow2 == 2 || bannerShow2 == 1">
         <canvas fabric="fabric1" template="2"></canvas>
     </div>
-    <div id="canvas-banner" class="fabric-container">
+    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow2 == 2 || bannerShow2 == 3">
         <canvas fabric="fabricEnter1" template="2"></canvas>
     </div>
 </div>
+<div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-class="{'selected': banner.config.prize.type == 3}">
+	<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 3</h3>
+    <div id="canvas-banner" class="fabric-container">
+        <canvas fabric="fabric2" template="3"></canvas>
+    </div>
+    <div id="canvas-banner" class="fabric-container">
+        <canvas fabric="fabricEnter2" template="3"></canvas>
+    </div>
+</div>
+<!-- /canvas -->
+
 <!-- JSON -->
 <div class="row margin-top-bottom">
 	<div class="col-md-12">

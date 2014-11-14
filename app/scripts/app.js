@@ -51,7 +51,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'chieffancypants.loadingBar'
         ])
         .constant('API', {
-            'URL': 'http://api/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
+            'URL': 'http://api.local/banner-api/public/api/v1', // 'http://localhost:8080/api/v1
             'GRANT': 'user', // grant type : user (user credentials) or jwt
             'CLIENT': {
                 'ID': '1413098344',
