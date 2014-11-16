@@ -3,6 +3,7 @@ define([
     'lodash',
     'underscore.string',
     'jszip',
+    'async',
     'angular-elastic',
     'fabricAngular',
     'fabricCanvas',
@@ -11,7 +12,7 @@ define([
     'fabricDirtyStatus',
     'fabricUtilities',
     'fabricWindow'
-], function (angular, _, _s, JSZip) {
+], function (angular, _, _s, JSZip, async) {
     'use strict';
 
     _.mixin(_s.exports());
@@ -121,54 +122,68 @@ define([
             this.$.banner = new this.Banner();
             angular.extend(this.$.banner, this.BannerData.model);
 
-            this.$.FabricConstants = this.FabricConstants;
+            var q = async.queue(function (task, callback) {
+                self.$log.log('[queue] ', task);
+                self._onCanvasCreated(task, callback);
+            });
 
-            this.$.$on('canvas:created', this._onCanvasCreated);
+            // assign a callback
+            q.drain = function() {
+                self.$log.log('[drain] all canvases have been created');
 
-            this.Keypress.onControls({
-                up: function() {
-                    if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
-                        self.$.fabric.controls.top -= 1;
-                        self.$.$apply();
-                        self.$log.debug('up', self.$.fabric.controls.top);
+                self.$.$evalAsync(self._watchAsync);
+
+                self.Keypress.onControls({
+                    up: function() {
+                        if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
+                            self.$.fabric.controls.top -= 1;
+                            self.$.$apply();
+                            self.$log.debug('up', self.$.fabric.controls.top);
+                        }
+                    },
+                    down: function() {
+                        if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
+                            self.$.fabric.controls.top += 1;
+                            self.$.$apply();
+                            self.$log.debug('down', self.$.fabric.controls.top);
+                        }
+                    },
+                    left: function() {
+                        if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
+                            self.$.fabric.controls.left -= 1;
+                            self.$.$apply();
+                            self.$log.debug('left', self.$.fabric.controls.left);
+                        }
+                    },
+                    right: function() {
+                        if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
+                            self.$.fabric.controls.left += 1;
+                            self.$.$apply();
+                            self.$log.debug('right', self.$.fabric.controls.left);
+                        }
                     }
-                },
-                down: function() {
-                    if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
-                        self.$.fabric.controls.top += 1;
-                        self.$.$apply();
-                        self.$log.debug('down', self.$.fabric.controls.top);
-                    }
-                },
-                left: function() {
-                    if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
-                        self.$.fabric.controls.left -= 1;
-                        self.$.$apply();
-                        self.$log.debug('left', self.$.fabric.controls.left);
-                    }
-                },
-                right: function() {
-                    if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
-                        self.$.fabric.controls.left += 1;
-                        self.$.$apply();
-                        self.$log.debug('right', self.$.fabric.controls.left);
-                    }
-                }
+                });
+            };
+
+            this.$.$on('canvas:created', function(event, args) {
+
+                // add to the queue
+                q.push(args, function (err) {
+                    self.$log.log('[finished] processing ' + args.canvasId);
+                });
+
             });
         },
         watch: {
             'fullEditor': '_onFullEditor',
+            // 'banner.config.background.overlay'  : '_onChangeBackgroundOverlay',
+            // 'banner.config.logo.enable'         : '_onLogoEnable',
+            // 'banner.images.logo'                : '_onLogoImage',
+            // 'banner.config.badge.enable'        : '_onBadgeEnable',
+            // 'banner.config.badge.size'          : '_onBadgeSize',
 
-            'banner.config.background.overlay'  : '_onChangeBackgroundOverlay',
-            'banner.images.background'          : '_onChangeBackgroundImage',
-
-            'banner.config.logo.enable'         : '_onLogoEnable',
-            'banner.images.logo'                : '_onLogoImage',
-
-            'banner.config.badge.enable'        : '_onBadgeEnable',
-            'banner.config.badge.size'          : '_onBadgeSize',
-
-            '{object}banner.images.prize'       : '_onChangePrizeImages',
+            // 'banner.images.background'          : '_onChangeBackgroundImage',
+            // '{object}banner.images.prize'       : '_onChangePrizeImages'
         },
         _watchAsync: function($scope) {
         	var self = this,
@@ -255,6 +270,14 @@ define([
             });
 
             $scope.$watch('banner.config.prize.type', this._onChangePrizeType);
+            $scope.$watch('banner.config.background.overlay', this._onChangeBackgroundOverlay);
+            $scope.$watch('banner.config.logo.enable', this._onLogoEnable);
+            $scope.$watch('banner.config.badge.enable', this._onBadgeEnable);
+            $scope.$watch('banner.config.badge.size', this._onBadgeSize);
+
+            $scope.$watch('banner.images.background', this._onChangeBackgroundImage);
+            $scope.$watch('banner.images.logo', this._onLogoImage);
+            $scope.$watchCollection('banner.images.prize', this._onChangePrizeImages);
 
             $scope.$watchCollection('banner.text.contest', this._onChangeTextContest);
             $scope.$watchCollection('banner.text.prize.content', this._onChangeTextPrizeContent);
@@ -301,25 +324,6 @@ define([
         	});
         },
 
-        _imgToDataUri: function(img, width, height) {
-
-            // create an off-screen canvas
-            var canvas = document.createElement('canvas'),
-                ctx = canvas.getContext('2d');
-
-            console.log(img, canvas, ctx);
-
-            // set its dimension to target size
-            canvas.width = width;
-            canvas.height = height;
-
-            // draw source image into the off-screen canvas:
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // encode image to data-uri with base64 version of compressed image
-            return canvas.toDataURL();
-        },
-
         /**
          * Mengatur background canvas dengan gambar acak. Gambar dari http://lorempixel.com, dengan ukuran canvas/background
          */
@@ -341,13 +345,24 @@ define([
             this.$.loadRandomImage = true;
 
             var img = new Image();
-            img.src = imageURL;
+            img.crossOrigin = 'Anonymous';
             img.onload = function() {
-                // var imgURI = self._imgToDataUri(this.src, this.width, this.height);
-                self.$.banner.images.background = this.src;
+
+                var canvas = document.createElement('canvas'),
+                    ctx = canvas.getContext('2d');
+
+                canvas.height = img.height;
+                canvas.width = img.width;
+                ctx.drawImage(img, 0, 0);
+
+                var dataURL = canvas.toDataURL('image/png');
+                console.log(dataURL);
+
+                self.$.banner.images.background = dataURL;
                 self.$.loadRandomImage = false;
                 self.$.$digest();
             };
+            img.src = imageURL;
         },
 
         /**
@@ -393,33 +408,52 @@ define([
         },
         doGenerate: function(isSaved) {
             var self = this;
-            var selected = this._getSelected();
-
-            var name = 'banner-prize-' + selected.prize + '.png';
-            // this.$.fabric.download(name);
-            var img = this.$.fabric.getCanvasData();
-            var data = img.replace('data:image/png;base64,', '');
+            var prizeTemplate = this._getSelected('prize');
 
             var zip = new JSZip();
-            zip.file(name, data, {base64:true});
 
-            // generate zip link
-            var DOMURL = window.URL || window.mozURL;
-            var downloadlink = DOMURL.createObjectURL(zip.generate({type:"blob"}));
+            var q = async.queue(function (fabric, callback) {
+                self.$log.log('[queue] ', fabric);
 
-            var link = document.createElement('a');
-            var filename = Date.now() + '.zip';
-            // var filename = Date.now() + '_' + _.slugify(this.$.banner.text.contest.title) + '.zip';
-            link.download = filename;
-            link.href = downloadlink;
-            link.click();
+                var type = fabric.canvasOriginal.isEnter ? 'enter' : 'like' ;
+                var name = 'banner-prize-' + prizeTemplate + '_' + type + '.png';
+                var img  = fabric.getCanvasData();
+                var data = img.replace('data:image/png;base64,', '');
 
-            if( isSaved ) {
-                this.$log.info('Saving the banner...');
-                this.$.banner.$save(function(response) {
-                    self.$log.debug('[SAVE]', response);
-                });
-            } 
+                zip.file(name, data, { base64:true });
+
+                callback();
+            });
+
+            // assign a callback
+            q.drain = function() {
+                self.$log.log('[drain] all canvases have been created');
+                // generate zip link
+                var DOMURL = window.URL || window.mozURL;
+                var downloadlink = DOMURL.createObjectURL(zip.generate({type:"blob"}));
+
+                var link = document.createElement('a');
+                var filename = Date.now() + '.zip';
+                link.download = filename;
+                link.href = downloadlink;
+                link.click();
+
+                // if( isSaved ) {
+                //     this.$log.info('Saving the banner...');
+                //     this.$.banner.$save(function(response) {
+                //         self.$log.debug('[SAVE]', response);
+                //     });
+                // } 
+            };
+
+            self._applyCanvas('*', function (fabric) {
+                if(fabric.canvasOriginal.prizeTemplate == prizeTemplate) {
+                    // add to the queue
+                    q.push(fabric, function (err) {
+                        self.$log.log('[finished] processing', fabric, err);
+                    });
+                }
+            });
         },
         doGetJSON: function(index) {
             var outputJSON = this.$.fabric.getJSON(true);
@@ -465,7 +499,6 @@ define([
 
             this.$log.debug('canvasSize', this.$.canvasSize);
             this.$log.debug('uploadOptions', this.$.uploadOptions);
-
         },
         
         /**
@@ -475,13 +508,15 @@ define([
          * @param  {Object} event canvas event
          * @param  {Object} args  nilai attribut dari canvas
          */
-        _onCanvasCreated: function(event, args) {
+        _onCanvasCreated: function(args, callback) {
             var self = this;
 
             this.$log.log('initialize canvas:created', args);
 
             var canvasFabric   = args.canvasId;
             var canvasTemplate = args.canvasTemplate;
+
+            var isEnter = /enter/i.test(canvasFabric);
 
             var dimensions = this.$.dimensions[canvasTemplate];
 
@@ -492,18 +527,18 @@ define([
                 CustomAttributes    : self.FabricConstants.CustomAttributes,
                 canvasOriginalWidth : dimensions.canvas.width,
                 canvasOriginalHeight: dimensions.canvas.height,
-                // canvasScale         : 0.8,
                 canvasOriginal      : {
                     width        : dimensions.canvas.width,
                     height       : dimensions.canvas.height,
                     overlay      : dimensions.overlay,
-                    prizeTemplate: canvasTemplate
+                    prizeTemplate: canvasTemplate,
+                    isEnter      : isEnter
                 }
             });
 
             var objects = self.BannerData.objects[canvasTemplate];
             if( objects ) {
-                if(/enter/i.test(canvasFabric)) {
+                if( isEnter ) {
                     // remove obj facebook
                     _.remove(objects, function(obj) {
                         return obj.options && /^facebook/.test(obj.options.name);
@@ -527,12 +562,17 @@ define([
                 self.$log.debug('objects', fabric.getObjects());
             }
 
+            callback();
+
+/*
+
             // Watchers
             // Executes the expression on the current scope at a later point in time.
             // ================================================================
             if(canvasFabric == 'fabric') {
                 self.$.$evalAsync(self._watchAsync);
             }
+  */          
         },
 
         _onFullEditor: function(newVal, oldVal) {

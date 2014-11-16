@@ -21,7 +21,8 @@ angular.module('common.fabric.canvas', [
 	self.createCanvas = function(id, template) {
 		var canvasId = 'fabric-canvas-' + id;
 		self.elements[id].attr('id', canvasId);
-		self.canvases[id] = new FabricWindow.Canvas(canvasId);
+		self.canvases[id] = new FabricWindow.Canvas(canvasId, { renderOnAddRemove: false });
+		
 		$rootScope.$broadcast('canvas:created', { canvasId:id, canvasTemplate:template });
 
 		return self.canvases[self.canvasId];

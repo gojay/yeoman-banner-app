@@ -9,8 +9,6 @@ angular.module('common.fabric.directive', [
 			fabric: '='
 		},
 		controller: function($scope, $attrs, $element) {
-			console.log('fabric:directive', $attrs, $element[0]);
-
 			var id = $attrs.fabric;
 			var template = $attrs.template;
 			

@@ -68,7 +68,8 @@ require.config({
         'lodash': '../bower_components/lodash/dist/lodash.min',
         'underscore.string': '../bower_components/underscore.string/dist/underscore.string.min',
 
-        'jszip': '../bower_components/jszip/dist/jszip.min'
+        'jszip': '../bower_components/jszip/dist/jszip.min',
+        'async': '../bower_components/async/lib/async'
     },
     shim: {
         'angular': {
