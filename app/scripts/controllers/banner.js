@@ -2,6 +2,7 @@ define([
     'angular',
     'lodash',
     'underscore.string',
+    'jszip',
     'angular-elastic',
     'fabricAngular',
     'fabricCanvas',
@@ -9,8 +10,8 @@ define([
     'fabricDirective',
     'fabricDirtyStatus',
     'fabricUtilities',
-    'fabricWindow',
-], function (angular, _, _s) {
+    'fabricWindow'
+], function (angular, _, _s, JSZip) {
     'use strict';
 
     _.mixin(_s.exports());
@@ -32,6 +33,7 @@ define([
             '$scope',
             '$log',
             '$timeout',
+            'Helpers',
 
             'Fabric',
             'FabricConstants',
@@ -153,8 +155,6 @@ define([
                     }
                 }
             });
-
-            this.$log.debug('this', this);
         },
         watch: {
             'fullEditor': '_onFullEditor',
@@ -166,7 +166,7 @@ define([
             'banner.images.logo'                : '_onLogoImage',
 
             'banner.config.badge.enable'        : '_onBadgeEnable',
-            'banner.config.badge.type'          : '_onBadgeType',
+            'banner.config.badge.size'          : '_onBadgeSize',
 
             '{object}banner.images.prize'       : '_onChangePrizeImages',
         },
@@ -177,7 +177,6 @@ define([
             log.log("$evalAsync", $scope);
 
             $scope.$watch('fabric.selectedObject', function(obj) {
-            	log.log("[selectedObject]", obj);
             	if(!obj) return;
 
             	self._applyCanvas(null, function(fabric){
@@ -186,7 +185,6 @@ define([
             });
 
             $scope.$watch('fabric.canvasScale', function(scale) {
-            	log.log("fabric.canvasScale", scale);
             	if(!scale) return;
 
             	self._applyCanvas(null, function(fabric){
@@ -194,40 +192,36 @@ define([
             	});
             });
             $scope.$watch('fabric.controls.angle', function(angle) {
-            	log.log("fabric.controls.angle", angle);
             	if(!angle) return;
-        		$scope.fabric.angleControl();
 
+        		$scope.fabric.angleControl();
             	self._applyCanvas(null, function(fabric){
             		fabric.controls.angle = angle;
             		fabric.angleControl();
             	});
             });
             $scope.$watch('fabric.controls.scale', function(scale) {
-            	log.log("fabric.controls.scale", scale);
             	if(!scale) return;
-        		$scope.fabric.scaleControl();
 
+        		$scope.fabric.scaleControl();
             	self._applyCanvas(null, function(fabric){
             		fabric.controls.scale = scale;
             		fabric.scaleControl();
             	});
             });
             $scope.$watch('fabric.controls.left', function(left) {
-            	log.log("fabric.controls.left", left);
             	if(!left) return;
-        		$scope.fabric.leftControl();
 
+        		$scope.fabric.leftControl();
             	self._applyCanvas(null, function(fabric){
             		fabric.controls.left = left;
             		fabric.leftControl();
             	});
             });
             $scope.$watch('fabric.controls.top', function(top) {
-            	log.log("fabric.controls.top", top);
             	if(!top) return;
-        		$scope.fabric.topControl();
 
+        		$scope.fabric.topControl();
             	self._applyCanvas(null, function(fabric){
             		fabric.controls.top = top;
             		fabric.topControl();
@@ -235,7 +229,8 @@ define([
             });
 
             $scope.$watch('fabric.selectedObject.hasShadow', function(hasShadow) {
-                if (!$scope.fabric.selectedObject || _.isUndefined(hasShadow)) return;
+                if (!hasShadow) return;
+
                 var shadow = null;
                 if (hasShadow) {
                     shadow = {
@@ -248,21 +243,15 @@ define([
             	self._applyCanvas('logo-polaroid', { shadow:shadow });
             });
             $scope.$watch('fabric.selectedObject.hasPlaceholder', function(hasPlaceholder) {
-                log.log("fabric.controls.hasPlaceholder", hasPlaceholder);
                 if (!$scope.fabric.selectedObject || _.isUndefined(hasPlaceholder)) return;
-            	self._applyCanvas('logo-polaroid', function(object){
+            	self._applyCanvas('logo', function(object){
             		object.setPlaceholder(hasPlaceholder);
             	});
             });
             $scope.$watch('fabric.selectedObject.H_PADDING', function(newVal, oldVal) {
-                if (!oldVal && !$scope.fabric.selectedObject) return;
-                // $scope.fabric.selectedObject.left += newVal - oldVal;
-                // $scope.fabric.render();
-            });
-            $scope.$watch('fabric.selectedObject.V_PADDING', function(newVal, oldVal) {
-                if (!oldVal && !$scope.fabric.selectedObject) return;
-                // $scope.fabric.selectedObject.top += newVal - oldVal;
-                // $scope.fabric.render();
+                if (!oldVal) return;
+
+                self._applyCanvas('logo', function(object){});
             });
 
             $scope.$watch('banner.config.prize.type', this._onChangePrizeType);
@@ -277,118 +266,186 @@ define([
             if(!this.$.fabric.selectedObject) return null;
             return _.titleize(this.$.fabric.selectedObject[type]);
         },
-        getFill: function() {
-            return this.$.fabric.getActiveStyle('fill');
-        },
-        getFontSize: function() {
-            return this.$.fabric.getActiveStyle('fontSize');
-        },
 
-        setRandomImage: function(e) {
-        	var self = this;
-
-        	var backgroundSize = this._getSelected('backgroundSize');
-        	var imageURL = 'http://lorempixel.com/';
-            var type = ['abstract', 'business', 'cats', 'city', 'fashion', 'nature', 'technics'];
-
-        	var tRandom = _.sample(type);
-        	var nRandom = _.random(1, 10);
-
-            imageURL += backgroundSize.width + '/' + backgroundSize.height + '/';
-        	imageURL += tRandom + '/' + nRandom;
-
-            this.$log.log('getRandomImage', imageURL);
-
-        	this.$.loadRandomImage = true;
-
-        	var img = new Image();
-        	img.src = imageURL;
-        	img.onload = function() {
-        		self.$.banner.images.background = this.src;
-                self.$.loadRandomImage = false;
-                self.$.$digest();
-        	};
-        },
-
-        setBgOverlay: function(overlay) {
-            this.$.banner.config.background.overlay = overlay;
-        },
+        /**
+         * Set background type
+         * @param {String/Int} type Background
+         */
         setBgType: function(type) {
-            this.$.banner.config.background.type = type;
+            if( _.isUndefined(type) ) {
+                type = this.$.banner.config.background.type;
+            } else {
+                this.$.banner.config.background.type = type;
+            }
 
             var selected = this._getSelected();
 
             var prizeTemplate = selected.prize;
             var objBgTemplate = selected.objects[0];
-            var objBgOptions  = objBgTemplate.options || {} ;
+            var objBgOptions  = objBgTemplate.options || { crossOrigin: 'anonymous' } ;
             var defaultImg    = selected.background || objBgTemplate['image'];
 
             var imageURL = type === 0 ? defaultImg : selected.backgroundTemplates[type];
 
-            this.$log.log('setBgType', imageURL, defaultImg, objBgOptions);
+            // ganti url localhost
+            // if(imageURL.indexOf('http') > -1) {
+            //     var indexImgname = imageURL.lastIndexOf('/') + 1;
+            //     imageURL = 'images/banner/' + imageURL.substr(indexImgname, imageURL.length);
+            // }
 
             this._applyCanvas('*', function(fabric){
             	if(fabric.canvasOriginal.prizeTemplate == prizeTemplate) {
+                    console.log(objBgOptions);
             		fabric.setbackgroundImage(imageURL, objBgOptions);
             	}
         	});
         },
+
+        _imgToDataUri: function(img, width, height) {
+
+            // create an off-screen canvas
+            var canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d');
+
+            console.log(img, canvas, ctx);
+
+            // set its dimension to target size
+            canvas.width = width;
+            canvas.height = height;
+
+            // draw source image into the off-screen canvas:
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // encode image to data-uri with base64 version of compressed image
+            return canvas.toDataURL();
+        },
+
+        /**
+         * Mengatur background canvas dengan gambar acak. Gambar dari http://lorempixel.com, dengan ukuran canvas/background
+         */
+        setRandomBackground: function() {
+            var self = this;
+            var backgroundSize = this._getSelected('backgroundSize');
+
+            var imageURL = 'http://lorempixel.com/';
+            var type     = ['abstract', 'business', 'cats', 'city', 'fashion', 'nature', 'technics'];
+
+            var tRandom = _.sample(type);
+            var nRandom = _.random(1, 10);
+
+            imageURL += backgroundSize.width + '/' + backgroundSize.height + '/';
+            imageURL += tRandom + '/' + nRandom;
+
+            this.$log.log('getRandomImage', imageURL);
+
+            this.$.loadRandomImage = true;
+
+            var img = new Image();
+            img.src = imageURL;
+            img.onload = function() {
+                // var imgURI = self._imgToDataUri(this.src, this.width, this.height);
+                self.$.banner.images.background = this.src;
+                self.$.loadRandomImage = false;
+                self.$.$digest();
+            };
+        },
+
+        /**
+         * Atur jenis logo Facebook
+         * @param {String} type Facebook logo
+         */
         setFbType: function(type) {
             this.$.banner.config.facebook.type = type;
+            
             var imageURL = this.$.templates.facebook[type];
 
             this._applyCanvas('facebook', function(obj) {
                 obj.getElement().setAttribute('src', imageURL); 
             });
         },
-        setLogoEnable: function(enable) {
-            this.$.banner.config.logo.enable = enable;
-        },
-        setBadgeEnable: function(enable) {
-            this.$.banner.config.badge.enable = enable;
-        },
+
+        /**
+         * atur jenis logo Badge
+         * @param {String} type Badge logo
+         */
         setBadgeType: function(type) {
             this.$.banner.config.badge.type = type;
 
             var image = this.$.templates.badges[type];
-            var fabric = this.$.fabric;
-            var obj = fabric.getObjectByName('badge');
-            if(!obj) {
-                fabric.addImage(image, { 
-                    name:'badge', 
-                    hasControls: true 
+            if(!this.$.banner.images.badge) {
+                this.$.banner.images.badge = image;
+                this._applyCanvas('*', function(fabric) {
+                    fabric.addImage(image, { 
+                        name:'badge', 
+                        hasControls: true,
+                        centeredScaling: true 
+                    });
                 });
             } else {
-                fabric.setImageObject('badge', image);
+                this._applyCanvas('badge', function(obj) {
+                    obj.getElement().setAttribute('src', image); 
+                });
             }
         },
 
         doSetting: function() {
             this.$.showEditor = !this.$.showEditor;
         },
-        doGenerate: function() {
-            this.$.banner.$save(function(response) {
-                this.$log.debug('[SAVE]', response);
-            });
+        doGenerate: function(isSaved) {
+            var self = this;
+            var selected = this._getSelected();
+
+            var name = 'banner-prize-' + selected.prize + '.png';
+            // this.$.fabric.download(name);
+            var img = this.$.fabric.getCanvasData();
+            var data = img.replace('data:image/png;base64,', '');
+
+            var zip = new JSZip();
+            zip.file(name, data, {base64:true});
+
+            // generate zip link
+            var DOMURL = window.URL || window.mozURL;
+            var downloadlink = DOMURL.createObjectURL(zip.generate({type:"blob"}));
+
+            var link = document.createElement('a');
+            var filename = Date.now() + '.zip';
+            // var filename = Date.now() + '_' + _.slugify(this.$.banner.text.contest.title) + '.zip';
+            link.download = filename;
+            link.href = downloadlink;
+            link.click();
+
+            if( isSaved ) {
+                this.$log.info('Saving the banner...');
+                this.$.banner.$save(function(response) {
+                    self.$log.debug('[SAVE]', response);
+                });
+            } 
         },
         doGetJSON: function(index) {
             var outputJSON = this.$.fabric.getJSON(true);
             this.$.outputJSONObject = index ? outputJSON.objects[index] : outputJSON.objects;
         },
 
-        /** private **/
-
+        /**
+         * Lakukan perubahan jika template "prize" baru dipilih.
+         * Atur dimensi upload (background, logo, & gambar "prize")
+         * Atur dimensi canvas sesuai template "prize"
+         * Atur gambar background yg pernah dipilih sebelumnya
+         * @param  {Integer} newVal Nilai baru "prize" yg dipilih
+         * @param  {Integer} oldVal Nilai lama "prize"
+         * @return {Void}      
+         */
         _onChangePrizeType: function(newVal, oldVal) {
             this.$log.log('_onChangePrizeType', newVal, oldVal);
-            this.$log.log('dimensions', this.$.dimensions);
-            this.$log.log('uploadOptions', this.$.uploadOptions.background.data);
+
+            if(!newVal) return;
 
             var dimensions = this.$.dimensions[newVal],
                 canvas = this.$.canvasSize = dimensions.canvas,
                 background = dimensions.background;
 
             _.extend(this.$.uploadOptions.background.data, background);
-            _.extend(this.$.uploadOptions.logo.data, dimensions.logo.image);
+            _.extend(this.$.uploadOptions.logo.data, dimensions.logo);
 
             if (dimensions.prize) {
                 _.map(this.$.uploadOptions.prize, function(item) {
@@ -397,17 +454,27 @@ define([
                 });
             }
 
-            this.$log.debug('canvasSize', this.$.canvasSize);
-            this.$log.debug('uploadOptions', this.$.uploadOptions);
-
             var fabric = this.$.fabric;
-            if (fabric && fabric.canvasOriginalWidth != canvas.width && fabric.canvasOriginalHeight != canvas.height) {
-                // this.$log.info('change canvas size...');
+            if (fabric.canvasOriginalWidth != canvas.width && 
+                fabric.canvasOriginalHeight != canvas.height) {
                 fabric.setCanvasSize(canvas.width, canvas.height);
             }
 
+            // set current background image
+            this.setBgType();
+
+            this.$log.debug('canvasSize', this.$.canvasSize);
+            this.$log.debug('uploadOptions', this.$.uploadOptions);
+
         },
         
+        /**
+         * Fungsi saat canvas telah dibuat
+         * Init fabricJS
+         * Build objects sesuai template "prize", dan konfigurasi untuk canvas "enter"
+         * @param  {Object} event canvas event
+         * @param  {Object} args  nilai attribut dari canvas
+         */
         _onCanvasCreated: function(event, args) {
             var self = this;
 
@@ -418,11 +485,11 @@ define([
 
             var dimensions = this.$.dimensions[canvasTemplate];
 
-            var fabric = this.$scope[canvasFabric] = new this.Fabric(canvasFabric, {
-                JSONExportProperties: this.FabricConstants.JSONExportProperties,
-                textDefaults        : this.FabricConstants.textDefaults,
-                shapeDefaults       : this.FabricConstants.shapeDefaults,
-                CustomAttributes    : this.FabricConstants.CustomAttributes,
+            var fabric = self.$scope[canvasFabric] = new self.Fabric(canvasFabric, {
+                JSONExportProperties: self.FabricConstants.JSONExportProperties,
+                textDefaults        : self.FabricConstants.textDefaults,
+                shapeDefaults       : self.FabricConstants.shapeDefaults,
+                CustomAttributes    : self.FabricConstants.CustomAttributes,
                 canvasOriginalWidth : dimensions.canvas.width,
                 canvasOriginalHeight: dimensions.canvas.height,
                 // canvasScale         : 0.8,
@@ -434,36 +501,38 @@ define([
                 }
             });
 
-            var objects = this.BannerData.objects[canvasTemplate];
+            var objects = self.BannerData.objects[canvasTemplate];
             if( objects ) {
-	            if(/enter/i.test(canvasFabric)) {
-	                // remove obj facebook
-	                _.remove(objects, function(obj) {
-	                    return obj.options && /^facebook/.test(obj.options.name);
-	                });
-	                // change text prize header content
-	                var prizeHeader = _.find(objects, function(obj) {
-	                    return obj.options && /prize-header-content/.test(obj.options.name);
-	                });
-	                prizeHeader.text = 'This Month\'s Prizes\nEnter to win!';
-	                var styles = [];
-	                for (var i = 0; i < prizeHeader.text.split('\n')[1].length ; i++) {
-	                    styles[i] = prizeHeader.options.styles[1][0];
-	                };
-	                prizeHeader.options.styles[1] = styles;
-	            } else {
-	                var objects = _.cloneDeep(this.BannerData.objects[canvasTemplate]);
-	            }
+                if(/enter/i.test(canvasFabric)) {
+                    // remove obj facebook
+                    _.remove(objects, function(obj) {
+                        return obj.options && /^facebook/.test(obj.options.name);
+                    });
+                    // change text prize header content
+                    var prizeHeader = _.find(objects, function(obj) {
+                        return obj.options && /prize-header-content/.test(obj.options.name);
+                    });
+                    prizeHeader.text = 'This Month\'s Prizes\nEnter to win!';
+                    var styles = [];
+                    for (var i = 0; i < prizeHeader.text.split('\n')[1].length ; i++) {
+                        styles[i] = prizeHeader.options.styles[1][0];
+                    };
+                    prizeHeader.options.styles[1] = styles;
+                } else {
+                    var objects = _.cloneDeep(self.BannerData.objects[canvasTemplate]);
+                }
 
-	            fabric.buildObjects(objects);
+                fabric.buildObjects(objects);
 
-	            this.$log.debug('objects', fabric.getObjects());
+                self.$log.debug('objects', fabric.getObjects());
             }
 
             // Watchers
             // Executes the expression on the current scope at a later point in time.
             // ================================================================
-            this.$.$evalAsync(this._watchAsync);
+            if(canvasFabric == 'fabric') {
+                self.$.$evalAsync(self._watchAsync);
+            }
         },
 
         _onFullEditor: function(newVal, oldVal) {
@@ -477,7 +546,7 @@ define([
         _onChangeBackgroundOverlay: function(newVal, oldVal) {
             this.$log.log('_onChangeBackgroundOverlay', newVal, oldVal);
             if( newVal == oldVal ) return;
-            
+
             var self = this;
 
             var canvases = _.filter(this.$scope, function(scope, key) {
@@ -619,22 +688,70 @@ define([
         },
 
         _onLogoEnable: function(newVal, oldVal) {
-            // this.$log.log('_onLogoEnable', newVal, oldVal);
+            this.$log.log('_onLogoEnable', newVal, oldVal);
+            if(_.isUndefined(newVal) || newVal == oldVal) return;
+
+            this._applyCanvas('logo', function(obj) {
+                obj.setVisible(newVal); 
+            });
         },
         _onLogoImage: function(newVal, oldVal) {
             this.$log.log('_onLogoImage', newVal, oldVal);
+            if(!newVal) return;
+
+            this._applyCanvas('logo', function(obj) {
+                obj.setImage(newVal);
+            });
+
             this.$rootScope.$broadcast('uploadimage:completed');
         },
 
         _onBadgeEnable: function(newVal, oldVal) {
-            // this.$log.log('_onBadgeEnable', newVal, oldVal);
+            this.$log.log('_onBadgeEnable', newVal, oldVal);
+            if(_.isUndefined(newVal) || newVal == oldVal) return;
+
+            this._applyCanvas('badge', function(obj) {
+                obj.setVisible(newVal); 
+            });
         },
-        _onBadgeType: function(newVal, oldVal) {
-            // this.$log.log('_onBadgeType', newVal, oldVal);
+        _onBadgeSize: function(newVal, oldVal) {
+            this.$log.log('_onBadgeSize', newVal, oldVal);
+            if(_.isUndefined(newVal) || newVal == oldVal) return;
+
+            this._applyCanvas('badge', function(obj) {
+                var size = obj.getOriginalSize();
+                var width = parseInt(size.width * newVal / 100, 10);
+                var height = parseInt(size.height * newVal / 100, 10);
+                obj.set({
+                    width: width,
+                    height: height,
+                });
+                obj.center();
+            });
         },
 
         _onChangePrizeImages: function(newVal, oldVal) {
+            var self = this;
             this.$log.log('_onChangePrizeImages', newVal, oldVal);
+            if(!newVal || newVal == oldVal) return;
+
+            var prizeTemplate = this._getSelected('prize');
+
+            angular.forEach(newVal, function(value, key) {
+                if(value) {
+                    var objName = 'prize-image-'+key;
+                    self._applyCanvas('*', function(fabric) {
+                        if(fabric.canvasOriginal.prizeTemplate == prizeTemplate) {
+                            var obj = fabric.getObjectByName(objName);
+                            if(obj) {
+                                obj.setImage(value);
+                                fabric.setActiveObject(obj);
+                            }
+                            fabric.render();
+                        }
+                    })
+                }
+            });
             this.$rootScope.$broadcast('uploadimage:completed');
         },
 

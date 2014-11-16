@@ -361,21 +361,12 @@
 					        </div>
 				      	</div>
 				      	<div class="form-group" ng-show="fabric.selectedObject.hasPlaceholder">
-			            	<div class="col-sm-2"><label for="">Horizontal Padding</label></div>
+			            	<div class="col-sm-2"><label for="">Padding</label></div>
 			                <div class="col-sm-8">
 			                    <input type="range" min="0" max="10" step="1" ng-model="fabric.selectedObject.H_PADDING" />
 			                </div>
 			            	<div class="col-sm-2">
 								<input type="number" ng-model="fabric.selectedObject.H_PADDING" class="input-sm form-control">
-			            	</div>
-			            </div>
-				      	<div class="form-group" ng-show="fabric.selectedObject.hasPlaceholder">
-			            	<div class="col-sm-2"><label for="">Vertical Padding</label></div>
-			                <div class="col-sm-8">
-			                    <input type="range" min="0" max="10" step="1" ng-model="fabric.selectedObject.V_PADDING" />
-			                </div>
-			            	<div class="col-sm-2">
-								<input type="number" ng-model="fabric.selectedObject.V_PADDING" class="input-sm form-control">
 			            	</div>
 			            </div>
 					</div>
@@ -522,6 +513,7 @@
 	    </tab>
 	</tabset>
 </div>
+
 <!-- zoom -->
 <div class="margin-top-bottom">
     <div class='col-xs-1 text-center'>
@@ -534,51 +526,85 @@
         <i class='fa fa-search-plus'></i>
 	</div>
 </div>
-<!-- canvas -->
-<div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-init="bannerShow1 = 2" ng-class="{'selected': banner.config.prize.type == 1}">
-	<div class="btn-group" style="position: absolute; left: 0;">
-		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 1}" ng-click="bannerShow1 = 1">Like</button>
-		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 2}" ng-click="bannerShow1 = 2">Both</button>
-		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 3}" ng-click="bannerShow1 = 3">Enter</button>
+
+<!-- tab content -->
+<div class="tab-content text-center">
+ 	<div class="tab-pane" id="0-prize">
+	    <img src="http://placehold.it/810x381&text=Template+Empty+Prize">
 	</div>
-	<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 1</h3>
-	<div class="btn-group" style="position: absolute; top:0; right: 0;">
-		<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"><toggle-switch>
+	<div class="tab-pane active" id="1-1prize">
+	    <div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-init="bannerShow1 = 2">
+			<div class="btn-group" style="position: absolute; left: 0;">
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 1}" ng-click="bannerShow1 = 1">Like</button>
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 2}" ng-click="bannerShow1 = 2">Both</button>
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow1 == 3}" ng-click="bannerShow1 = 3">Enter</button>
+			</div>
+			<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 1</h3>
+			<div class="btn-group" style="position: absolute; top:0; right: 0;" ng-show="fullEditor">
+				<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"></toggle-switch>
+			</div>
+
+		    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow1 == 2 || bannerShow1 == 1">
+		        <canvas fabric="fabric" template="1"></canvas>
+		    </div>
+		    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow1 == 2 || bannerShow1 == 3">
+		        <canvas fabric="fabricEnter" template="1"></canvas>
+		    </div>
+		</div>
 	</div>
-    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow1 == 2 || bannerShow1 == 1">
-        <canvas fabric="fabric" template="1"></canvas>
-    </div>
-    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow1 == 2 || bannerShow1 == 3">
-        <canvas fabric="fabricEnter" template="1"></canvas>
-    </div>
-</div>
-<div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-init="bannerShow2 = 2" ng-class="{'selected': banner.config.prize.type == 2}">
-	<div class="btn-group" style="position: absolute; left: 0;">
-		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 1}" ng-click="bannerShow2 = 1">Like</button>
-		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 2}" ng-click="bannerShow2 = 2">Both</button>
-		<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 3}" ng-click="bannerShow2 = 3">Enter</button>
+	<div class="tab-pane" id="1-2prizes">
+	    <div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-init="bannerShow2 = 2">
+			<div class="btn-group" style="position: absolute; left: 0;">
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 1}" ng-click="bannerShow2 = 1">Like</button>
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 2}" ng-click="bannerShow2 = 2">Both</button>
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow2 == 3}" ng-click="bannerShow2 = 3">Enter</button>
+			</div>
+			<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 2</h3>
+			<div class="btn-group" style="position: absolute; top:0; right: 0;" ng-show="fullEditor">
+				<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"></toggle-switch>
+			</div>
+
+		    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow2 == 2 || bannerShow2 == 1">
+		        <canvas fabric="fabric1" template="2"></canvas>
+		    </div>
+		    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow2 == 2 || bannerShow2 == 3">
+		        <canvas fabric="fabricEnter1" template="2"></canvas>
+		    </div>
+		</div>
 	</div>
-	<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 2</h3>
-    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow2 == 2 || bannerShow2 == 1">
-        <canvas fabric="fabric1" template="2"></canvas>
-    </div>
-    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow2 == 2 || bannerShow2 == 3">
-        <canvas fabric="fabricEnter1" template="2"></canvas>
-    </div>
+	<div class="tab-pane" id="1-3prizes">
+	    <div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-init="bannerShow3 = 2">
+			<div class="btn-group" style="position: absolute; left: 0;">
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow3 == 1}" ng-click="bannerShow3 = 1">Like</button>
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow3 == 2}" ng-click="bannerShow3 = 2">Both</button>
+				<button type="button" class="btn btn-sm btn-default" ng-class="{'active': bannerShow3 == 3}" ng-click="bannerShow3 = 3">Enter</button>
+			</div>
+			<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 3</h3>
+			<div class="btn-group" style="position: absolute; top:0; right: 0;" ng-show="fullEditor">
+				<toggle-switch ng-model="banner.config.background.overlay" knob-label="Overlay"></toggle-switch>
+			</div>
+
+		    <div id="canvas-banner" class="fabric-container" ng-show="bannerShow3 == 2 || bannerShow3 == 1">
+		        <canvas fabric="fabric2" template="3"></canvas>
+		    </div>
+		    <div id="canvas-banner" class="fabric-container">
+		        <canvas fabric="fabricEnter2" template="3" ng-show="bannerShow3 == 2 || bannerShow3 == 1"></canvas>
+		    </div>
+		</div>
+	</div>
+	<div class="tab-pane" id="2-1prize">
+	    <img src="http://placehold.it/810x381&text=Template+2-1+Prize">
+	</div>
+	<div class="tab-pane" id="2-2prizes">
+	    <img src="http://placehold.it/810x381&text=Template+2-2+Prizes">
+	</div>
+	<div class="tab-pane" id="2-3prizes">
+	    <img src="http://placehold.it/810x381&text=Template+2-3+Prize">
+	</div>
 </div>
-<div class="col-xs-12 col-md-12 margin-top-bottom image-builder" ng-class="{'selected': banner.config.prize.type == 3}">
-	<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">Template 3</h3>
-    <div id="canvas-banner" class="fabric-container">
-        <canvas fabric="fabric2" template="3"></canvas>
-    </div>
-    <div id="canvas-banner" class="fabric-container">
-        <canvas fabric="fabricEnter2" template="3"></canvas>
-    </div>
-</div>
-<!-- /canvas -->
 
 <!-- JSON -->
-<div class="row margin-top-bottom">
+<div class="row margin-top-bottom" ng-show="fullEditor">
 	<div class="col-md-12">
 		<div class="form-group" ng-init="dropdownIsOpen = false">
 			<div class="btn-group" dropdown is-open="dropdownIsOpen">
@@ -599,29 +625,5 @@
 		<div class="form-group">
 			<textarea class="input-sm form-control" rows="10">{{outputJSONObject | json}}</textarea>
 		</div>
-	</div>
-</div>
-
-<div class="tab-content text-center hide">
- 	<div class="tab-pane active" id="0-prize">
-	    <img src="http://placehold.it/810x381&text=Template+Empty+Prize">
-	</div>
-	<div class="tab-pane" id="1-1prize">
-	    <img src="http://placehold.it/810x381&text=Template+1-1+Prize">
-	</div>
-	<div class="tab-pane" id="1-2prizes">
-	    <img src="http://placehold.it/810x381&text=Template+1-2+Prizes">
-	</div>
-	<div class="tab-pane" id="1-3prizes">
-	    <img src="http://placehold.it/810x381&text=Template+1-3+Prizes">
-	</div>
-	<div class="tab-pane" id="2-1prize">
-	    <img src="http://placehold.it/810x381&text=Template+2-1+Prize">
-	</div>
-	<div class="tab-pane" id="2-2prizes">
-	    <img src="http://placehold.it/810x381&text=Template+2-2+Prizes">
-	</div>
-	<div class="tab-pane" id="2-3prizes">
-	    <img src="http://placehold.it/810x381&text=Template+2-3+Prize">
 	</div>
 </div>

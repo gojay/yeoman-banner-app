@@ -185,8 +185,8 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .tabs-left > .nav-tabs {
-  float: left;
-  margin-right: 19px;
+  /*float: left;
+  margin-right: 19px;*/
   border-right: 1px solid #ddd;
   padding-right: 0;
 }
@@ -232,7 +232,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 #settings .panel-group .panel:first-child {
-  border-top: 1px solid rgb(44, 62, 80);
+  /*border-top: 1px solid rgb(44, 62, 80);*/
 }
 #settings .panel-group .panel {
   border: none;
@@ -247,7 +247,7 @@ input[type="range"]::-webkit-slider-thumb {
   background-color: #ecf0f1;
 }
 #settings .panel-primary .panel-title {
-  font-weight: bold;
+  /*font-weight: bold;*/
   font-size:  18px;
   line-height: 20px;
   color: #2C3E50;

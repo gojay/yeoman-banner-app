@@ -66,8 +66,9 @@ require.config({
         'jwt':'lib/jws-3.0',
 
         'lodash': '../bower_components/lodash/dist/lodash.min',
-        'underscore.string': '../bower_components/underscore.string/dist/underscore.string.min'
+        'underscore.string': '../bower_components/underscore.string/dist/underscore.string.min',
 
+        'jszip': '../bower_components/jszip/dist/jszip.min'
     },
     shim: {
         'angular': {

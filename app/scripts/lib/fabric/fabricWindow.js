@@ -56,8 +56,9 @@ angular.module('common.fabric.window', [])
 	            this.fire('image:loaded');
 	        }).bind(this);
 	    },
-	    setShadow: function() {
-	    	console.log('setShadow', this);
+	    setImage: function(image) {
+	    	if(!image) return;
+	    	this.image.setAttribute('src', image);
 	    },
 	    setPlaceholder: function(value) {
 	        this.hasPlaceholder = value;

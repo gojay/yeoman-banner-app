@@ -45,7 +45,8 @@ define(['angular'], function(angular) {
                     },
                     images: {
                         background : null,
-                        logo: BannerImages.logo[0],
+                        logo: null,
+                        badge: null,
                         prize: {
                             1: null,
                             2: null,
@@ -67,6 +68,7 @@ define(['angular'], function(angular) {
                         badge: {
                             enable: false,
                             type: -1,
+                            size: 100
                         },
                         prize: {
                             type: 1,
@@ -85,22 +87,22 @@ define(['angular'], function(angular) {
                     [
                         {
                             type : 'background',
-                            image: 'http://placehold.it/810x380'
+                            image: 'images/default/810x380.png'
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/122x80',
+                            image: 'images/default/122x80.png',
                             options: {
-                                name: 'logo-polaroid',
+                                name: 'logo',
                                 top: 10,
                                 left: 10
                             }
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/340x163',
+                            image: 'images/default/340x163.png',
                             options: {
-                                name: 'prize-polaroid',
+                                name: 'prize-image-1',
                                 top : 185,
                                 left: 440
                             }
@@ -286,31 +288,31 @@ define(['angular'], function(angular) {
                     [
                         {
                             type : 'background',
-                            image: 'http://placehold.it/810x340'
+                            image: 'images/default/810x340.png'
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/122x80',
+                            image: 'images/default/122x80.png',
                             options: {
-                                name: 'logo-polaroid',
+                                name: 'logo',
                                 top: 10,
                                 left: 10
                             }
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/193x120',
+                            image: 'images/default/193x120.png',
                             options: {
-                                name: 'prize-polaroid',
+                                name: 'prize-image-1',
                                 top : 190,
                                 left: 365
                             }
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/193x120',
+                            image: 'images/default/193x120.png',
                             options: {
-                                name: 'prize-polaroid-2',
+                                name: 'prize-image-2',
                                 top : 190,
                                 left: 588
                             }
@@ -521,7 +523,7 @@ define(['angular'], function(angular) {
                     [
                         {
                             type : 'background',
-                            image: 'http://placehold.it/770x315',
+                            image: 'images/default/770x315.png',
                             options: {
                                 left: 20,
                                 top : 20,
@@ -530,14 +532,15 @@ define(['angular'], function(angular) {
                                     blur   : 10,
                                     offsetX: 0,
                                     offsetY: 10
-                                }
+                                },
+                                crossOrigin: 'anonymous'
                             }
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/122x80',
+                            image: 'images/default/122x80.png',
                             options: {
-                                name: 'logo-polaroid',
+                                name: 'logo',
                                 top : 30,
                                 left: 30
                             }
@@ -553,27 +556,27 @@ define(['angular'], function(angular) {
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/230x230',
+                            image: 'images/default/230x230.png',
                             options: {
-                                name: 'prize-polaroid',
+                                name: 'prize-image-1',
                                 top : 435,
                                 left: 20
                             }
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/230x230',
+                            image: 'images/default/230x230.png',
                             options: {
-                                name: 'prize-polaroid-2',
+                                name: 'prize-image-2',
                                 top : 435,
                                 left: 280
                             }
                         },
                         {
                             type: 'polaroid',
-                            image: 'http://placehold.it/230x230',
+                            image: 'images/default/230x230.png',
                             options: {
-                                name: 'prize-polaroid-3',
+                                name: 'prize-image-3',
                                 top : 435,
                                 left: 540
                             }
@@ -829,8 +832,8 @@ define(['angular'], function(angular) {
                             height:80
                         },
                         prize : {
-                            width:340,
-                            height:183
+                            width :340,
+                            height:163
                         },
                         overlay: 138,
                     },
@@ -848,8 +851,8 @@ define(['angular'], function(angular) {
                             height:80
                         },
                         prize : {
-                            width:203,
-                            height:130
+                            width:193,
+                            height:120
                         },
                         overlay: 135,
                     },
@@ -867,8 +870,8 @@ define(['angular'], function(angular) {
                             height:315
                         },
                         prize : {
-                            width:250,
-                            height:250
+                            width:230,
+                            height:230
                         },
                         overlay: 195,
                     },

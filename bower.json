@@ -32,7 +32,8 @@
     "imgareaselect": "~0.9.10",
     "blockui": "*",
     "underscore.string": "~2.3.3",
-    "angular-toggle-switch": "~1.0.0"
+    "angular-toggle-switch": "~1.0.0",
+    "jszip": "Stuk/jszip#~2.4.0"
   },
   "devDependencies": {
     "angular-mocks": "1.2.11",

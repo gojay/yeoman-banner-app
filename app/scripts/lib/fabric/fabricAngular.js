@@ -321,6 +321,24 @@ angular.module('common.fabric', [
                     return object.text;
                 };
 
+                // Get Object By Name
+                self.getObjectByName = function(name, items) {
+                    var object = null,
+                        objects = items ? items.getObjects() : canvas.getObjects();
+
+                    for (var i = 0, len = items ? items.size() : canvas.size(); i < len; i++) {
+                        if (objects[i].name && objects[i].name === name) {
+                            object = objects[i];
+                            break;
+                        }
+                    }
+                    return object;
+                };
+
+                self.getSize = function() {
+                    return self.presetSize;
+                };
+
                 self.buildObjects = function (options) {
                     angular.forEach(options, function(data, key){
                         switch(data.type) {
@@ -459,6 +477,117 @@ angular.module('common.fabric', [
                 //
                 // Text
                 // ==============================================================
+                
+                self.wrapCanvasText = function(t, canvas, maxW, maxH, justify) {
+
+                    if (typeof maxH === "undefined") {
+                        maxH = 0;
+                    }
+                    var words = t.text.split(" ");
+                    var formatted = '';
+
+                    // This works only with monospace fonts
+                    justify = justify || 'left';
+
+                    // clear newlines
+                    var sansBreaks = t.text.replace(/(\r\n|\n|\r)/gm, "");
+                    // calc line height
+                    var lineHeight = new fabric.Text(sansBreaks, {
+                        fontFamily: t.fontFamily,
+                        fontSize: t.fontSize
+                    }).height;
+
+                    // adjust for vertical offset
+                    var maxHAdjusted = maxH > 0 ? maxH - lineHeight : 0;
+                    var context = canvas.getContext("2d");
+
+
+                    context.font = t.fontSize + "px " + t.fontFamily;
+                    var currentLine = '';
+                    var breakLineCount = 0;
+
+                    n = 0;
+                    while (n < words.length) {
+                        var isNewLine = currentLine == "";
+                        var testOverlap = currentLine + ' ' + words[n];
+
+                        // are we over width?
+                        var w = context.measureText(testOverlap).width;
+
+                        if (w < maxW) { // if not, keep adding words
+                            if (currentLine != '') currentLine += ' ';
+                            currentLine += words[n];
+                            // formatted += words[n] + ' ';
+                        } else {
+
+                            // if this hits, we got a word that need to be hypenated
+                            if (isNewLine) {
+                                var wordOverlap = "";
+
+                                // test word length until its over maxW
+                                for (var i = 0; i < words[n].length; ++i) {
+
+                                    wordOverlap += words[n].charAt(i);
+                                    var withHypeh = wordOverlap + "-";
+
+                                    if (context.measureText(withHypeh).width >= maxW) {
+                                        // add hyphen when splitting a word
+                                        withHypeh = wordOverlap.substr(0, wordOverlap.length - 2) + "-";
+                                        // update current word with remainder
+                                        words[n] = words[n].substr(wordOverlap.length - 1, words[n].length);
+                                        formatted += withHypeh; // add hypenated word
+                                        break;
+                                    }
+                                }
+                            }
+                            while (justify == 'right' && context.measureText(' ' + currentLine).width < maxW)
+                            currentLine = ' ' + currentLine;
+
+                            while (justify == 'center' && context.measureText(' ' + currentLine + ' ').width < maxW)
+                            currentLine = ' ' + currentLine + ' ';
+
+                            formatted += currentLine + '\n';
+                            breakLineCount++;
+                            currentLine = "";
+
+                            continue; // restart cycle
+                        }
+                        if (maxHAdjusted > 0 && (breakLineCount * lineHeight) > maxHAdjusted) {
+                            // add ... at the end indicating text was cutoff
+                            formatted = formatted.substr(0, formatted.length - 3) + "...\n";
+                            currentLine = "";
+                            break;
+                        }
+                        n++;
+                    }
+
+                    if (currentLine != '') {
+                        while (justify == 'right' && context.measureText(' ' + currentLine).width < maxW)
+                        currentLine = ' ' + currentLine;
+
+                        while (justify == 'center' && context.measureText(' ' + currentLine + ' ').width < maxW)
+                        currentLine = ' ' + currentLine + ' ';
+
+                        formatted += currentLine + '\n';
+                        breakLineCount++;
+                        currentLine = "";
+                    }
+
+                    // get rid of empy newline at the end
+                    formatted = formatted.substr(0, formatted.length - 1);
+
+                    var ret = new fabric.Text(formatted, { // return new text-wrapped text obj
+                        left: t.left,
+                        top: t.top,
+                        fill: t.fill,
+                        fontFamily: t.fontFamily,
+                        fontSize: t.fontSize,
+                        originX: t.originX,
+                        originY: t.originY,
+                        angle: t.angle,
+                    });
+                    return ret;
+                }
 
                 self.isText = function() {
                     var object = canvas.getActiveObject();
@@ -612,26 +741,6 @@ angular.module('common.fabric', [
                     });
                     canvas._activeObject = null;
                     canvas.setActiveGroup(group.setCoords()).renderAll();
-                };
-
-                //
-                // Get Object By Name
-                // ==============================================================
-                self.getObjectByName = function(name, items) {
-                    var object = null,
-                        objects = items ? items.getObjects() : canvas.getObjects();
-
-                    for (var i = 0, len = items ? items.size() : canvas.size(); i < len; i++) {
-                        if (objects[i].name && objects[i].name === name) {
-                            object = objects[i];
-                            break;
-                        }
-                    }
-                    return object;
-                };
-
-                self.getSize = function() {
-                    return self.presetSize;
                 };
 
                 //
@@ -952,7 +1061,6 @@ angular.module('common.fabric', [
                 // ==============================================================
                 self.selectActiveObject = function() {
                     var activeObject = canvas.getActiveObject();
-
                     if (!activeObject) {
                         return;
                     }
@@ -1183,8 +1291,6 @@ angular.module('common.fabric', [
 
                     self.maxBounding.left = self.canvasWidth - activeObject.getWidth();
                     self.maxBounding.top = self.canvasHeight - activeObject.getHeight();
-
-                    // console.log('updateBounding', self.maxBounding);
                 };
 
                 self.updateControls = function() {
@@ -1236,8 +1342,8 @@ angular.module('common.fabric', [
                 // ============================================================
                 self.startCanvasListeners = function() {
                     canvas.on('object:selected', function() {
-                        self.stopContinuousRendering();
                         console.info('object:selected');
+                        self.stopContinuousRendering();
                         $timeout(function() {
                             self.selectActiveObject();
                             self.updateBounding();
@@ -1247,7 +1353,7 @@ angular.module('common.fabric', [
                     });
 
                     canvas.on('selection:created', function() {
-                        // console.info('selection:created');
+                        console.info('selection:created');
                         self.stopContinuousRendering();
                     });
 
@@ -1274,8 +1380,8 @@ angular.module('common.fabric', [
                     });
 
                     canvas.on({
-                        'object:moving': self.updateControls,
-                        'object:scaling': self.updateControls,
+                        'object:moving'  : self.updateControls,
+                        'object:scaling' : self.updateControls,
                         'object:resizing': self.updateControls,
                         'object:rotating': self.updateControls
                     });
@@ -1293,26 +1399,6 @@ angular.module('common.fabric', [
                     canvases.push(canvas);
                     canvas.clear();
                     canvas.hoverCursor = 'pointer';
-
-                    console.log('init',canvases)
-
-                    // For easily accessing the json
-                    // JSONObject = angular.fromJson(self.json);
-                    // self.loadJSON(self.json);
-
-                    // JSONObject = JSONObject || {};
-
-                    // self.canvasScale = 1;
-
-                    // JSONObject.background = JSONObject.background || '#ffffff';
-                    // self.setCanvasBackgroundColor(JSONObject.background);
-
-                    // // Set the size of the canvas
-                    // JSONObject.width = JSONObject.width || 300;
-                    // self.canvasOriginalWidth = JSONObject.width;
-
-                    // JSONObject.height = JSONObject.height || 300;
-                    // self.canvasOriginalHeight = JSONObject.height;
 
                     self.setCanvasSize(self.canvasOriginalWidth, self.canvasOriginalHeight);
 

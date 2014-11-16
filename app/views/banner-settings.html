@@ -1,5 +1,4 @@
-
-<!-- button -->
+<!-- button
 <button type="button" class="btn btn-sm btn-block"
 	style="{{ showEditor ? 'margin-top:15px' : '' }}" 
 	ng-class="showEditor ? 'btn-primary' : 'btn-success' "
@@ -7,26 +6,14 @@
 	<i ng-class="showEditor ? 'fa fa-bars' : 'fa fa-gear' "></i> 
 	{{ showEditor? 'Templates' : 'Settings' }}
 </button>
+ -->
 <!-- settings -->
+<h4 style="font-weight: bold">Settings</h4>
 <div id="settings" class="margin-top-bottom" ng-class="animation.settings" ng-hide="!showEditor">
 	<accordion close-others="accordion.closeOthers">
 		<!-- Background -->
         <accordion-group heading="Background" is-open="accordion.isFirstOpen" class="panel-primary">
 		   	<div class="form-horizontal">
-			    <div class="form-group">
-			      	<label for="inputLogo" class="col-md-12 control-label">Overlay</label>
-				    <div class="col-md-12 field-top">
-					    <div class="btn-group btn-block">
-					    	<button class="btn btn-success btn-sm"
-					    		ng-click="setBgOverlay(1)"
-					    		ng-class="{'active': banner.config.background.overlay}">Yes</button>
-					    	<button class="btn btn-success btn-sm"
-					    		ng-click="setBgOverlay(0)"
-					    		ng-class="{'active': !banner.config.background.overlay}">No</button>
-					    </div>
-				    </div>
-			    </div>
-
 			    <div class="form-group">
 			      	<label for="inputLogo" class="col-md-12 control-label">Image</label>
 				    <div class="col-md-12 field-top">
@@ -41,7 +28,7 @@
 					    </div>
 				    </div>
 				    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 field-top" ng-show="banner.config.background.type == 0">
-				    	<button type="button" class="btn btn-sm btn-block btn-success" ng-click="setRandomImage()" ng-disabled="loadRandomImage">
+				    	<button type="button" class="btn btn-sm btn-block btn-success" ng-click="setRandomBackground()" ng-disabled="loadRandomImage">
 				    		<span ng-if="loadRandomImage">
 				    			<i class="fa fa-circle-o-notch fa-spin"></i> Loading... 
 				    		</span>
@@ -55,9 +42,20 @@
 	                    	upload-image-options="uploadOptions.background"></upload-image>
 	                </div>
 			    </div>
-
 			    <div class="form-group">
-			      	<label for="inputLogo" class="col-md-12 control-label">FB Logo</label>
+			      	<label for="inputLogo" class="col-md-12 control-label">Overlay</label>
+				    <div class="col-md-12 field-top">
+					    <toggle-switch ng-model="banner.config.background.overlay"></toggle-switch>
+				    </div>
+			    </div>
+			</div>
+        </accordion-group>
+
+        <!-- Facebook -->
+        <accordion-group heading="Facebook" class="panel-primary">
+		   	<div class="form-horizontal">
+			    <div class="form-group">
+			      	<!-- <label for="inputLogo" class="col-md-12 control-label">FB Logo</label> -->
 				    <div class="btn-group col-md-12 btn-images field-top">
 				        <button class="btn btn-default btn-sm col-md-4" style="background: transparent" 
 				        	ng-repeat="img in templates.facebook"
@@ -76,16 +74,7 @@
 			    <div class="form-group">
 			      	<label class="col-md-3 control-label">Enable</label>
 			    	<div class="col-md-8">
-			            <div class="btn-group">
-					        <button class="btn btn-success btn-sm" 
-					        	ng-class="{'active':banner.config.logo.enable}"
-					        	ng-click="setLogoEnable(true)"> On
-					        </button>
-					        <button class="btn btn-success btn-sm" 
-					        	ng-class="{'active':!banner.config.logo.enable}"
-					        	ng-click="setLogoEnable(false)"> Off
-					        </button>
-					    </div>
+			    		<toggle-switch ng-model="banner.config.logo.enable"></toggle-switch>
 					</div>
 			    </div>
 			    <div class="form-group" ng-show="banner.config.logo.enable">
@@ -102,16 +91,7 @@
 
         <!-- Badge -->
         <accordion-group heading="Bagde" class="panel-primary">
-		    <div class="btn-group">
-		        <button class="btn btn-success btn-sm" 
-		        	ng-class="{'active':banner.config.badge.enable}"
-		        	ng-click="setBadgeEnable(true)"> On
-		        </button>
-		        <button class="btn btn-success btn-sm" 
-		        	ng-class="{'active':!banner.config.badge.enable}"
-		        	ng-click="setBadgeEnable(false)"> Off
-		        </button>
-		    </div>
+    		<toggle-switch ng-model="banner.config.badge.enable" knob-label="Enable"></toggle-switch>
 		    <div class="field-top btn-group btn-images field-top" ng-show="banner.config.badge.enable">
 		        <button class="btn btn-default btn-sm col-md-3" style="background: transparent" 
 		        	ng-repeat="img in templates.badges"
@@ -120,6 +100,11 @@
 		        	<img ng-src="{{img}}" width="100%">
 		        </button>
 		    </div>
+		    <div class="field-top input-group margin-bottom-sm" ng-show="banner.config.badge.enable && fabric.selectedObject && fabric.selectedObject.name == 'badge'">
+			  <span class="bg-primary input-group-addon"><i class="fa fa-arrows-alt fa-fw"></i></span>
+			  <input class="form-control" type="number" ng-model="banner.config.badge.size">
+			  <span class="bg-primary input-group-addon">%</span>
+			</div>
         </accordion-group>
 
         <!-- Prizes -->

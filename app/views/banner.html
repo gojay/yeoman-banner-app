@@ -41,7 +41,7 @@
 	    border-radius: 1px;
 	    box-shadow: 0 1px 4px -1px rgba(0, 0, 0, .4);
 	    display: inline-block;
-	    margin: 50px 50px 0;
+	    margin: 20px 0 0;
 	    position: relative;
 	    vertical-align: middle;
 	    z-index: 0;
@@ -82,9 +82,9 @@
 			<!-- templates -->
 			<!-- <div id="templates" ng-class="animation.templates" ng-hide="showEditor"> -->
 			<div id="templates" ng-class="animation.templates">
-				<h4 style="margin-left:15px">Default Templates</h4>
+				<h4 style="font-weight: bold">Templates</h4>
 				<div class="tabbable tabs-left">
-					<ul class="margin-top-bottom nav nav-tabs col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<ul class="margin-top-bottom nav nav-tabs">
 						<li class="disabled"><a href="#0-prize" data-toggle="tab" data-prize="0">Template Empty Prize</a></li>
 						<li class="active"><a href="#1-1prize" data-toggle="tab" data-prize="1">Template 1 - 1 Prize</a></li>
 						<li><a href="#1-2prizes" data-toggle="tab" data-prize="2">Template 1 - 2 Prizes</a></li>
@@ -104,13 +104,13 @@
 	<div class="row">
 		<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" ng-hide="!showEditor || fullEditor">
 			<div class="btn-group btn-block">
-				<button type="button" class="btn col-lg-10 btn-sm btn-success" ng-click="doGenerate()"><i class="fa fa-gear"></i> Generate Image</button>
+				<button type="button" class="btn col-lg-10 btn-sm btn-success" ng-click="doGenerate(false)"><i class="fa fa-gear"></i> Generate Image</button>
 				<button type="button" class="btn col-lg-2 btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
 					<span class="caret"></span>
 					<span class="sr-only">Toggle Dropdown</span>
 				</button>
 				<ul class="dropdown-menu col-lg-12" role="menu">
-					<li><a href="#">Generate Image & Save</a></li>
+					<li><a href ng-click="doGenerate(true)">Generate & Save</a></li>
 				</ul>
 		    </div>
 		</div>
