@@ -1081,7 +1081,7 @@ angular.module('common.fabric', [
 
                 self.deselectActiveObject = function() {
                     console.log('deselectActiveObject', self.selectedObject);
-                    self.selectedObject = false;
+                    self.selectedObject = null;
                 };
 
                 self.deleteActiveObject = function() {
@@ -1342,7 +1342,7 @@ angular.module('common.fabric', [
                 // ============================================================
                 self.startCanvasListeners = function() {
                     canvas.on('object:selected', function() {
-                        console.info('object:selected');
+                        // console.info('object:selected');
                         self.stopContinuousRendering();
                         $timeout(function() {
                             self.selectActiveObject();
@@ -1353,7 +1353,7 @@ angular.module('common.fabric', [
                     });
 
                     canvas.on('selection:created', function() {
-                        console.info('selection:created');
+                        // console.info('selection:created');
                         self.stopContinuousRendering();
                     });
 

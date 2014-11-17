@@ -43,10 +43,18 @@
 	                </div>
 			    </div>
 			    <div class="form-group">
-			      	<label for="inputLogo" class="col-md-12 control-label">Overlay</label>
-				    <div class="col-md-12 field-top">
-					    <toggle-switch ng-model="banner.config.background.overlay"></toggle-switch>
-				    </div>
+			    	<div class="col-md-6">
+				      	<label for="inputLogo" class="control-label">Overlay</label>
+					    <div class="field-top">
+						    <toggle-switch ng-model="banner.config.background.overlay"></toggle-switch>
+					    </div>
+			    	</div>
+			    	<div class="col-md-6" ng-hide="banner.config.background.overlay">
+				      	<label for="inputLogo" class="control-label">Color</label>
+					    <div class="field-top">
+						    <input type="color" ng-model="fabric.canvasBackgroundColor">
+					    </div>
+			    	</div>
 			    </div>
 			</div>
         </accordion-group>
@@ -156,8 +164,7 @@
 			    	ng-model="banner.text.contest.description"></textarea>
 		  	</div>
 
-		  	<!-- <div ng-if="banner.config.prize.type > 0"> -->
-		  	<div>
+		  	<div ng-if="banner.config.prize.type > 0">
 	            <!-- <div class="form-group">
 				    <label for="textTitle">Prize Header Title</label>
 				    <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter prize header title"
@@ -168,17 +175,17 @@
 				    <input type="text" class="form-control input-sm" id="textTitle" placeholder="Enter prize header description"
 				    	ng-model="banner.text.prize.header.description">
 			  	</div> -->
-			  	<div class="form-group">
+			  	<div class="form-group" ng-show="banner.config.prize.type >= 1">
 				    <label for="textPrizeDescription-1">Prize 1</label>
 				    <textarea class="form-control input-sm" id="textPrizeDescription-1" placeholder="Enter prize 1 description"
 				    	ng-model="banner.text.prize.content[1]"></textarea>
 			  	</div>
-			  	<div class="form-group">
+			  	<div class="form-group" ng-show="banner.config.prize.type >= 2">
 				    <label for="textPrizeDescription-2">Prize 2</label>
 				    <textarea class="form-control input-sm" id="textPrizeDescription-2" placeholder="Enter prize 2 description"
 				    	ng-model="banner.text.prize.content[2]"></textarea>
 			  	</div>
-			  	<div class="form-group">
+			  	<div class="form-group" ng-show="banner.config.prize.type >= 3">
 				    <label for="textPrizeDescription-3">Prize 3</label>
 				    <textarea class="form-control input-sm" id="textPrizeDescription-3" placeholder="Enter prize 3 description"
 				    	ng-model="banner.text.prize.content[3]"></textarea>

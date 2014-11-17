@@ -58,6 +58,7 @@ angular.module('common.fabric.window', [])
 	    },
 	    setImage: function(image) {
 	    	if(!image) return;
+	    	this.image.crossOrigin = 'anonymous';
 	    	this.image.setAttribute('src', image);
 	    },
 	    setPlaceholder: function(value) {

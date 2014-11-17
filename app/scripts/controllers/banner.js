@@ -34,7 +34,6 @@ define([
             '$scope',
             '$log',
             '$timeout',
-            'Helpers',
 
             'Fabric',
             'FabricConstants',
@@ -175,15 +174,7 @@ define([
             });
         },
         watch: {
-            'fullEditor': '_onFullEditor',
-            // 'banner.config.background.overlay'  : '_onChangeBackgroundOverlay',
-            // 'banner.config.logo.enable'         : '_onLogoEnable',
-            // 'banner.images.logo'                : '_onLogoImage',
-            // 'banner.config.badge.enable'        : '_onBadgeEnable',
-            // 'banner.config.badge.size'          : '_onBadgeSize',
-
-            // 'banner.images.background'          : '_onChangeBackgroundImage',
-            // '{object}banner.images.prize'       : '_onChangePrizeImages'
+            'fullEditor': '_onFullEditor'
         },
         _watchAsync: function($scope) {
         	var self = this,
@@ -274,7 +265,6 @@ define([
             $scope.$watch('banner.config.logo.enable', this._onLogoEnable);
             $scope.$watch('banner.config.badge.enable', this._onBadgeEnable);
             $scope.$watch('banner.config.badge.size', this._onBadgeSize);
-
             $scope.$watch('banner.images.background', this._onChangeBackgroundImage);
             $scope.$watch('banner.images.logo', this._onLogoImage);
             $scope.$watchCollection('banner.images.prize', this._onChangePrizeImages);
@@ -291,7 +281,7 @@ define([
         },
 
         /**
-         * Set background type
+         * Atur gambar background pada canvas
          * @param {String/Int} type Background
          */
         setBgType: function(type) {
@@ -331,34 +321,36 @@ define([
             var self = this;
             var backgroundSize = this._getSelected('backgroundSize');
 
-            var imageURL = 'http://lorempixel.com/';
+            // var imageURL = 'http://lorempixel.com/';
+            var imageURL = 'http://placekitten.com/';
             var type     = ['abstract', 'business', 'cats', 'city', 'fashion', 'nature', 'technics'];
 
             var tRandom = _.sample(type);
             var nRandom = _.random(1, 10);
 
-            imageURL += backgroundSize.width + '/' + backgroundSize.height + '/';
-            imageURL += tRandom + '/' + nRandom;
+            imageURL += backgroundSize.width + '/' + backgroundSize.height;
+            imageURL += '?image=' + nRandom;
+            // imageURL += tRandom + '/' + nRandom;
 
             this.$log.log('getRandomImage', imageURL);
 
             this.$.loadRandomImage = true;
 
             var img = new Image();
-            img.crossOrigin = 'Anonymous';
             img.onload = function() {
 
-                var canvas = document.createElement('canvas'),
-                    ctx = canvas.getContext('2d');
+                // var canvas = document.createElement('canvas'),
+                //     ctx = canvas.getContext('2d');
 
-                canvas.height = img.height;
-                canvas.width = img.width;
-                ctx.drawImage(img, 0, 0);
+                // canvas.height = img.height;
+                // canvas.width = img.width;
+                // ctx.drawImage(img, 0, 0);
 
-                var dataURL = canvas.toDataURL('image/png');
-                console.log(dataURL);
+                // var dataURL = canvas.toDataURL('image/png');
+                // console.log(dataURL);
 
-                self.$.banner.images.background = dataURL;
+                // self.$.banner.images.background = dataURL;
+                self.$.banner.images.background = this.src;
                 self.$.loadRandomImage = false;
                 self.$.$digest();
             };
@@ -366,7 +358,7 @@ define([
         },
 
         /**
-         * Atur jenis logo Facebook
+         * Atur gambar logo Facebook
          * @param {String} type Facebook logo
          */
         setFbType: function(type) {
@@ -380,7 +372,7 @@ define([
         },
 
         /**
-         * atur jenis logo Badge
+         * atur gambar logo Badge
          * @param {String} type Badge logo
          */
         setBadgeType: function(type) {
@@ -406,6 +398,11 @@ define([
         doSetting: function() {
             this.$.showEditor = !this.$.showEditor;
         },
+
+        /**
+         * Konversikan canvas menjadi image
+         * @param  {Boolean} isSaved Simpan konfigurasi
+         */
         doGenerate: function(isSaved) {
             var self = this;
             var prizeTemplate = this._getSelected('prize');
@@ -414,6 +411,8 @@ define([
 
             var q = async.queue(function (fabric, callback) {
                 self.$log.log('[queue] ', fabric);
+
+                fabric.deselectActiveObject();
 
                 var type = fabric.canvasOriginal.isEnter ? 'enter' : 'like' ;
                 var name = 'banner-prize-' + prizeTemplate + '_' + type + '.png';
@@ -455,9 +454,14 @@ define([
                 }
             });
         },
+
+        /**
+         * Ambil data JSON object 
+         * @param  {String} index Object yg dipilih
+         */
         doGetJSON: function(index) {
             var outputJSON = this.$.fabric.getJSON(true);
-            this.$.outputJSONObject = index ? outputJSON.objects[index] : outputJSON.objects;
+            this.$.outputJSONObject = index ? outputJSON.objects[index] : outputJSON;
         },
 
         /**
@@ -563,16 +567,6 @@ define([
             }
 
             callback();
-
-/*
-
-            // Watchers
-            // Executes the expression on the current scope at a later point in time.
-            // ================================================================
-            if(canvasFabric == 'fabric') {
-                self.$.$evalAsync(self._watchAsync);
-            }
-  */          
         },
 
         _onFullEditor: function(newVal, oldVal) {
@@ -717,7 +711,7 @@ define([
         	var selected = this._getSelected();
 
             var objBgTemplate = selected.objects[0];
-            var objBgOptions  = objBgTemplate.options || {} ;
+            var objBgOptions  = objBgTemplate.options || { crossOrigin: 'anonymous' } ;
 
             this._applyCanvas('*', function(fabric){
             	if(fabric.canvasOriginal.prizeTemplate == selected.prize) {
@@ -785,7 +779,7 @@ define([
                             var obj = fabric.getObjectByName(objName);
                             if(obj) {
                                 obj.setImage(value);
-                                fabric.setActiveObject(obj);
+                                // fabric.setActiveObject(obj);
                             }
                             fabric.render();
                         }

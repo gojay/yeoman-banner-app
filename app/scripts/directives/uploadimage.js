@@ -156,14 +156,14 @@ define([
                                 var _this = this;
                                 switch(act) {
                                     case 'crop':
-                                        var blob = this.getBlob(true);
+                                        var blob = this.getBlob();
                                         $log.debug('blob', blob);
 
-                                        $scope.image = blob;
+                                        // $scope.image = blob;
 
                                         // upload
-                                        // $scope.selectedFiles[0] = blob;
-                                        // $scope.start(0);
+                                        $scope.selectedFiles[0] = blob;
+                                        $scope.start(0);
 
                                         $scope.$on('uploadimage:completed', function(data, percent){
                                             _this.close();
