@@ -142,8 +142,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
                     })
                     .when('/facebook/conversation', {
                         templateUrl: 'views/conversation.html',
-                        controller: 'ConversationCtrl',
-                        resolve: pingResolver
+                        controller: 'ConversationCtrl'
                     })
                     /* splash/poster */
                     .when('/splash/mobile', {

@@ -246,7 +246,7 @@ define([
                         offsetY: 10
                     };
                 }
-            	self._applyCanvas('logo-polaroid', { shadow:shadow });
+            	self._applyCanvas('logo', { shadow:shadow });
             });
             $scope.$watch('fabric.selectedObject.hasPlaceholder', function(hasPlaceholder) {
                 if (!$scope.fabric.selectedObject || _.isUndefined(hasPlaceholder)) return;

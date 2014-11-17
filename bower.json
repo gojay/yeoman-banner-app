@@ -34,7 +34,8 @@
     "underscore.string": "~2.3.3",
     "angular-toggle-switch": "~1.0.0",
     "jszip": "Stuk/jszip#~2.4.0",
-    "async": "~0.9.0"
+    "async": "~0.9.0",
+    "rn-lazy": "revolunet/rn-lazy"
   },
   "devDependencies": {
     "angular-mocks": "1.2.11",

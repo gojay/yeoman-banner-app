@@ -1,0 +1,91 @@
+<div class="form-group col-md-12 prefix">
+	<label>Logo</label>
+	<span class="pull-right">
+		<toggle-switch
+		    ng-model="conversation.config.logo.enable"
+		    knob-label="Enable">
+		<toggle-switch>
+	</span>
+	<span class="help-block" ng-show="conversation.config.logo.enable">Upload Image (use PNG for tansparent background)</span>
+	<div class="row" ng-show="conversation.config.logo.enable">
+		<div class="col-md-4">
+			<upload-image ng-model="conversation.images.logo"
+            	upload-image-enable-crop="true" 
+            	upload-image-class="btn-primary btn-block" 
+            	upload-image-options="uploadOptions.logo"></upload-image>
+    	</div>
+		<div class="col-md-8">
+			<div class="checkbox">
+			    <label>
+			      <input type="checkbox" ng-model="conversation.config.logo.placeholder"> Placeholder
+			    </label>
+			 </div>
+		</div>
+	</div>
+</div>
+
+<div class="form-group col-md-12 prefix margin-top">
+	<label>Element 1</label>
+	<span class="pull-right">
+		<toggle-switch
+		    ng-model="conversation.config.elements[1].enable"
+		    knob-label="Enable">
+		<toggle-switch>
+	</span>
+	<span class="help-block" ng-show="conversation.config.elements[1].enable">Upload Image (use PNG for tansparent background)</span>
+	<div class="row" ng-show="conversation.config.elements[1].enable">
+		<div class="col-md-4">
+			<upload-image ng-model="conversation.images.logo"
+            	upload-image-enable-crop="true" 
+            	upload-image-class="btn-primary btn-block" 
+            	upload-image-options="uploadOptions.logo"></upload-image>
+    	</div>
+		<div class="col-md-4">
+			<div class="checkbox">
+			    <label>
+			      <input type="checkbox" ng-model="conversation.config.elements[1].placeholder"> Placeholder
+			    </label>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="checkbox">
+			    <label>
+			      <input type="checkbox" ng-model="conversation.config.elements[1].default"> Default
+			    </label>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="form-group col-md-12 prefix margin-top">
+	<label>Element 2</label>
+	<span class="pull-right">
+		<toggle-switch
+		    ng-model="conversation.config.elements[2].enable"
+		    knob-label="Enable">
+		<toggle-switch>
+	</span>
+	<span class="help-block" ng-show="conversation.config.elements[2].enable">Upload Image (use PNG for tansparent background)</span>
+	<div class="row" ng-show="conversation.config.elements[2].enable">
+		<div class="col-md-4">
+			<upload-image ng-model="conversation.images.logo"
+            	upload-image-enable-crop="true" 
+            	upload-image-class="btn-primary btn-block" 
+            	upload-image-options="uploadOptions.logo"></upload-image>
+    	</div>
+		<div class="col-md-4">
+			<div class="checkbox">
+			    <label>
+			      <input type="checkbox" ng-model="conversation.config.elements[2].placeholder"> Placeholder
+			    </label>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="checkbox">
+			    <label>
+			      <input type="checkbox" ng-model="conversation.config.elements[2].default"> Default
+			    </label>
+			</div>
+		</div>
+	</div>
+</div>

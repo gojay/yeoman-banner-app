@@ -92,6 +92,34 @@ angular.module('common.fabric.window', [])
 	    }
 	});
 
+	//
+    // ImageCircle
+    // ================================================================
+	fabric.ImageCircle = fabric.util.createClass(fabric.Image, {
+	  	type: 'image',
+	  	initialize: function(element, options) {
+		    this.callSuper('initialize', element, options);
+		    options && this.set('name', options.name);
+	  	},
+	  	toObject: function() {
+	    	return fabric.util.object.extend(this.callSuper('toObject'), { name: this.name });
+	  	},
+		clipTo: function(ctx) {
+		    ctx.arc(0, 0, this.width / 2 , 0, 2*Math.PI, true);
+		}
+	});
+	fabric.ImageCircle.fromURL = function(url, callback, imgOptions) {
+	    fabric.util.loadImage(url, function(img) {
+	      callback(new fabric.ImageCircle(img, imgOptions));
+	    }, null, imgOptions && imgOptions.crossOrigin);
+	};
+	fabric.ImageCircle.fromObject = function(object, callback) {
+	  fabric.util.loadImage(object.src, function(img) {
+	    callback && callback(new fabric.ImageCircle(img, object));
+	  });
+	};
+	fabric.ImageCircle.async = true;
+
 	return $window.fabric;
 
 }]);

@@ -371,6 +371,9 @@ angular.module('common.fabric', [
                                 
                                 fabric.Image.fromURL(data.image, function(object) {
                                     canvas.add(object);
+                                    if( data.sendBack) {
+                                        canvas.sendToBack(object);
+                                    }
                                 }, options);
                                 break;
                             case 'polaroid':
@@ -446,7 +449,8 @@ angular.module('common.fabric', [
                     if ( !object ) return;
 
                     object.getElement().setAttribute('src', imageURL);
-                    self.render();
+                    canvas.calcOffset();
+                    canvas.renderAll();
                 };
 
                 //

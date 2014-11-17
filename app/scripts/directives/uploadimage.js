@@ -356,7 +356,7 @@ define([
                     var button = el.find('button');
                     var input  = el.find('input');
 
-                    if (angular.isUndefined(scope.text)) scope.text = 'Browse';
+                    if (angular.isUndefined(scope.text)) scope.text = attrs.uploadImageBtnText || 'Browse';
                     if (attrs.uploadImageClass) button.addClass(attrs.uploadImageClass);
 
                     scope.enableCrop = angular.isDefined(attrs.uploadImageEnableCrop) ? attrs.uploadImageEnableCrop : false;
