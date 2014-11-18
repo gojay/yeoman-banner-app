@@ -13,7 +13,9 @@ define([
     'fabricDirective',
     'fabricDirtyStatus',
     'fabricUtilities',
-    'fabricWindow'
+    'fabricWindow',
+
+    'jquery-blockui'
 ], function (angular, _, _s, JSZip, async) {
     'use strict';
 
@@ -25,7 +27,8 @@ define([
         'classy-initScope',
         'common.fabric',
         'common.fabric.utilities',
-        'common.fabric.constants'
+        'common.fabric.constants',
+        'common.fabric.window'
     ])
 
     app.classy.controller({
@@ -36,9 +39,11 @@ define([
             '$log',
             '$timeout',
             '$q',
+            '$compile',
 
             'Fabric',
             'FabricConstants',
+            'FabricWindow',
             'Keypress'
         ],
         initScope: {
@@ -133,6 +138,7 @@ define([
                 }
             },
             backgrounds: {
+                progress: -1,
                 size: 0,
                 errors: 0,
                 data: []
@@ -231,19 +237,18 @@ define([
          * @return {Void}        _handleMultipleFiles
          */
         onFileSelect: function($files) {
-            this.$log.log('onFileSelect', $files);
+            var self = this,
+                log = self.$log;
 
-            var self = this;
-
-            self.$.showPreview = true;
-
-            angular.element('html, body').animate({
+            angular.element('body').animate({
                 scrollTop: angular.element("#preview").offset().top
+            }, 1000, function() {
+                log.info('Start chaining...');
+                self._handleMultipleFiles($files).then(function (response) {
+                    log.info('End chain...');
+                    log.log('completed', response, self.$.backgrounds);
+                });
             });
-
-            self.$timeout(function() {
-                self._handleMultipleFiles($files);
-            }, 800);
         },
 
         onFileChange: function($files, index) {
@@ -285,8 +290,7 @@ define([
                         backgrounds.size += blob.size;
 
                         backgrounds.data[index] = {
-                            error: null,
-                            index: index,
+                            notify: 'waiting',
                             src  : img,
                             data : {
                                 blob: blob,
@@ -319,8 +323,34 @@ define([
             var log = this.$log;
             var requests = this.$.backgrounds.data;
 
-            self._doGenerate(requests).then(function(response){
-                log.log('response', response);
+            angular.forEach(requests, function(value, key){
+                self.$timeout(function() {
+                    var el = angular.element('#background-preview-'+ key);
+                    var message = '<i class="fa fa-spinner fa-spin"></i> <span class="notify">waiting..<span>';
+                    el.block({ 
+                        message: message, 
+                        css: { 
+                            backgroundColor: 'transparent',
+                            width: '200px',
+                            border: 'none' 
+                        },
+                        overlayCSS:  { 
+                            backgroundColor: '#fff', 
+                            opacity: 0.8
+                        },   
+                    });
+                });
+            });
+
+            angular.element('body').animate({
+                scrollTop: angular.element("#preview").offset().top - 60
+            }, 1000, function() {
+                log.info('Start generating...');
+                self.$.backgrounds.progress = 0;
+                self._doGenerate(requests).then(function(response){
+                    log.info('End generate...');
+                    log.log('response', response);
+                });
             });
         },
 
@@ -328,19 +358,53 @@ define([
             var self = this, 
                 log = this.$log;
 
-            var until = requests.length - 1;
+            var until = requests.length - 1,
+                size = 0;
 
             var defer = this.$q.defer();
 
-            var promises = requests.reduce(function(promise, request, _index) {
-                log.log('request', _index, request);
+            var promises = requests.reduce(function(promise, request, index) {
+                log.log('request', index, request);
                 return promise.then(function() {
-                    return self._doSomething(_index).then(function(response) {
-                        log.log('chain', _index, response);
-                        if(_index == until) return 'completed';
-                    });
-                }, function reject(error) {
-                    log.warn(error);
+                    var el = angular.element('#background-preview-'+ index);
+                    return self._doSomething(index)
+                        .then(function resolve(response) {
+                            log.log('resolve', index, response);
+                        }, function reject(response) {
+                            log.log('reject', index, response);
+                        }, function notify(response) {
+                            log.log('notify', index, response);
+                            // el.find('.blockMsg > .notify').text(response);
+                            var message = '<i class="fa fa-spinner fa-spin"></i> <span class="notify">'+ response +'<span>';
+                            el.block({ 
+                                message: message, 
+                                css: { 
+                                    backgroundColor: 'transparent',
+                                    width: '200px',
+                                    border: 'none' 
+                                },
+                                overlayCSS:  { 
+                                    backgroundColor: '#fff', 
+                                    opacity: 0.8
+                                },   
+                            });
+                        })
+                        .then(function() {
+                            el.unblock();
+                            size += request.data.blob.size;
+                            var total = self.$.backgrounds.size;
+                            var progress = size/total * 100;
+                            self.$.backgrounds.progress = progress
+                            log.log('progress', progress);
+
+                            if(index != 0 && index % 3 == 0) {
+                                angular.element('body').animate({
+                                    scrollTop: el.offset().top - 60
+                                }, 1000);
+                            }
+
+                            if(index == until) return 'completed';
+                        });
                 });
             }, defer.promise);
 
@@ -349,11 +413,55 @@ define([
             return promises;
         },
         _doSomething: function(index) {
+            var self = this,
+                log = self.$log,
+                timeout = self.$timeout;
+
+            var backgroundId = '#background-preview-' + index,
+                backgroundImage = self.$.backgrounds.data[index].src;
+
+            var originalCanvas = self.$.fabric.canvas,
+                width = originalCanvas.originalWidth, 
+                height = originalCanvas.originalHeight,
+                canvasScale = self.$.fabric.canvasScale;
+
             var defer = this.$q.defer();
 
-            this.$timeout(function() {
-                defer.resolve('ok ' + index)
+            timeout(function() { defer.notify('Preparing...'); });
+
+            var json = JSON.stringify(originalCanvas.toJSON([]));
+            
+            var canvasEl = document.createElement('canvas');
+            var canvas = new self.FabricWindow.Canvas(canvasEl);
+            canvas.loadFromJSON(json, function() {
+                canvas.originalWidth = width;
+                canvas.originalHeight = height;
+                canvas.setWidth(width * canvasScale);
+                canvas.setHeight(height * canvasScale);
+
+                var objects = canvas.getObjects();
+                for (var i in objects) {
+                    objects[i].lockObject = true;
+                    objects[i].hasControls = false;
+                    objects[i].setCoords();
+                }
+
+                canvas.setBackgroundImage(backgroundImage, canvas.renderAll.bind(canvas), {
+                    scaleX: canvasScale,
+                    scaleY: canvasScale
+                });
+            });
+
+            canvasEl.style.position = 'relative';
+            angular.element(backgroundId).find('.image').html(canvasEl);
+
+            timeout(function() {
+                defer.notify('Generating...');
+                timeout(function() {
+                    defer.resolve('completed ' + index)
+                }, Math.floor(Math.random() * 1000));
             }, Math.floor(Math.random() * 1000));
+
 
             return defer.promise;
         },
@@ -361,29 +469,48 @@ define([
         /** @private **/
  
         _handleMultipleFiles: function(files){
-            var self = this;
+            var self = this,
+                log = this.$log;
 
-            var tasks = []
-            for (var i = 0; i < files.length; i++) {
-                tasks.push(
-                    self._queue(files[i]).then(function(res){ 
-                        var index = res.index;
-                        console.log("resolve", index, res);
-                        self.$.backgrounds.data[index] = { loading:false, src:res.src, data:res.data };
-                        return res; 
-                    }, function reject(error) {
-                        var index = error.index;
-                        console.log("reject", index, error);
-                        self.$.backgrounds.errors += 1;
-                        self.$.backgrounds.data[index] = { loading:false, src:error.src, error: error.message };
-                        return error;
-                    })
-                );
-            }
+            var backgrounds = self.$.backgrounds;
 
-            this.$q.all(tasks).then(function(res) {
-                console.log("backgrounds", self.$.backgrounds);
-            });
+            var until = files.length - 1;
+
+            var defer = self.$q.defer();
+
+            var promises = files.reduce(function (promise, file, index) {
+                return promise.then(function() {
+                    return self._queue(file)
+                        .then(function resolve(response) {
+                            log.log('resolve', index, response);
+                            response.loading = false;
+                            backgrounds.data[index] = response;
+                        }, function reject(response) {
+                            log.warn('reject', index, response);
+                            response.loading = false;
+                            backgrounds.errors += 1;
+                            backgrounds.data[index] = response;
+                        }, function notify(message) {
+                            log.info('notify', index, message);
+                            backgrounds.data.push({ loading:true, notify:message });
+                        })
+                        .then(function() {
+                            log.info('finally', index);
+
+                            if(index != 0 && index % 3 == 0) {
+                                angular.element('body').animate({
+                                    scrollTop: angular.element('#background-preview-'+ index).offset().top - 60
+                                }, 1000);
+                            }
+
+                            if(index == until) return 'completed';
+                        });
+                });
+            }, defer.promise);
+
+            defer.resolve();
+
+            return promises;
         },
         // add queue request
         _queue: function(file){
@@ -397,7 +524,7 @@ define([
 
             var index = backgrounds.data.length;
 
-            backgrounds.data.push({ loading: true });
+            this.$timeout(function() { defer.notify('checking file...'); });
 
             // validation image
             var valid = this._validation(file, false);
@@ -405,8 +532,8 @@ define([
                 log.warn(valid.message);
 
                 defer.reject({ 
-                    index: index,
-                    message: valid.message 
+                    src: 'images/default/file.png',
+                    error: valid.message 
                 });
 
             } else {
@@ -433,9 +560,8 @@ define([
                                 log.warn('File '+ name +' is too small!!');
 
                                 defer.reject({
-                                    index: index,
-                                    message: 'File '+ name +' is too small!!',
-                                    src: img
+                                    error: 'File '+ name +' is too small!!',
+                                    src  : img
                                 });
 
                             } else {
@@ -449,15 +575,14 @@ define([
                                     direction = 'portrait';
                                 }
 
-                                log.info('added', filename);
+                                log.info('File added', filename);
 
                                 var type = self._getImageType(width, height);
 
                                 backgrounds.size += blob.size;
 
                                 defer.resolve({
-                                    error: null,
-                                    index: index,
+                                    notify: 'waiting',
                                     src  : img,
                                     data : {
                                         blob  : blob,
@@ -569,25 +694,11 @@ define([
 
             var objects = [
                 {
-                    type: 'image',
-                    image: 'images/conversation/tpl-1.png',
-                    sendBack: true,
-                    options: {
-                        name: 'background',
-                        left: 0,
-                        top : 0,
-                        hasControls: false,
-                        lockObject: true,
-                        lockRotation: true,
-                        lockUniScaling: true,
-                        lockScalingY: true,
-                        lockScalingX: true,
-                        lockMovementX: true,
-                        lockMovementY: true
-                    }
+                    type: 'overlay',
+                    image: 'images/conversation/tpl-1.png'
                 },
                 {
-                    type: 'polaroid',
+                    type: 'image',
                     image: 'images/default/165x45.png',
                     options: {
                         name: 'logo',
@@ -596,7 +707,7 @@ define([
                     }
                 },
                 {
-                    type: 'polaroid',
+                    type: 'image',
                     image: 'images/default/70x70.png',
                     options: {
                         name: 'element-1',
@@ -605,7 +716,7 @@ define([
                     }
                 },
                 {
-                    type: 'polaroid',
+                    type: 'image',
                     image: 'images/default/70x70.png',
                     options: {
                         name: 'element-2',
@@ -626,7 +737,7 @@ define([
             this.$log.log('_onChangeTemplate', selected);
 
             var imgURL = 'images/conversation/' + selected.template.default;
-            this.$.fabric.setImageObject('background', imgURL);
+            this.$.fabric.setOverlayImage(imgURL);
         }
     });
 });

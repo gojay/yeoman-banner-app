@@ -268,6 +268,12 @@ angular.module('common.fabric', [
                             scaleY: self.canvasScale
                         });
                     }
+                    if (canvas.overlayImage) {
+                        canvas.overlayImage.set({
+                            scaleX: self.canvasScale,
+                            scaleY: self.canvasScale
+                        });
+                    }
                     self.updateControls();
                 };
 
@@ -345,6 +351,10 @@ angular.module('common.fabric', [
                             case 'background':
                                 var options = data.options ? data.options : {} ;
                                 canvas.setBackgroundImage(data.image, null, options);
+                                break;
+                            case 'overlay':
+                                var options = data.options ? data.options : {} ;
+                                canvas.setOverlayImage(data.image, canvas.renderAll.bind(canvas), options);
                                 break;
                             case 'text':
                                 var options = angular.extend(self.textDefaults, data.options);
@@ -1156,6 +1166,23 @@ angular.module('common.fabric', [
                     });
                 };
 
+                self.cloneJSON = function() {
+                    canvas.clone(function(clone) {
+                        var objects = clone.getObjects();
+                        for (var i in objects) {
+                            objects[i].lockMovementX = true;
+                            objects[i].lockMovementY = true;
+                            objects[i].lockScalingX = true;
+                            objects[i].lockScalingY = true;
+                            objects[i].lockUniScaling = true;
+                            objects[i].lockRotation = true;
+                            objects[i].lockObject = true;
+                            objects[i].hasControls = false;
+                        }
+                        console.log('clone', clone);
+                    });
+                };
+
                 //
                 // Download Canvas
                 // ==============================================================
@@ -1393,6 +1420,9 @@ angular.module('common.fabric', [
 
                 self.setbackgroundImage = function(imageURL, options) {
                     canvas.setBackgroundImage(imageURL, canvas.renderAll.bind(canvas), options);
+                },
+                self.setOverlayImage = function(imageURL) {
+                    canvas.setOverlayImage(imageURL, canvas.renderAll.bind(canvas));
                 },
 
                 //

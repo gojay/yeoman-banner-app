@@ -68,6 +68,13 @@
 		opacity: 0.2 !important; 
 	}
 
+	.img-preparing {
+		opacity: .4
+	}
+	.img-generating {
+		opacity: .8
+	}
+
 	/* drop backgrounds */
 
 	#drop-backgrounds {
@@ -192,16 +199,31 @@
 	<div id="preview" class="row margin-top" style="min-height:500px;">
 		<h4>Preview <span ng-show="backgrounds.data.length > 0"><span class="badge">{{ backgrounds.data.length }}</span></span></h4>
 
-		<div class="col-md-12 margin-top" ng-show="backgrounds.data.length > 0">
+		<div class="progress progress-striped active" ng-show="backgrounds.progress > -1">
+		  	<div class="progress-bar progress-bar-success" style="width: {{ backgrounds.progress }}%"></div>
+		</div>
+
+		<div class="col-md-12 margin-top" ng-show="backgrounds.data.errors > 0">
 			<span class="label label-danger">Errors : {{ backgrounds.errors }}</span>
 		</div>
 		
-		<div class="col-md-12 margin-top well">
-			<div class="col-md-3" ng-repeat="image in backgrounds.data" style="height:300px" ng-class="{'v-center': image.error && !image.src}">
-				<wave-spinner ng-show="image.loading"></wave-spinner>
-				
-				<img ng-src="{{image.src}}" class="img-responsive" ng-show="image.src && !image.loading" ng-class="{'img-small': image.error && image.src}">
+		<div class="col-md-12 margin-top">
+			<div id="background-preview-{{ $index }}" class="col-md-3" style="min-height:300px" 
+				ng-repeat="image in backgrounds.data"
+				ng-class="{
+					'img-preparing': image.status && image.status == 'prepare', 
+					'img-generating': image.status && image.status == 'generate'
+				}">
 
+				<div ng-show="image.loading" style="position:relative; top:40%">
+					<span class="col-md-12 text-center" style="margin-top:40px">{{ image.notify }}</span>
+					<wave-spinner></wave-spinner>
+				</div>
+
+				<div class="image text-center" ng-show="image.src && !image.loading">
+					<img ng-src="{{image.src}}" class="img-responsive" ng-class="{'img-small': image.error && image.src}">
+				</div>
+				
 				<div ng-show="image.error && !image.loading" class="text-danger text-center" style="position:absolute; top:30%;">
 					  <div class="alert alert-dismissable alert-warning" style="opacity: .8;">
 						<p class="ng-binding">{{ image.error }}</p>

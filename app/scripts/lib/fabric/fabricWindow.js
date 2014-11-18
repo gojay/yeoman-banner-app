@@ -2,35 +2,6 @@ angular.module('common.fabric.window', [])
 
 .factory('FabricWindow', ['$window', function($window) {
 
-	fabric.LabeledRect = fabric.util.createClass(fabric.Rect, {
-
-	  type: 'text',
-
-	  initialize: function(options) {
-	    options || (options = { });
-
-	    this.callSuper('initialize', options);
-	    this.set('text', options.text || '');
-	  },
-
-	  toObject: function() {
-	    return fabric.util.object.extend(this.callSuper('toObject'), {
-	      text: this.get('text')
-	    });
-	  },
-
-	  _render: function(ctx) {
-	    this.callSuper('_render', ctx);
-
-	    console.log('this', this);
-
-	    ctx.font = '20px Helvetica';
-	    ctx.fillStyle = '#333';
-	    ctx.fillText(this.text, -this.width/2 + 20, -this.height/2 + 20);
-	  }
-	});
-
-    //
     // PolaroidPhoto
     // ================================================================
 	fabric.PolaroidPhoto = fabric.util.createClass(fabric.Object, fabric.Observable, {
@@ -64,6 +35,9 @@ angular.module('common.fabric.window', [])
 	    setPlaceholder: function(value) {
 	        this.hasPlaceholder = value;
 	    },
+	  	toObject: function() {
+	    	return fabric.util.object.extend(this.callSuper('toObject'), { name: this.name });
+	  	},
 	    _render: function(ctx) {
 	        if (this.loaded) {
 
@@ -91,6 +65,13 @@ angular.module('common.fabric.window', [])
 	        }
 	    }
 	});
+	fabric.PolaroidPhoto.fromObject = function (object, callback) {
+	    fabric.util.enlivenObjects(object.objects, function (enlivenedObjects) {
+	        delete object.objects;
+	        callback && calback(new fabric.PolaroidPhoto(enlivenedObjects, object));
+	    });
+	};
+	fabric.PolaroidPhoto.async = true;
 
 	//
     // ImageCircle
