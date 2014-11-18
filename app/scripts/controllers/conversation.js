@@ -132,7 +132,12 @@ define([
                     h: 403
                 }
             },
-            imgPreview: []
+            backgrounds: {
+                size: 0,
+                errors: 0,
+                data: []
+            },
+            showPreview: false
         },
         init: function() {
             var self = this;
@@ -160,8 +165,6 @@ define([
                     }
                 }
             };
-
-            this.$.errorFiles = [];
 
             this.$.$on('canvas:created', this._onCanvasCreated);
         },
@@ -221,16 +224,37 @@ define([
             if(!this.$.fabric.selectedObject) return null;
             return _.titleize(this.$.fabric.selectedObject[type]);
         },
+
+        /**
+         * Atur file background (multiple)
+         * @param  {FILE} $files file input
+         * @return {Void}        _handleMultipleFiles
+         */
         onFileSelect: function($files) {
             this.$log.log('onFileSelect', $files);
-            this._handleMultipleFiles($files);
+
+            var self = this;
+
+            self.$.showPreview = true;
+
+            angular.element('html, body').animate({
+                scrollTop: angular.element("#preview").offset().top
+            });
+
+            self.$timeout(function() {
+                self._handleMultipleFiles($files);
+            }, 800);
         },
+
         onFileChange: function($files, index) {
             var self = this, 
-                 log = this.$log;
+                log = this.$log,
+                dimensions = this.$.dimensions,
+                backgrounds = this.$.backgrounds;
 
             var file = $files[0];
 
+            // validation
             var valid = this._validation(file, true);
             if(valid === false) return;
 
@@ -256,32 +280,25 @@ define([
                             return;
                         }
 
-                        var ratio = width/height, direction;
-                        if( ratio == 1 ) {
-                            direction = 'default';
-                        } else if( ratio > 1 ) {
-                            direction = 'landscape';
-                        } else {
-                            direction = 'portrait';
-                        }
+                        var type = self._getImageType(width, height);
 
-                        self._fileSizes += blob.size;
+                        backgrounds.size += blob.size;
 
-                        var dimension = self.$.dimensions[direction];
-                        self.$.imgPreview[index] = {
+                        backgrounds.data[index] = {
                             error: null,
                             index: index,
                             src  : img,
                             data : {
                                 blob: blob,
                                 name: filename, 
-                                dimension: dimension,
-                                direction: direction
+                                dimension: dimensions[type],
+                                type: type
                             }
                         };
-                        self.$.$apply();
 
-                        log.log('imgPreview', self.$.imgPreview[index]);
+                        backgrounds.errors -= 1;
+
+                        self.$.$apply();
                     };
                 };
             })(file);
@@ -292,12 +309,57 @@ define([
             angular.element($event.currentTarget).next().trigger('click');
         },
         doDeleteImg: function(index) {
-            this.$.imgPreview.splice(index, 1);
+            var backgrounds = this.$.backgrounds;
+            backgrounds.errors -= 1;
+            backgrounds.data.splice(index, 1);
+        },
+
+        doGenerate: function() {
+            var self = this;
+            var log = this.$log;
+            var requests = this.$.backgrounds.data;
+
+            self._doGenerate(requests).then(function(response){
+                log.log('response', response);
+            });
+        },
+
+        _doGenerate: function(requests) {
+            var self = this, 
+                log = this.$log;
+
+            var until = requests.length - 1;
+
+            var defer = this.$q.defer();
+
+            var promises = requests.reduce(function(promise, request, _index) {
+                log.log('request', _index, request);
+                return promise.then(function() {
+                    return self._doSomething(_index).then(function(response) {
+                        log.log('chain', _index, response);
+                        if(_index == until) return 'completed';
+                    });
+                }, function reject(error) {
+                    log.warn(error);
+                });
+            }, defer.promise);
+
+            defer.resolve();
+
+            return promises;
+        },
+        _doSomething: function(index) {
+            var defer = this.$q.defer();
+
+            this.$timeout(function() {
+                defer.resolve('ok ' + index)
+            }, Math.floor(Math.random() * 1000));
+
+            return defer.promise;
         },
 
         /** @private **/
-
-        _fileSizes: 0, 
+ 
         _handleMultipleFiles: function(files){
             var self = this;
 
@@ -305,22 +367,22 @@ define([
             for (var i = 0; i < files.length; i++) {
                 tasks.push(
                     self._queue(files[i]).then(function(res){ 
-                        console.log("resolve", res);
                         var index = res.index;
-                        self.$.imgPreview[index] = { loading:false, src:res.src, data:res.data };
+                        console.log("resolve", index, res);
+                        self.$.backgrounds.data[index] = { loading:false, src:res.src, data:res.data };
                         return res; 
                     }, function reject(error) {
-                        console.log("reject", error);
                         var index = error.index;
-                        self.$.imgPreview[index] = { loading:false, error: error.message, src:error.src };
+                        console.log("reject", index, error);
+                        self.$.backgrounds.errors += 1;
+                        self.$.backgrounds.data[index] = { loading:false, src:error.src, error: error.message };
                         return error;
                     })
                 );
             }
 
             this.$q.all(tasks).then(function(res) {
-                console.log("imgPreview", self.$.imgPreview);
-                console.log("Finished add to list", res, self._fileSizes);
+                console.log("backgrounds", self.$.backgrounds);
             });
         },
         // add queue request
@@ -330,9 +392,12 @@ define([
             var self = this;
             var log = this.$log;
 
-            var index = self.$.imgPreview.length;
+            var dimensions = this.$.dimensions,
+                backgrounds = this.$.backgrounds;
 
-            self.$.imgPreview.push({ loading: true });
+            var index = backgrounds.data.length;
+
+            backgrounds.data.push({ loading: true });
 
             // validation image
             var valid = this._validation(file, false);
@@ -386,18 +451,19 @@ define([
 
                                 log.info('added', filename);
 
-                                self._fileSizes += blob.size;
+                                var type = self._getImageType(width, height);
 
-                                var dimension = self.$.dimensions[direction];
+                                backgrounds.size += blob.size;
+
                                 defer.resolve({
-                                    index: index,
                                     error: null,
+                                    index: index,
                                     src  : img,
                                     data : {
                                         blob  : blob,
                                         name  : filename, 
-                                        dimension: dimension,
-                                        direction: direction
+                                        dimension: dimensions[type],
+                                        type: type
                                     }
                                 });
 
@@ -413,11 +479,28 @@ define([
             // return promise
             return defer.promise;
         },
+        /**
+         * Jenis gambar : default, potrait, landscape
+         * @param  {Integer} width  Lebar gambar
+         * @param  {Integer} height Tinggi gambar
+         * @return {Sting}        Jenis gambar
+         */
+        _getImageType: function(width, height) {
+            var ratio = width/height, type;
+            if( ratio == 1 ) {
+                type = 'default';
+            } else if( ratio > 1 ) {
+                type = 'landscape';
+            } else {
+                type = 'portrait';
+            }
+            return type;
+        },
         // file validation
         _validation: function(file, showAlert){
             var response = { status: true };
 
-            var currentImages = this.$.imgPreview;
+            var currentImages = this.$.backgrounds;
             // validation file image selected
             if (!(file.type && file.type.match('image.*'))) {
                 var message = 'File '+ file.name +' is not an image. Only JPG, PNG or GIF files are allowed';

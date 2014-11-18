@@ -1,0 +1,536 @@
+<style>
+	.tf {
+		padding: 15px;
+		border-left: 1px solid rgb(236, 240, 241);
+		border-right: 1px solid rgb(236, 240, 241);
+		border-bottom: 1px solid rgb(236, 240, 241);
+	}
+</style>
+<!-- config -->
+<div class="row margin-bottom" ng-init="showConfig = false" ng-show="fullEditor && fabric.selectedObject">
+    <div class="col-md-12">
+        <div class="btn-group pull-right" ng-show="fullEditor && fabric.selectedObject">
+            <toggle-switch ng-model="showConfig" knob-label="Config">
+                <toggle-switch>
+        </div>
+    </div>
+    <tabset class="col-md-12" ng-show="showConfig">
+        <!-- object -->
+        <tab heading="{{getObjectTitle('type')}}">
+            <div ng-switch='fabric.selectedObject.type'>
+
+                <div ng-switch-when="text">
+                    <div class="col-md-12 tf">
+                        <div class="col-md-6">
+                            <div class="form-horizontal col-md-12">
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <div class="btn-group btn-block" dropdown is-open="dropdown.fontIsOpen">
+                                            <button type="button" class="col-sm-12 btn btn-primary dropdown-toggle" ng-disabled="disabled">
+                                                <span class='object-font-family-preview' style='font-family: "{{ fabric.selectedObject.fontFamily }}";'>
+                                                    {{ fabric.selectedObject.fontFamily }}
+                                                </span>
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li ng-repeat='font in FabricConstants.fonts' ng-click='fabric.setFontFamily(font.name); dropdown.fontIsOpen = !dropdown.fontIsOpen' style='font-family: "{{ font.name }}";'>
+                                                    <a>
+                                                        <span class='object-font-family-preview' style='font-family: {{ font.name }};'>
+                                                            {{ font.name }}
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <textarea style="text-align: {{ fabric.selectedObject.textAlign }}" class="input-sm form-control" rows="6" ng-model="fabric.selectedObject.text"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-horizontal col-md-12">
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        <i class="fa fa-text-height"></i>
+                                        <input type='number' class="input-sm form-control" ng-model="fabric.selectedObject.fontSize" />
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <i class="fa fa-align-left"></i>
+                                        <input type='number' class="input-sm form-control" ng-model="fabric.selectedObject.lineHeight" step=".1" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <label>Align</label>
+                                        <div class='btn-group btn-block'>
+                                            <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'left' }" ng-click="fabric.selectedObject.textAlign = 'left'" class='btn btn-sm'>
+                                                <i class='fa fa-align-left'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'center' }" ng-click="fabric.selectedObject.textAlign = 'center'" class='btn btn-sm'>
+                                                <i class='fa fa-align-center'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'right' }" ng-click="fabric.selectedObject.textAlign = 'right'" class='btn btn-sm'>
+                                                <i class='fa fa-align-right'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Styles</label>
+                                        <div class='btn-group btn-block'>
+                                            <button ng-class="{ 'btn-default': fabric.isBold() }" ng-click="fabric.toggleBold()" class='btn btn-sm'>
+                                                <i class='fa fa-bold'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.isItalic() }" ng-click="fabric.toggleItalic()" class='btn btn-sm'>
+                                                <i class='fa fa-italic'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.isUnderline() }" ng-click="fabric.toggleUnderline()" class='btn btn-sm'>
+                                                <i class='fa fa-underline'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.isLinethrough() }" ng-click="fabric.toggleLinethrough()" class='btn btn-sm'>
+                                                <i class='fa fa-strikethrough'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <label>Color</label>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type='color' class="input-sm form-control" ng-model="fabric.selectedObject.fill" />
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type='text' class="input-sm form-control" ng-model="fabric.selectedObject.fill" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-switch-when="i-text">
+                    <div class="form-horizontal tf col-md-12">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <textarea style="text-align: {{ fabric.selectedObject.textAlign }}" class="input-sm form-control" rows="6" ng-model="fabric.selectedObject.text"></textarea>
+                                <!-- <div class="checkbox">
+						                        <label>
+						                          <input type="checkbox" ng-model="fabric.textDefaults.keepCenterH"> Keep Center 
+						                        </label>
+						                    </div> -->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <legend>Color</legend>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type='color' class="input-sm form-control" bind-value-to="fill" />
+                            </div>
+                            <div class="col-sm-6">
+                                <button class="btn btn-sm btn-block" ng-click="fabric.setSelectionStyle('fill', 'random');">Random Color</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <legend>Stroke</legend>
+                            </div>
+                            <div class="col-sm-8">
+                                <label for="">Color</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="">Width</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type='color' class="input-sm col-sm-12 form-control" ng-model="fabric.selectedObject.stroke" />
+                            </div>
+                            <div class="col-sm-5">
+                                <input type='text' class="input-sm col-sm-12 form-control" ng-model="fabric.selectedObject.stroke" />
+                            </div>
+                            <div class="col-sm-4">
+                                <input type='number' class="input-sm form-control" ng-model="fabric.selectedObject.strokeWidth" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <legend>Font</legend>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="btn-group btn-block" dropdown is-open="dropdown.fontIsOpen">
+                                    <button type="button" class="col-sm-12 btn btn-primary dropdown-toggle" ng-disabled="disabled">
+                                        <span class='object-font-family-preview' style='font-family: "{{ fabric.selectedObject.fontFamily }}";'>
+                                            {{ fabric.selectedObject.fontFamily }}
+                                        </span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li ng-repeat='font in FabricConstants.fonts' ng-click='fabric.setFontFamily(font.name); dropdown.fontIsOpen = !dropdown.fontIsOpen' style='font-family: "{{ font.name }}";'>
+                                            <a>
+                                                <span class='object-font-family-preview' style='font-family: {{ font.name }};'>
+                                                    {{ font.name }}
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <i class="fa fa-text-height"></i>
+                                <input type='number' class="input-sm form-control" min="1" max="120" step="1" bind-value-to="fontSize" />
+                            </div>
+                            <div class="col-sm-6">
+                                <i class="fa fa-align-left"></i>
+                                <input type='number' class="input-sm form-control" ng-model="fabric.selectedObject.lineHeight" step=".1" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <legend>Stlye & Align</legend>
+                            </div>
+                            <div class='btn-group col-sm-12'>
+                                <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'left' }" ng-click="fabric.selectedObject.textAlign = 'left'" class='btn btn-sm'>
+                                    <i class='fa fa-align-left'></i>
+                                </button>
+
+                                <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'center' }" ng-click="fabric.selectedObject.textAlign = 'center'" class='btn btn-sm'>
+                                    <i class='fa fa-align-center'></i>
+                                </button>
+
+                                <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'right' }" ng-click="fabric.selectedObject.textAlign = 'right'" class='btn btn-sm'>
+                                    <i class='fa fa-align-right'></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class='btn-group col-sm-12'>
+                                <button ng-class="{ 'btn-default': fabric.isBold() }" ng-click="fabric.toggleBold()" class='btn btn-sm'>
+                                    <i class='fa fa-bold'></i>
+                                </button>
+
+                                <button ng-class="{ 'btn-default': fabric.isItalic() }" ng-click="fabric.toggleItalic()" class='btn btn-sm'>
+                                    <i class='fa fa-italic'></i>
+                                </button>
+
+                                <button ng-class="{ 'btn-default': fabric.isUnderline() }" ng-click="fabric.toggleUnderline()" class='btn btn-sm'>
+                                    <i class='fa fa-underline'></i>
+                                </button>
+
+                                <button ng-class="{ 'btn-default': fabric.isLinethrough() }" ng-click="fabric.toggleLinethrough()" class='btn btn-sm'>
+                                    <i class='fa fa-strikethrough'></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-switch-when="textbox">
+                    <div class="col-md-12 tf">
+                        <div class="col-md-6">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <div class="btn-group btn-block" dropdown is-open="dropdown.fontIsOpen">
+                                            <button type="button" class="col-sm-12 btn btn-primary dropdown-toggle" ng-disabled="disabled">
+                                                <span class='object-font-family-preview' style='font-family: "{{ fabric.selectedObject.fontFamily }}";'>
+                                                    {{ fabric.selectedObject.fontFamily }}
+                                                </span>
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu col-md-12">
+                                                <li ng-repeat='font in FabricConstants.fonts' ng-click='fabric.setFontFamily(font.name); dropdown.fontIsOpen = !dropdown.fontIsOpen' style='font-family: "{{ font.name }}";'>
+                                                    <a>
+                                                        <span class='object-font-family-preview' style='font-family: {{ font.name }};'>
+                                                            {{ font.name }}
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <textarea style="text-align: {{ fabric.selectedObject.textAlign }}" class="input-sm form-control" rows="6" ng-model="fabric.selectedObject.text"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-6">
+                                        <i class="fa fa-text-height"></i>
+                                        <input type='number' class="input-sm form-control" bind-value-to="fontSize" />
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <i class="fa fa-align-left"></i>
+                                        <input type='number' class="input-sm form-control" ng-model="fabric.selectedObject.lineHeight" step=".1" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class='col-sm-6'>
+                                        <label class="label-control">Align</label>
+                                        <div class='btn-group btn-block'>
+                                            <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'left' }" ng-click="fabric.selectedObject.textAlign = 'left'" class='btn btn-sm'>
+                                                <i class='fa fa-align-left'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'center' }" ng-click="fabric.selectedObject.textAlign = 'center'" class='btn btn-sm'>
+                                                <i class='fa fa-align-center'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.selectedObject.textAlign == 'right' }" ng-click="fabric.selectedObject.textAlign = 'right'" class='btn btn-sm'>
+                                                <i class='fa fa-align-right'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class='col-sm-6'>
+                                        <label class="label-control">Styles</label>
+                                        <div class='btn-group btn-block'>
+                                            <button ng-class="{ 'btn-default': fabric.isBold() }" ng-click="fabric.toggleBold()" class='btn btn-sm'>
+                                                <i class='fa fa-bold'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.isItalic() }" ng-click="fabric.toggleItalic()" class='btn btn-sm'>
+                                                <i class='fa fa-italic'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.isUnderline() }" ng-click="fabric.toggleUnderline()" class='btn btn-sm'>
+                                                <i class='fa fa-underline'></i>
+                                            </button>
+
+                                            <button ng-class="{ 'btn-default': fabric.isLinethrough() }" ng-click="fabric.toggleLinethrough()" class='btn btn-sm'>
+                                                <i class='fa fa-strikethrough'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-if="fabric.selectedObject.isEditing">
+                                    <div class="form-group">
+                                        <label class="label-control col-sm-12">Color</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-6">
+                                            <input type='color' class="input-sm form-control" bind-value-to="fill" />
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <button class="btn btn-sm btn-block" ng-click="fabric.setSelectionStyle('fill', 'random');">Random Color</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-switch-when="image">
+                    <div class="form-horizontal tf col-md-12">
+
+                    </div>
+                </div>
+
+                <div ng-switch-when="polaroid">
+                    <div class="form-horizontal tf col-md-12">
+                        <div class="form-group">
+                            <label for="inputTint" class="col-sm-2">Shadow</label>
+                            <div class="col-sm-10">
+                                <toggle-switch ng-model="fabric.selectedObject.hasShadow">
+                                    <toggle-switch>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputTint" class="col-sm-2">Placeholder</label>
+                            <div class="col-sm-10">
+                                <toggle-switch ng-model="fabric.selectedObject.hasPlaceholder">
+                                    <toggle-switch>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="fabric.selectedObject.hasPlaceholder">
+                            <label for="inputTint" class="col-sm-2">Placeholder Color</label>
+                            <div class="col-sm-2">
+                                <input type="color" class='form-control input-sm' ng-model='fabric.selectedObject.fill' />
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="text" class='form-control input-sm' ng-model='fabric.selectedObject.fill' />
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="fabric.selectedObject.hasPlaceholder">
+                            <div class="col-sm-2">
+                                <label for="">Padding</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="range" min="0" max="10" step="1" ng-model="fabric.selectedObject.H_PADDING" />
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="number" ng-model="fabric.selectedObject.H_PADDING" class="input-sm form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-switch-when="group">
+                    <div class="form-horizontal tf col-md-12">
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label for="">Contest Title</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <textarea ng-model="banner.text.contest.title" class="input-sm form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label for="">Contest Description</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <textarea ng-model="banner.text.contest.description" class="input-sm form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tab>
+        <!-- control -->
+        <tab heading="Controls">
+            <div class="form-horizontal tf col-md-12">
+                <div class="form-group">
+                    <div class="col-sm-2">
+                        <label for="">Transparent</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type='range' min="0" max="1" step=".1" ng-model="fabric.selectedObject.opacity" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" ng-model="fabric.selectedObject.opacity" class="input-sm form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2">
+                        <label for="">Scale</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type='range' min='.1' max='3' step='.1' ng-model='fabric.controls.scale' />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="number" ng-model="fabric.controls.scale" step='.1' class="input-sm form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2">
+                        <label for="">Angle</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type='range' min="-90" max="90" step='1' ng-model='fabric.controls.angle' />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" ng-model="fabric.controls.angle" class="input-sm form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2">
+                        <label for="">Left</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type='range' min="0" max="{{fabric.canvasOriginalWidth}}" step='1' ng-model='fabric.controls.left' />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="number" ng-model="fabric.controls.left" class="input-sm form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-2">
+                        <label for="">Top</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type='range' min="0" max="{{fabric.canvasOriginalHeight}}" step='1' ng-model='fabric.controls.top' />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="number" ng-model="fabric.controls.top" class="input-sm form-control">
+                    </div>
+                </div>
+            </div>
+        </tab>
+        <!-- position -->
+        <tab heading="Position">
+            <div class="tf col-md-12">
+                <div class="col-md-6">
+                    <div class="form-horizontal">
+                        <!-- Flip -->
+                        <div class="form-group mbm" style="padding-top:0px">
+                            <div class="col-sm-12">
+                                <button class='btn btn-sm btn-block' ng-class="{ 'btn-default': fabric.getFlipX() }" ng-click="{ 'btn-default': fabric.toggleFlipX() }">
+                                    <i class='fa fa-exchange'></i> Flip
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Movement -->
+                        <div class="form-group">
+                            <div class="btn-group col-xs-12 btn-group-vertical">
+                                <button ng-click='fabric.toggleLockMovementXActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementX }" class='btn btn-sm btn-block'>
+                                    Lock Movement X
+                                </button>
+                                <button ng-click='fabric.toggleLockMovementYActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockMovementY }" class='btn btn-sm btn-block'>
+                                    Lock Movement Y
+                                </button>
+                                <button ng-click='fabric.toggleLockActiveObject(); fabric.setDirty(true)' ng-class="{ 'btn-default': fabric.selectedObject.lockObject }" class='btn btn-sm btn-block'>
+                                    Lock All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-horizontal">
+                        <!-- Centering -->
+                        <div class="form-group">
+                            <div class="btn-group col-xs-12 btn-group-vertical">
+                                <button ng-click='fabric.center()' class='btn btn-sm btn-block'>
+                                    Center
+                                </button>
+
+                                <button ng-click='fabric.centerH()' class='btn btn-sm btn-block'>
+                                    Center Horizontally
+                                </button>
+
+                                <button ng-click='fabric.centerV()' class='btn btn-sm btn-block'>
+                                    Center Vertically
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Z Index -->
+                        <div class="form-group">
+                            <div class="btn-group col-xs-12 btn-group-vertical">
+                                <button ng-click='fabric.bringToFront(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+                                    Bring to front
+                                </button>
+
+                                <button ng-click='fabric.bringForward(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+                                    Bring forwards
+                                </button>
+
+                                <button ng-click='fabric.sendBackwards(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+                                    Send backwards
+                                </button>
+
+                                <button ng-click='fabric.sendToBack(); fabric.setDirty(true)' class='btn btn-sm btn-block'>
+                                    Send to back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </tab>
+    </tabset>
+</div>
