@@ -22,16 +22,18 @@ define([
                 '</div>',
                 restrict: 'E',
                 replace: true,
-                controller: ['$scope', '$http', '$log', '$timeout', '$window', '$compile', '$upload', 'API',
-                    function($scope, $http, $log, $timeout, $window, $compile, $upload, API) {
+                controller: ['$scope', '$rootScope', '$http', '$log', '$timeout', '$window', '$compile', '$upload', 'API',
+                    function($scope, $rootScope, $http, $log, $timeout, $window, $compile, $upload, API) {
                         var self = this;
                         var uploadURL = API.URL + '/upload';
 
-                        this.cropController = {
+                        self.cropController = {
                             parentEl : '.blockUI.blockPage',
+                            openSelection : false,
+                            selectionIndex: null,
                             imgEl    : null,
                             mime     : null,
-                            selection: {},
+                            selection: null,
                             init     : function(file) {
                                 var _this = this;
 
@@ -49,6 +51,17 @@ define([
                                     }
                                 })(file);
                             },
+                            selectionOnly: function(args) {
+                                var image = args.image;
+
+                                this.openSelection = true;
+                                this.selectionIndex = args.index;
+                                this.selection = args.selection || null;
+
+                                $scope.dataUrls[0] = image.src;
+                                $scope.progress[0] = -1;
+                                this.open(image);
+                            },
                             open: function(image) {
                                 var _this = this;
                                 
@@ -64,11 +77,12 @@ define([
                                     css: {
                                         cursor : 'default',
                                         border : 'none',
-                                        top    : 60  + 'px',
+                                        top    : '0px',
                                         left   : left + 'px',
                                         width  : image.width + 'px'
                                     },
                                     onBlock: function(){
+                                        angular.element('.navbar').addClass('hide');
                                         // disable body scroll
                                         // angular.element('body')
                                         //     .css('overflow', 'hidden')
@@ -77,7 +91,7 @@ define([
                                         //         e.stopPropagation();
                                         //     });
 
-                                        var cropSelection = _this._position(image);
+                                        var cropSelection = _this.selection || _this._position(image);
                                         _this.imgEl.imgAreaSelect({
                                             x1 : cropSelection.x1,
                                             y1 : cropSelection.y1,
@@ -102,6 +116,7 @@ define([
                                         });
                                     },
                                     onUnblock: function() {
+                                        angular.element('.navbar').removeClass('hide');
                                         // enable body scroll
                                         // angular.element('body')
                                         //     .css('overflow', 'inherit')
@@ -111,7 +126,8 @@ define([
                             },
                             close: function() {
                                 this.imgEl.remove();
-                                angular.element('[class^=imgareaselect]').remove();
+                                angular.element('.blockUI > [class^=imgareaselect]').remove();
+                                angular.element('.imgareaselect-crop-wrapper').remove();
                                 $.unblockUI();
                             },
                             toBlob: function (dataURI) {
@@ -142,8 +158,8 @@ define([
                                     this.imgEl[0],
                                     this.selection.x1, 
                                     this.selection.y1, 
-                                    this.selection.width, 
-                                    this.selection.height,
+                                    this.selection.x2, 
+                                    this.selection.y2,
                                     0, 0, 
                                     this.selection.width, 
                                     this.selection.height
@@ -156,6 +172,12 @@ define([
                                 var _this = this;
                                 switch(act) {
                                     case 'crop':
+                                        if( _this.openSelection ) {
+                                            $rootScope.$broadcast('uploadimage:close:selection', { selection: _this.selection, index: _this.selectionIndex });
+                                            _this.close();
+                                            return;
+                                        }
+
                                         var blob = this.getBlob();
                                         $log.debug('blob', blob);
 
@@ -188,13 +210,11 @@ define([
                                 }
                             },
                             _position: function(image) {
-                                if(!image) return {};
-
                                 var blockEl = angular.element(this.parentEl);
                                 var options = $scope.uploadOptions.data;
 
                                 var x1 = parseInt((blockEl.width() - options.width) / 2),
-                                    y1 = parseInt((blockEl.height() - options.height) / 2) - 60;
+                                    y1 = parseInt((blockEl.height() - options.height) / 2) - 0;
 
                                 return {
                                     x1: x1,
@@ -218,18 +238,27 @@ define([
                             },
                             _handleTemplate: function(styles) {
                                 var styles = this._styles();
-                                return '<div class="imgareaselect-crop-wrapper" style="'+ styles +'"><div class="btn-group">'+
-                                    '<button type="button" class="btn btn-success" ng-click="cropHandle(\'crop\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="Ok, crop it! :)"><i class="fa fa-crop"></i> Crop</button>'+
-                                    '<button type="button" class="btn btn-info" ng-click="cropHandle(\'ratio\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="resize this image with ratio"><i class="fa fa-expand"></i> Aspect Ratio</button>'+
-                                    '<button type="button" class="btn btn-default" ng-click="cropHandle(\'fit\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="resize this image with auto fit"><i class="fa fa-arrows-alt"></i> Auto Fit</button>'+
-                                    '<button type="button" class="btn btn-danger" ng-click="cropHandle(\'cancel\')" ng-disabled="loadingProgress > 0">Cancel</button>'+
-                                '</div></div>';
+                                var template = '<div class="imgareaselect-crop-wrapper" style="'+ styles +'"><div class="btn-group">'+
+                                    '<button type="button" class="btn btn-success" ng-click="cropHandle(\'crop\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="Ok, crop it! :)"><i class="fa fa-crop"></i> Crop</button>';
+                                if(!this.openSelection) {
+                                    // '<button type="button" class="btn btn-info" ng-click="cropHandle(\'ratio\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="resize this image with ratio"><i class="fa fa-expand"></i> Aspect Ratio</button>'+
+                                    template += '<button type="button" class="btn btn-default" ng-click="cropHandle(\'fit\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="resize this image with auto fit"><i class="fa fa-arrows-alt"></i> Auto Fit</button>'
+                                }
+                                    template += '<button type="button" class="btn btn-danger" ng-click="cropHandle(\'cancel\')" ng-disabled="loadingProgress > 0">Cancel</button></div></div>';
+                                return template;
                             }
+                        };
+
+                        self.openSelection = function(evt, args) {
+                            $scope.dataUrls = [];
+                            $scope.progress = [];
+                            self.cropController.selectionOnly(args);
                         };
 
                         $scope.cropHandle = function(act) {
                             return self.cropController.handle(act);
                         };
+                        $scope.$on('uploadimage:open:selection', self.openSelection);
 
                         if( angular.isUndefined($scope.uploadOptions) ) $scope.uploadOptions = { headers:{}, data:{} };
 

@@ -1,6 +1,10 @@
 <style>
 	hr { margin-top: 0; }
 
+	.thumbnail h4 {
+		word-wrap: break-word;
+	}
+
 	.field-top {
 		padding-top: 10px;
 	}
@@ -203,41 +207,76 @@
 		  	<div class="progress-bar progress-bar-success" style="width: {{ backgrounds.progress }}%"></div>
 		</div>
 
-		<div class="col-md-12 margin-top" ng-show="backgrounds.data.errors > 0">
+		<div class="col-md-12 margin-top" ng-show="backgrounds.errors > 0">
 			<span class="label label-danger">Errors : {{ backgrounds.errors }}</span>
 		</div>
 		
 		<div class="col-md-12 margin-top">
-			<div id="background-preview-{{ $index }}" class="col-md-3" style="min-height:300px" 
-				ng-repeat="image in backgrounds.data"
+			<div id="background-preview-{{ $index }}" class="col-md-4" style="min-height:400px" 
+				ng-repeat="background in backgrounds.data"
 				ng-class="{
-					'img-preparing': image.status && image.status == 'prepare', 
-					'img-generating': image.status && image.status == 'generate'
+					'img-preparing': background.status && background.status == 'prepare', 
+					'img-generating': background.status && background.status == 'generate'
 				}">
 
-				<div ng-show="image.loading" style="position:relative; top:40%">
-					<span class="col-md-12 text-center" style="margin-top:40px">{{ image.notify }}</span>
+				<div ng-show="background.loading" style="position:relative; top:40%">
+					<span class="col-md-12 text-center" style="margin-top:40px">{{ background.notify }}</span>
 					<wave-spinner></wave-spinner>
 				</div>
 
-				<div class="image text-center" ng-show="image.src && !image.loading">
-					<img ng-src="{{image.src}}" class="img-responsive" ng-class="{'img-small': image.error && image.src}">
-				</div>
-				
-				<div ng-show="image.error && !image.loading" class="text-danger text-center" style="position:absolute; top:30%;">
-					  <div class="alert alert-dismissable alert-warning" style="opacity: .8;">
-						<p class="ng-binding">{{ image.error }}</p>
-						<p>
-							<button type="button" class="btn btn-sm btn-default" ng-click="doChangeImg($event)">Change</button>
-							<input type="file" ng-file-select="onFileChange($files, $index)" class="hide" onclick="this.value=null">
-							<button type="button" class="btn btn-sm btn-danger" ng-click="doDeleteImg($index)">Delete</button>
-						</p>
-					</div>
-				</div>
+				<div class="image thumbnail text-center" ng-show="!background.loading">
+					<img ng-src="{{background.image.src}}" class="img-responsive" style="max-height:250px" 
+						ng-class="{'img-small': background.error && background.image}"
+						img-show-crop="background" 
+						img-show-crop-parent="background-preview-{{ $index }}">
+			      	<div class="caption">
+				        <h4>{{background.options.template}} : {{background.name}}</h4>
+						<div ng-show="background.error" class="text-danger text-center">
+							<div class="alert alert-dismissable alert-warning">
+								<p>{{ background.error }}</p>
+								<p>
+									<button type="button" class="btn btn-sm btn-default" ng-click="doChangeImg($event)">Change</button>
+									<input type="file" ng-file-select="onFileChange($files, $index)" class="hide" onclick="this.value=null">
+									<button type="button" class="btn btn-sm btn-danger" ng-click="doDeleteImg($index)">Delete</button>
+								</p>
+							</div>
+						</div>
+
+						<div ng-show="!background.options.handle.type && !background.error"><button type="button" class="btn btn-sm btn-danger" ng-click="doDeleteImg($index)">Delete</button></div>
+
+						<div ng-hide="background.error || !background.options.handle.type"> 
+							<div class="btn-group btn-group-sm text-center">
+							  	<div class="btn-group btn-group-sm" role="group">
+								    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false"
+								    	ng-class="{'btn-success active': background.options.handle.type == 'crop'}">
+								      	Crop {{ background.options.handle.set }}
+								      	<span class="caret"></span>
+								    </button>
+								    <ul class="dropdown-menu" role="menu">
+								      	<li><a href ng-click="setHandle($index, 'center')">Center</a></li>
+								      	<li><a href ng-click="setHandle($index, 'custom')">Custom</a></li>
+								    </ul>
+							  	</div>
+							  	<button type="button" class="btn"
+							  		ng-class="{'btn-success active': background.options.handle.type == 'fit'}" 
+							  		ng-click="setHandle($index, 'fit')">Auto Fit</button>
+							  	<button type="button" class="btn btn-danger"  
+							  		ng-click="doDeleteImg($index)">Delete</button>
+							</div>
+							<!-- dummy upload image directive. hide this, only use crop window -->
+							<upload-image ng-model="background.image"
+				            	upload-image-selection-only="true" 
+				            	upload-image-class="hide" 
+				            	upload-image-options="{data:background.options.size}">
+			            	</upload-image>
+						</div>
+			      	</div>
+			    </div>
 			</div>
 		</div>
 
-		<div class="col-md-12 margin-top">
+		<div class="col-md-12 margin-top" ng-show="backgrounds.data.length > 0">
+			<button type="button" class="pull-right btn btn-sm btn-danger" ng-click="doEmptyFiles()">Empty</button>
 			<button type="button" class="pull-right btn btn-sm btn-success" ng-disabled="backgrounds.errors > 0" ng-click="doGenerate()">Generate</button>
 		</div>
 	</div>

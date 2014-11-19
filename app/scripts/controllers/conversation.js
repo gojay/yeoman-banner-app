@@ -15,7 +15,8 @@ define([
     'fabricUtilities',
     'fabricWindow',
 
-    'jquery-blockui'
+    'jquery-blockui',
+    'jquery-imgareaselect'
 ], function (angular, _, _s, JSZip, async) {
     'use strict';
 
@@ -29,7 +30,91 @@ define([
         'common.fabric.utilities',
         'common.fabric.constants',
         'common.fabric.window'
-    ])
+    ]);
+
+    app.directive('imgShowCrop', function() {
+        return {
+            scope: {
+                data: '=imgShowCrop'
+            },
+            restrict: 'A',
+            link: function($scope, $element, $attrs) {
+                var self = this;
+                var parentId = '#' + $attrs.imgShowCropParent;
+
+                var ias;
+
+                var getOriginalCropSelection = function(data) {
+                    var image = data.image,
+                        size = data.options.size;
+                    var x1 = parseInt((image.width - size.width) / 2),
+                        y1 = parseInt((image.height - size.height) / 2);
+                    return {
+                        x1: x1,
+                        y1: y1,
+                        x2 : parseInt(x1 + size.width),
+                        y2 : parseInt(y1 + size.height)
+                    };
+                };
+
+                // x1: 474 x2: 1024 y1: 0 y2: 403
+                var getCropSelection = function() {
+                    var image = $scope.data.image;
+                    var ratioWidth = $element.width() / image.width;
+                    var ratioHeight = $element.height() / image.height;
+
+                    var originalSelection = $scope.data.options.handle.selection ? $scope.data.options.handle.selection : getOriginalCropSelection($scope.data);
+                    return {
+                        x1: originalSelection.x1 * ratioWidth,
+                        y1: originalSelection.y1 * ratioHeight,
+                        x2: originalSelection.x2 * ratioWidth,
+                        y2: originalSelection.y2 * ratioHeight
+                    }
+                };
+
+                var showCropSelection = function() {
+                    if($scope.data.error || $scope.data.options.handle.type != 'crop') {
+                        return;
+                    }
+
+                    var selection = getCropSelection();
+
+                    angular.element('[class^=imgareaselect]', $element).remove();
+
+                    ias = $element.imgAreaSelect({
+                        x1: selection.x1, 
+                        y1: selection.y1, 
+                        x2: selection.x2, 
+                        y2: selection.y2,
+                        parent    : parentId,
+                        resizable : false,
+                        movable   : false,
+                        disable   : true,
+                        instance  : true
+                    });
+                };
+
+                $scope.$watch('data.options.handle.selection', function(newVal, oldVal) {
+                    console.log('selection', newVal, oldVal);
+                    if(newVal == oldVal) return;
+                    showCropSelection(newVal);
+                });
+                $scope.$watch('data.options.handle.type', function(newVal, oldVal) {
+                    console.log('type', newVal, oldVal);
+                    if(newVal == oldVal || !ias) return;
+
+                    if(newVal == 'crop') {
+                        ias.setOptions({ show: true });
+                    } else {
+                        ias.setOptions({ hide: true });
+                    }
+                    ias.update();
+                });
+
+                $element.bind('load', showCropSelection);
+            }
+        }
+    });
 
     app.classy.controller({
         name: 'ConversationCtrl',
@@ -74,7 +159,7 @@ define([
                     template: {
                         default  : 'tpl-1.png',
                         landscape: 'tpl-1-landscape.png',
-                        potrait  : 'tpl-1-potrait.png'
+                        portrait  : 'tpl-1-portrait.png'
                     }
                 },
                 {
@@ -83,7 +168,7 @@ define([
                     template: {
                         default  : 'tpl-2.png',
                         landscape: 'tpl-2-landscape.png',
-                        potrait  : 'tpl-2-potrait.png'
+                        portrait  : 'tpl-2-portrait.png'
                     }
                 },
                 {
@@ -92,7 +177,7 @@ define([
                     template: {
                         default  : 'tpl-3.png',
                         landscape: 'tpl-3-landscape.png',
-                        potrait  : 'tpl-3-potrait.png'
+                        portrait  : 'tpl-3-portrait.png'
                     }
                 },
                 {
@@ -101,7 +186,7 @@ define([
                     template: {
                         default  : 'tpl-4.png',
                         landscape: 'tpl-4-landscape.png',
-                        potrait  : 'tpl-4-potrait.png'
+                        portrait  : 'tpl-4-portrait.png'
                     }
                 },
                 {
@@ -110,7 +195,7 @@ define([
                     template: {
                         default  : 'tpl-5.png',
                         landscape: 'tpl-5-landscape.png',
-                        potrait  : 'tpl-5-potrait.png'
+                        portrait  : 'tpl-5-portrait.png'
                     }
                 },
                 {
@@ -119,22 +204,22 @@ define([
                     template: {
                         default  : 'tpl-6.png',
                         landscape: 'tpl-6-landscape.png',
-                        potrait  : 'tpl-6-potrait.png'
+                        portrait  : 'tpl-6-portrait.png'
                     }
                 }
             ],
             dimensions: {
                 'default': {
-                    w: 403,
-                    h: 403
+                    width: 403,
+                    height: 403
                 },
                 'portrait': {
-                    w: 403,
-                    h: 550
+                    width: 403,
+                    height: 550
                 },
                 'landscape': {
-                    w: 550,
-                    h: 403
+                    width: 550,
+                    height: 403
                 }
             },
             backgrounds: {
@@ -143,6 +228,7 @@ define([
                 errors: 0,
                 data: []
             },
+            selection: {},
             showPreview: false
         },
         init: function() {
@@ -173,6 +259,8 @@ define([
             };
 
             this.$.$on('canvas:created', this._onCanvasCreated);
+
+            this.$.$on('uploadimage:close:selection', this._onCropSelection);
         },
         watch: {
             '{object}templates': '_onChangeTemplate'
@@ -231,10 +319,33 @@ define([
             return _.titleize(this.$.fabric.selectedObject[type]);
         },
 
+        setHandle: function(index, type) {
+            this.$log.log(index, type);
+            var backgound = this.$.backgrounds.data[index],
+                options = backgound.options;
+            if( type == 'fit' ) {
+                options.handle.type = 'fit';
+            } else {
+                options.handle.type = 'crop';
+                options.handle.set = type;
+                if( type == 'custom' ) {
+                    // open crop window...
+                    this.$rootScope.$broadcast('uploadimage:open:selection', { 
+                        index:index, 
+                        image:backgound.image, 
+                        selection:backgound.options.handle.selection 
+                    });
+                } else {
+                    // set default selection 'center'
+                    backgound.options.handle.selection = null;
+                }
+            }
+        },
+
         /**
-         * Atur file background (multiple)
-         * @param  {FILE} $files file input
-         * @return {Void}        _handleMultipleFiles
+         * Atur input file background (multiple)
+         * @param  {Object} $files Input files
+         * @return {void}          _chainReadFiles
          */
         onFileSelect: function($files) {
             var self = this,
@@ -244,7 +355,7 @@ define([
                 scrollTop: angular.element("#preview").offset().top
             }, 1000, function() {
                 log.info('Start chaining...');
-                self._handleMultipleFiles($files).then(function (response) {
+                self._chainReadFiles($files).then(function (response) {
                     log.info('End chain...');
                     log.log('completed', response, self.$.backgrounds);
                 });
@@ -273,8 +384,6 @@ define([
                     var image = new Image();
                     image.src = e.target.result;
                     image.onload = function(){
-                        var img = this.src;
-
                         // parse integer
                         var width  = parseInt(this.width);
                         var height = parseInt(this.height);
@@ -285,21 +394,15 @@ define([
                             return;
                         }
 
-                        var type = self._getImageType(width, height);
-
-                        backgrounds.size += blob.size;
-
+                        var options = self._getImageAttributes(width, height);
                         backgrounds.data[index] = {
-                            notify: 'waiting',
-                            src  : img,
-                            data : {
-                                blob: blob,
-                                name: filename, 
-                                dimension: dimensions[type],
-                                type: type
-                            }
+                            image: image,
+                            blob : blob,
+                            name : filename, 
+                            options: options
                         };
 
+                        backgrounds.size += blob.size;
                         backgrounds.errors -= 1;
 
                         self.$.$apply();
@@ -337,150 +440,50 @@ define([
                         overlayCSS:  { 
                             backgroundColor: '#fff', 
                             opacity: 0.8
-                        },   
+                        }  
                     });
                 });
             });
+
+            self.$.fabric.setZoom(0.6);
 
             angular.element('body').animate({
                 scrollTop: angular.element("#preview").offset().top - 60
             }, 1000, function() {
                 log.info('Start generating...');
+                // set progress to 0
                 self.$.backgrounds.progress = 0;
-                self._doGenerate(requests).then(function(response){
+                self._chainGenerateBackground(requests).then(function(response){
                     log.info('End generate...');
                     log.log('response', response);
+                    // reset zoom
+                    self.$.fabric.resetZoom();
                 });
             });
         },
-
-        _doGenerate: function(requests) {
-            var self = this, 
-                log = this.$log;
-
-            var until = requests.length - 1,
-                size = 0;
-
-            var defer = this.$q.defer();
-
-            var promises = requests.reduce(function(promise, request, index) {
-                log.log('request', index, request);
-                return promise.then(function() {
-                    var el = angular.element('#background-preview-'+ index);
-                    return self._doSomething(index)
-                        .then(function resolve(response) {
-                            log.log('resolve', index, response);
-                        }, function reject(response) {
-                            log.log('reject', index, response);
-                        }, function notify(response) {
-                            log.log('notify', index, response);
-                            // el.find('.blockMsg > .notify').text(response);
-                            var message = '<i class="fa fa-spinner fa-spin"></i> <span class="notify">'+ response +'<span>';
-                            el.block({ 
-                                message: message, 
-                                css: { 
-                                    backgroundColor: 'transparent',
-                                    width: '200px',
-                                    border: 'none' 
-                                },
-                                overlayCSS:  { 
-                                    backgroundColor: '#fff', 
-                                    opacity: 0.8
-                                },   
-                            });
-                        })
-                        .then(function() {
-                            el.unblock();
-                            size += request.data.blob.size;
-                            var total = self.$.backgrounds.size;
-                            var progress = size/total * 100;
-                            self.$.backgrounds.progress = progress
-                            log.log('progress', progress);
-
-                            if(index != 0 && index % 3 == 0) {
-                                angular.element('body').animate({
-                                    scrollTop: el.offset().top - 60
-                                }, 1000);
-                            }
-
-                            if(index == until) return 'completed';
-                        });
-                });
-            }, defer.promise);
-
-            defer.resolve();
-
-            return promises;
-        },
-        _doSomething: function(index) {
-            var self = this,
-                log = self.$log,
-                timeout = self.$timeout;
-
-            var backgroundId = '#background-preview-' + index,
-                backgroundImage = self.$.backgrounds.data[index].src;
-
-            var originalCanvas = self.$.fabric.canvas,
-                width = originalCanvas.originalWidth, 
-                height = originalCanvas.originalHeight,
-                canvasScale = self.$.fabric.canvasScale;
-
-            var defer = this.$q.defer();
-
-            timeout(function() { defer.notify('Preparing...'); });
-
-            var json = JSON.stringify(originalCanvas.toJSON([]));
-            
-            var canvasEl = document.createElement('canvas');
-            var canvas = new self.FabricWindow.Canvas(canvasEl);
-            canvas.loadFromJSON(json, function() {
-                canvas.originalWidth = width;
-                canvas.originalHeight = height;
-                canvas.setWidth(width * canvasScale);
-                canvas.setHeight(height * canvasScale);
-
-                var objects = canvas.getObjects();
-                for (var i in objects) {
-                    objects[i].lockObject = true;
-                    objects[i].hasControls = false;
-                    objects[i].setCoords();
-                }
-
-                canvas.setBackgroundImage(backgroundImage, canvas.renderAll.bind(canvas), {
-                    scaleX: canvasScale,
-                    scaleY: canvasScale
-                });
-            });
-
-            canvasEl.style.position = 'relative';
-            angular.element(backgroundId).find('.image').html(canvasEl);
-
-            timeout(function() {
-                defer.notify('Generating...');
-                timeout(function() {
-                    defer.resolve('completed ' + index)
-                }, Math.floor(Math.random() * 1000));
-            }, Math.floor(Math.random() * 1000));
-
-
-            return defer.promise;
+        doEmptyFiles: function() {
+            this.$.backgrounds = {
+                progress: -1,
+                size: 0,
+                errors: 0,
+                data: []
+            };
         },
 
         /** @private **/
  
-        _handleMultipleFiles: function(files){
+        _chainReadFiles: function(files){
             var self = this,
                 log = this.$log;
 
             var backgrounds = self.$.backgrounds;
-
             var until = files.length - 1;
 
             var defer = self.$q.defer();
 
             var promises = files.reduce(function (promise, file, index) {
                 return promise.then(function() {
-                    return self._queue(file)
+                    return self._readFile(file)
                         .then(function resolve(response) {
                             log.log('resolve', index, response);
                             response.loading = false;
@@ -497,10 +500,10 @@ define([
                         .then(function() {
                             log.info('finally', index);
 
-                            if(index != 0 && index % 3 == 0) {
+                            if(index % 3 == 0) {
                                 angular.element('body').animate({
                                     scrollTop: angular.element('#background-preview-'+ index).offset().top - 60
-                                }, 1000);
+                                }, 400);
                             }
 
                             if(index == until) return 'completed';
@@ -512,19 +515,16 @@ define([
 
             return promises;
         },
-        // add queue request
-        _queue: function(file){
+        _readFile: function(file){
+            var self = this, 
+                log = this.$log;
+
+            var backgrounds = this.$.backgrounds, 
+                index = backgrounds.data.length;
+
             var defer = this.$q.defer();
 
-            var self = this;
-            var log = this.$log;
-
-            var dimensions = this.$.dimensions,
-                backgrounds = this.$.backgrounds;
-
-            var index = backgrounds.data.length;
-
-            this.$timeout(function() { defer.notify('checking file...'); });
+            this.$timeout(function() { defer.notify('Reading file...'); });
 
             // validation image
             var valid = this._validation(file, false);
@@ -532,7 +532,7 @@ define([
                 log.warn(valid.message);
 
                 defer.reject({ 
-                    src: 'images/default/file.png',
+                    image: { src: 'images/default/file.png' },
                     error: valid.message 
                 });
 
@@ -548,48 +548,33 @@ define([
                         var image = new Image();
                         image.src = e.target.result;
                         image.onload = function(){
-                            var img = this.src;
-
                             // parse integer
                             var width  = parseInt(this.width);
                             var height = parseInt(this.height);
 
                             // gambar terlalu kecil ? max width n height = 403
-                            if(width <= 403 && height <= 403) {
+                            if(width < 403 || height < 403) {
 
                                 log.warn('File '+ name +' is too small!!');
 
                                 defer.reject({
                                     error: 'File '+ name +' is too small!!',
-                                    src  : img
+                                    image: { src: this.src }
                                 });
 
                             } else {
 
-                                var ratio = width/height, direction;
-                                if( ratio == 1 ) {
-                                    direction = 'default';
-                                } else if( ratio > 1 ) {
-                                    direction = 'landscape';
-                                } else {
-                                    direction = 'portrait';
-                                }
-
                                 log.info('File added', filename);
-
-                                var type = self._getImageType(width, height);
 
                                 backgrounds.size += blob.size;
 
+                                var options = self._getImageAttributes(width, height);
+
                                 defer.resolve({
-                                    notify: 'waiting',
-                                    src  : img,
-                                    data : {
-                                        blob  : blob,
-                                        name  : filename, 
-                                        dimension: dimensions[type],
-                                        type: type
-                                    }
+                                    image : image,
+                                    blob: blob,
+                                    name: filename, 
+                                    options: options
                                 });
 
                             }
@@ -598,30 +583,17 @@ define([
                 })(file);
                 // read as data uri
                 fileReader.readAsDataURL(file);
-
             }
 
             // return promise
             return defer.promise;
         },
         /**
-         * Jenis gambar : default, potrait, landscape
-         * @param  {Integer} width  Lebar gambar
-         * @param  {Integer} height Tinggi gambar
-         * @return {Sting}        Jenis gambar
+         * file validation
+         * @param  {Object} file       File input
+         * @param  {Boolean} showAlert Tampikan "alert"
+         * @return {Void|Object}       Respons validasi
          */
-        _getImageType: function(width, height) {
-            var ratio = width/height, type;
-            if( ratio == 1 ) {
-                type = 'default';
-            } else if( ratio > 1 ) {
-                type = 'landscape';
-            } else {
-                type = 'portrait';
-            }
-            return type;
-        },
-        // file validation
         _validation: function(file, showAlert){
             var response = { status: true };
 
@@ -673,6 +645,228 @@ define([
             }
 
             return response;
+        },
+        /**
+         * Attribut gambar : direction, handle, size
+         * @param  {Integer} width  Lebar gambar
+         * @param  {Integer} height Tinggi gambar
+         * @return {Object}
+         */
+        _getImageAttributes: function(width, height) {
+            var template, handle;
+
+            if(width == 403 && height == 403) {
+                template = 'default';
+                handle = { type: null };
+            } else if((width >= 403 && height < 550) || (width < 550 && height >= 403)) {
+                template = 'default';
+                handle = { type: 'crop', set: 'center', selection: null };
+            } else {
+                var ratio = width/height;
+                if( ratio > 1 ) {
+                    template = 'landscape';
+                    handle = { type: 'crop', set: 'center', selection: null };
+                } else {
+                    template = 'portrait';
+                    handle = { type: 'crop', set: 'center', selection: null };
+                } 
+            }
+
+            var size = this.$.dimensions[template];
+
+            return { template:template, handle:handle, size:size };
+        },
+
+        _chainGenerateBackground: function(requests) {
+            var self = this, 
+                log = this.$log;
+
+            var until = requests.length - 1,
+                size = 0;
+
+            var defer = this.$q.defer();
+
+            var promises = requests.reduce(function(promise, request, index) {
+                log.log('request', index, request);
+                return promise.then(function() {
+                    var el = angular.element('#background-preview-'+ index);
+                    return self._generateBackground(el, request)
+                        .then(function resolve(response) {
+                            log.log('resolve', index, response);
+                        }, function reject(response) {
+                            log.log('reject', index, response);
+                        }, function notify(response) {
+                            log.log('notify', index, response);
+                            el.find('.blockMsg > .notify').text(response);
+                        })
+                        .then(function() {
+                            // unblock element
+                            el.unblock();
+
+                            // calculate progress size
+                            size += request.blob.size;
+                            var total = self.$.backgrounds.size;
+                            var progress = size/total * 100;
+                            self.$.backgrounds.progress = progress
+                            log.log('progress', progress);
+
+                            // scroll to element
+                            if(index % 4 == 0) {
+                                angular.element('body').animate({
+                                    scrollTop: el.offset().top - 60
+                                }, 400);
+                            }
+
+                            // completed
+                            if(index == until) return 'completed';
+                        });
+                });
+            }, defer.promise);
+
+            defer.resolve();
+
+            return promises;
+        },
+        _generateBackground: function(element, file) {
+            var self = this,
+                log = self.$log,
+                timeout = self.$timeout;
+            // define file background
+            var background = file.image,
+                options = file.options;
+            // define original canvas
+            var originalCanvas = self.$.fabric.canvas,
+                canvasScale = self.$.fabric.canvasScale;
+
+            var defer = this.$q.defer();
+
+            ///////////////////////////////////
+            // 1. Prepare background image //
+            ///////////////////////////////////
+            timeout(function() { defer.notify('Preparing background...'); });
+
+            var backgroundImage;
+            if( options.handle.type === 'crop' ) {
+                // do crop background image
+                timeout(function() { defer.notify('Cropping background...'); });
+                backgroundImage = this._getImageCrop(background, options);
+            } else if( options.handle.type === 'fit' ) {
+                // do upload 'fit' background image
+                timeout(function() { defer.notify('Resizing background...'); });
+            } else {
+                // background is fit!
+                backgroundImage = background.src;
+            }
+
+            //////////////////////
+            // 2. Create canvas //
+            //////////////////////
+            timeout(function() { defer.notify('Creating canvas...'); });
+
+            // get objects original canvas
+            var canvasProperties = originalCanvas.toJSON([
+                'background',
+                'overlayImage',
+                'objects',
+                'originalHeight',
+                'originalWidth',
+                'height',
+                'width',
+            ]);
+            // get json objects
+            var json = JSON.stringify(canvasProperties);
+            // get canvas size by background
+            var canvasSize = options.size;
+            var overlayImage = 'images/conversation/' + self.$.templates[0].template[options.template];
+
+            // create fabric canvas
+            var canvasEl = document.createElement('canvas');
+            var canvas = new self.FabricWindow.Canvas(canvasEl);
+            canvas.loadFromJSON(json, function() {
+                // set canvas dimension
+                canvas.originalWidth = canvasSize.width;
+                canvas.originalHeight = canvasSize.height;
+                canvas.setWidth(canvasSize.width * canvasScale);
+                canvas.setHeight(canvasSize.height * canvasScale);
+
+                // set lock objects
+                var objects = canvas.getObjects();
+                angular.forEach(objects, function(object, key){
+                    if(options.template == 'landscape') {
+                        object.left = canvas.originalWidth/canvasProperties.originalWidth * object.left;
+                    } else if(options.template == 'portrait') {
+                        object.top = canvas.originalHeight/canvasProperties.originalHeight * object.top;
+                    }                   
+                    object.lockObject = true;
+                    object.hasControls = false;
+                    object.setCoords();
+                });
+
+                // set backgound image
+                canvas.setBackgroundImage(backgroundImage, canvas.renderAll.bind(canvas), {
+                    top : 0,
+                    left: 0,
+                    scaleX: canvasScale,
+                    scaleY: canvasScale
+                });
+                // set overlay image
+                canvas.setOverlayImage(overlayImage, canvas.renderAll.bind(canvas), {
+                    top : 0,
+                    left: 0,
+                    scaleX: canvasScale,
+                    scaleY: canvasScale
+                });
+            });
+            // set relative position
+            canvasEl.style.position = 'relative';
+
+            // replace background image to fabric canvas element
+            element.find('.image').html(canvasEl);
+
+            ////////////////////////
+            // 3. Generate canvas //
+            ////////////////////////
+
+            timeout(function() {
+                defer.notify('Generating...');
+                timeout(function() {
+                    defer.resolve('completed');
+                }, Math.floor(Math.random() * 1000));
+            });
+
+            return defer.promise;
+        },
+
+        _getImageCrop: function(image, options) {
+            var selection = (options.handle.type == 'custom' && options.handle.selection) ? 
+                                options.handle.selection : 
+                                this._getCropSelection(image, options.size);
+
+            var canvas = document.createElement('canvas');
+            canvas.width  = image.width;
+            canvas.height = image.height;
+            canvas.getContext('2d').drawImage(
+                image,
+                selection.x1, 
+                selection.y1, 
+                selection.x2, 
+                selection.y2,
+                0, 0, 
+                image.width, 
+                image.height
+            );
+            return canvas.toDataURL();
+        },
+        _getCropSelection: function(image, options) {
+            var x1 = parseInt((image.width - options.width) / 2),
+                y1 = parseInt((image.height - options.height) / 2);
+
+            return {
+                x1: x1,
+                y1: y1,
+                x2 : parseInt(x1 + options.width),
+                y2 : parseInt(y1 + options.height)
+            };
         },
 
         _onCanvasCreated: function(event, args) {
@@ -738,6 +932,10 @@ define([
 
             var imgURL = 'images/conversation/' + selected.template.default;
             this.$.fabric.setOverlayImage(imgURL);
+        },
+        _onCropSelection: function(event, args) {
+            this.$log.log('_onCropSelection', event, args);
+            this.$.backgrounds.data[args.index].options.handle.selection = args.selection;
         }
     });
 });
