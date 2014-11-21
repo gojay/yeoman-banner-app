@@ -200,15 +200,15 @@
 		</section>
 	</div>
 	<!-- background images preview -->
-	<div id="preview" class="row margin-top" style="min-height:500px;">
-		<h4>Preview <span ng-show="backgrounds.data.length > 0"><span class="badge">{{ backgrounds.data.length }}</span></span></h4>
+	<div id="preview" class="row margin-top">
+		<h4>Backgrounds <span ng-show="backgrounds.data.length > 0"><span class="badge">{{ backgrounds.data.length }}</span></span></h4>
 
-		<div class="progress progress-striped active" ng-show="backgrounds.progress > -1">
+		<div class="progress progress-striped" ng-show="backgrounds.progress > -1" ng-class="{'active':backgrounds.progress > 0 && backgrounds.progress < 100}">
 		  	<div class="progress-bar progress-bar-success" style="width: {{ backgrounds.progress }}%"></div>
 		</div>
 
-		<div class="col-md-12 margin-top" ng-show="backgrounds.errors > 0">
-			<span class="label label-danger">Errors : {{ backgrounds.errors }}</span>
+		<div class="col-md-12 margin-top" ng-show="backgrounds.errors.length > 0">
+			<span class="label label-danger">Errors : {{ backgrounds.errors.length }}</span>
 		</div>
 		
 		<div class="col-md-12 margin-top">
@@ -230,7 +230,7 @@
 						img-show-crop="background" 
 						img-show-crop-parent="background-preview-{{ $index }}">
 			      	<div class="caption">
-				        <h4>{{background.options.template}} : {{background.name}}</h4>
+				        <h4>{{background.template}} : {{background.name}}</h4>
 						<div ng-show="background.error" class="text-danger text-center">
 							<div class="alert alert-dismissable alert-warning">
 								<p>{{ background.error }}</p>
@@ -242,14 +242,14 @@
 							</div>
 						</div>
 
-						<div ng-show="!background.options.handle.type && !background.error"><button type="button" class="btn btn-sm btn-danger" ng-click="doDeleteImg($index)">Delete</button></div>
+						<div ng-show="!background.act && !background.error"><button type="button" class="btn btn-sm btn-danger" ng-click="doDeleteImg($index)">Delete</button></div>
 
-						<div ng-hide="background.error || !background.options.handle.type"> 
+						<div ng-hide="background.error || !background.act"> 
 							<div class="btn-group btn-group-sm text-center">
 							  	<div class="btn-group btn-group-sm" role="group">
 								    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false"
-								    	ng-class="{'btn-success active': background.options.handle.type == 'crop'}">
-								      	Crop {{ background.options.handle.set }}
+								    	ng-class="{'btn-success active': background.act == 'crop'}">
+								      	Crop {{ background.crop.type }}
 								      	<span class="caret"></span>
 								    </button>
 								    <ul class="dropdown-menu" role="menu">
@@ -258,8 +258,8 @@
 								    </ul>
 							  	</div>
 							  	<button type="button" class="btn"
-							  		ng-class="{'btn-success active': background.options.handle.type == 'fit'}" 
-							  		ng-click="setHandle($index, 'fit')">Auto Fit</button>
+							  		ng-class="{'btn-success active': background.act == 'resize'}" 
+							  		ng-click="setHandle($index, 'resize')">Auto Fit</button>
 							  	<button type="button" class="btn btn-danger"  
 							  		ng-click="doDeleteImg($index)">Delete</button>
 							</div>
@@ -267,7 +267,7 @@
 							<upload-image ng-model="background.image"
 				            	upload-image-selection-only="true" 
 				            	upload-image-class="hide" 
-				            	upload-image-options="{data:background.options.size}">
+				            	upload-image-options="{data:background.resize}">
 			            	</upload-image>
 						</div>
 			      	</div>
@@ -277,7 +277,7 @@
 
 		<div class="col-md-12 margin-top" ng-show="backgrounds.data.length > 0">
 			<button type="button" class="pull-right btn btn-sm btn-danger" ng-click="doEmptyFiles()">Empty</button>
-			<button type="button" class="pull-right btn btn-sm btn-success" ng-disabled="backgrounds.errors > 0" ng-click="doGenerate()">Generate</button>
+			<button type="button" class="pull-right btn btn-sm btn-success" ng-disabled="backgrounds.errors.length > 0" ng-click="doGenerate()">Generate</button>
 		</div>
 	</div>
 </div>

@@ -29,11 +29,11 @@ define([
 
                         self.cropController = {
                             parentEl : '.blockUI.blockPage',
+                            imageEl  : null,
+                            handleEl : null,
+                            selection: null,
                             openSelection : false,
                             selectionIndex: null,
-                            imgEl    : null,
-                            mime     : null,
-                            selection: null,
                             init     : function(file) {
                                 var _this = this;
 
@@ -53,26 +53,25 @@ define([
                             },
                             selectionOnly: function(args) {
                                 var image = args.image;
-
+                                // set variables 
                                 this.openSelection = true;
                                 this.selectionIndex = args.index;
                                 this.selection = args.selection || null;
-
-                                $scope.dataUrls[0] = image.src;
-                                $scope.progress[0] = -1;
+                                // open imgaraeselect
                                 this.open(image);
                             },
                             open: function(image) {
                                 var _this = this;
                                 
-                                _this.imgEl = angular.element(image);
+                                _this.imageEl = angular.element(image);
 
-                                var top  = ($window.innerHeight - image.height) / 2, 
-                                    left = ($window.innerWidth - image.width) / 2;
+                                var left = ($window.innerWidth - image.width) / 2;
                                 $.blockUI({
-                                    message   : _this.imgEl,
+                                    message   : _this.imageEl,
                                     overlayCSS:{
-                                        cursor : 'default'
+                                        cursor : 'default',
+                                        opacity: 1,
+                                        backgroundColor: '#000'
                                     },
                                     css: {
                                         cursor : 'default',
@@ -82,6 +81,7 @@ define([
                                         width  : image.width + 'px'
                                     },
                                     onBlock: function(){
+                                        // hide navbar
                                         angular.element('.navbar').addClass('hide');
                                         // disable body scroll
                                         // angular.element('body')
@@ -92,7 +92,7 @@ define([
                                         //     });
 
                                         var cropSelection = _this.selection || _this._position(image);
-                                        _this.imgEl.imgAreaSelect({
+                                        _this.imageEl.imgAreaSelect({
                                             x1 : cropSelection.x1,
                                             y1 : cropSelection.y1,
                                             x2 : cropSelection.x2,
@@ -103,12 +103,10 @@ define([
                                             onInit    : function(img, selection){ 
                                                 _this.selection = selection;
                                                 // init config handle template
-                                                var template = _this._handleTemplate({
-                                                    width: image.width,
-                                                    left : left
-                                                });
+                                               var handle = _this._handleTemplate();
+                                                _this.handleEl = angular.element(handle);
                                                 // append into body, then compile it
-                                                angular.element('body').append($compile(template)($scope));
+                                                angular.element('body').append($compile(_this.handleEl)($scope));
                                             },
                                             onSelectEnd : function(img, selection){
                                                 _this.selection = selection;
@@ -116,6 +114,7 @@ define([
                                         });
                                     },
                                     onUnblock: function() {
+                                        // show navbar
                                         angular.element('.navbar').removeClass('hide');
                                         // enable body scroll
                                         // angular.element('body')
@@ -125,9 +124,9 @@ define([
                                 });
                             },
                             close: function() {
-                                this.imgEl.remove();
-                                angular.element('.blockUI > [class^=imgareaselect]').remove();
-                                angular.element('.imgareaselect-crop-wrapper').remove();
+                                this.imageEl.imgAreaSelect({ remove:true });
+                                this.imageEl.remove();
+                                this.handleEl.remove();
                                 $.unblockUI();
                             },
                             toBlob: function (dataURI) {
@@ -140,7 +139,7 @@ define([
                                 }
 
                                 // separate out the mime component
-                                var mimeString = this.mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
+                                var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
                                 // write the bytes of the string to a typed array
                                 var ia = new Uint8Array(byteString.length);
@@ -155,7 +154,7 @@ define([
                                 canvas.width  = this.selection.width;
                                 canvas.height = this.selection.height;
                                 canvas.getContext('2d').drawImage(
-                                    this.imgEl[0],
+                                    this.imageEl[0],
                                     this.selection.x1, 
                                     this.selection.y1, 
                                     this.selection.x2, 
@@ -236,7 +235,7 @@ define([
 
                                 return styles.join(';');
                             },
-                            _handleTemplate: function(styles) {
+                            _handleTemplate: function() {
                                 var styles = this._styles();
                                 var template = '<div class="imgareaselect-crop-wrapper" style="'+ styles +'"><div class="btn-group">'+
                                     '<button type="button" class="btn btn-success" ng-click="cropHandle(\'crop\')" ng-disabled="loadingProgress > 0" tooltip-placement="bottom" tooltip="Ok, crop it! :)"><i class="fa fa-crop"></i> Crop</button>';

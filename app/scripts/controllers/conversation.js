@@ -3,7 +3,6 @@ define([
     'lodash',
     'underscore.string',
     'jszip',
-    'async',
 
     'angular-file-upload',
 
@@ -17,7 +16,7 @@ define([
 
     'jquery-blockui',
     'jquery-imgareaselect'
-], function (angular, _, _s, JSZip, async) {
+], function (angular, _, _s, JSZip) {
     'use strict';
 
     _.mixin(_s.exports());
@@ -35,35 +34,41 @@ define([
     app.directive('imgShowCrop', function() {
         return {
             scope: {
-                data: '=imgShowCrop'
+                background: '=imgShowCrop'
             },
             restrict: 'A',
             link: function($scope, $element, $attrs) {
                 var self = this;
                 var parentId = '#' + $attrs.imgShowCropParent;
+                var isShouldbeCrop = $scope.background.error || $scope.background.act != 'crop';
 
-                var ias;
+                var $crop;
 
-                var getOriginalCropSelection = function(data) {
-                    var image = data.image,
-                        size = data.options.size;
-                    var x1 = parseInt((image.width - size.width) / 2),
-                        y1 = parseInt((image.height - size.height) / 2);
-                    return {
-                        x1: x1,
-                        y1: y1,
-                        x2 : parseInt(x1 + size.width),
-                        y2 : parseInt(y1 + size.height)
+                var getCenterCropSelection = function() {
+                    var image = $scope.background.image,
+                        resize = $scope.background.resize;
+
+                    var x1 = parseInt((image.width - resize.width) / 2),
+                        y1 = parseInt((image.height - resize.height) / 2);
+
+                    var selection = {
+                        x1 : x1,
+                        y1 : y1,
+                        x2 : parseInt(x1 + resize.width),
+                        y2 : parseInt(y1 + resize.height)
                     };
+                    $scope.background.crop.selection = selection;
+                    return selection;
                 };
 
-                // x1: 474 x2: 1024 y1: 0 y2: 403
                 var getCropSelection = function() {
-                    var image = $scope.data.image;
+                    var image = $scope.background.image;
+                    // get ratio
                     var ratioWidth = $element.width() / image.width;
                     var ratioHeight = $element.height() / image.height;
-
-                    var originalSelection = $scope.data.options.handle.selection ? $scope.data.options.handle.selection : getOriginalCropSelection($scope.data);
+                    // get original center selection
+                    var originalSelection = $scope.background.crop.selection || getCenterCropSelection();
+                    // send scale selection
                     return {
                         x1: originalSelection.x1 * ratioWidth,
                         y1: originalSelection.y1 * ratioHeight,
@@ -73,15 +78,16 @@ define([
                 };
 
                 var showCropSelection = function() {
-                    if($scope.data.error || $scope.data.options.handle.type != 'crop') {
+                    if( isShouldbeCrop ) {
                         return;
                     }
-
+                    console.log('showCropSelection:selection', $scope.background.crop.selection);
+                    // get crop selection
                     var selection = getCropSelection();
-
-                    angular.element('[class^=imgareaselect]', $element).remove();
-
-                    ias = $element.imgAreaSelect({
+                    // remove imgareaselect
+                    $element.imgAreaSelect({remove:true});
+                    // instance imgareaselect
+                    $crop = $element.imgAreaSelect({
                         x1: selection.x1, 
                         y1: selection.y1, 
                         x2: selection.x2, 
@@ -93,25 +99,31 @@ define([
                         instance  : true
                     });
                 };
+                
+                // img onload
+                $element.bind('load', showCropSelection);
 
-                $scope.$watch('data.options.handle.selection', function(newVal, oldVal) {
-                    console.log('selection', newVal, oldVal);
+                $scope.$watch('background.crop.selection', function(newVal, oldVal) {
                     if(newVal == oldVal) return;
-                    showCropSelection(newVal);
+                    showCropSelection();
                 });
-                $scope.$watch('data.options.handle.type', function(newVal, oldVal) {
-                    console.log('type', newVal, oldVal);
-                    if(newVal == oldVal || !ias) return;
+                $scope.$watch('background.act', function(newVal, oldVal) {
+                    if(newVal == oldVal || !$crop) return;
 
                     if(newVal == 'crop') {
-                        ias.setOptions({ show: true });
+                        $crop.setOptions({ show: true });
                     } else {
-                        ias.setOptions({ hide: true });
+                        $crop.setOptions({ hide: true });
                     }
-                    ias.update();
+                    $crop.update();
                 });
-
-                $element.bind('load', showCropSelection);
+                $scope.$watch('background.generate', function(newVal, oldVal) {
+                    if(newVal) {
+                        console.log('remove:imgAreaSelect', $element);
+                        // remove imgareaselect
+                        $element.imgAreaSelect({ remove:true });
+                    }
+                });
             }
         }
     });
@@ -152,7 +164,31 @@ define([
                     }
                 }
             },
-            templates: [
+            dimensions: {
+                'default': {
+                    width: 403,
+                    height: 403
+                },
+                'portrait': {
+                    width: 403,
+                    height: 550
+                },
+                'landscape': {
+                    width: 550,
+                    height: 403
+                }
+            },
+            backgrounds: {
+                progress: -1,
+                size: 0,
+                errors: [],
+                data: []
+            }
+        },
+        init: function() {
+            var self = this;
+
+            this.$.templates = [
                 {
                     title: 'Template 1',
                     open: true,
@@ -207,33 +243,7 @@ define([
                         portrait  : 'tpl-6-portrait.png'
                     }
                 }
-            ],
-            dimensions: {
-                'default': {
-                    width: 403,
-                    height: 403
-                },
-                'portrait': {
-                    width: 403,
-                    height: 550
-                },
-                'landscape': {
-                    width: 550,
-                    height: 403
-                }
-            },
-            backgrounds: {
-                progress: -1,
-                size: 0,
-                errors: 0,
-                data: []
-            },
-            selection: {},
-            showPreview: false
-        },
-        init: function() {
-            var self = this;
-
+            ];
             this.$.conversation = {
                 images: {
                     logo: null
@@ -319,25 +329,24 @@ define([
             return _.titleize(this.$.fabric.selectedObject[type]);
         },
 
-        setHandle: function(index, type) {
-            this.$log.log(index, type);
-            var backgound = this.$.backgrounds.data[index],
-                options = backgound.options;
-            if( type == 'fit' ) {
-                options.handle.type = 'fit';
+        setHandle: function(index, act) {
+            this.$log.log(index, act);
+            var backgound = this.$.backgrounds.data[index];
+            if( act == 'resize' ) {
+                backgound.act = 'resize';
             } else {
-                options.handle.type = 'crop';
-                options.handle.set = type;
-                if( type == 'custom' ) {
+                backgound.act = 'crop';
+                backgound.crop.type = act;
+                if( act == 'custom' ) {
                     // open crop window...
                     this.$rootScope.$broadcast('uploadimage:open:selection', { 
-                        index:index, 
-                        image:backgound.image, 
-                        selection:backgound.options.handle.selection 
+                        index: index, 
+                        image: backgound.image, 
+                        selection: backgound.crop.selection 
                     });
                 } else {
-                    // set default selection 'center'
-                    backgound.options.handle.selection = null;
+                    // set default selection (center)
+                    backgound.crop.selection = null;
                 }
             }
         },
@@ -394,16 +403,17 @@ define([
                             return;
                         }
 
-                        var options = self._getImageAttributes(width, height);
-                        backgrounds.data[index] = {
-                            image: image,
-                            blob : blob,
-                            name : filename, 
-                            options: options
-                        };
-
                         backgrounds.size += blob.size;
-                        backgrounds.errors -= 1;
+                        // remove index errors
+                        _.remove(backgrounds.errors, function(num) { return num == index; });
+
+                        var attrs = self._getImageAttributes(width, height);
+                        backgrounds.data[index] = angular.extend({
+                            generate: false,
+                            image: image,
+                            blob: blob,
+                            name: filename
+                        }, attrs);
 
                         self.$.$apply();
                     };
@@ -417,7 +427,9 @@ define([
         },
         doDeleteImg: function(index) {
             var backgrounds = this.$.backgrounds;
-            backgrounds.errors -= 1;
+            // remove backgrounds errors
+            _.remove(backgrounds.errors, function(num) { return num == index; });
+            // remove backgrounds data by index
             backgrounds.data.splice(index, 1);
         },
 
@@ -453,6 +465,8 @@ define([
                 log.info('Start generating...');
                 // set progress to 0
                 self.$.backgrounds.progress = 0;
+                // remove imgareaselect
+                angular.element('[class^=imgareaselect]').remove();
                 self._chainGenerateBackground(requests).then(function(response){
                     log.info('End generate...');
                     log.log('response', response);
@@ -465,7 +479,7 @@ define([
             this.$.backgrounds = {
                 progress: -1,
                 size: 0,
-                errors: 0,
+                errors: [],
                 data: []
             };
         },
@@ -491,7 +505,7 @@ define([
                         }, function reject(response) {
                             log.warn('reject', index, response);
                             response.loading = false;
-                            backgrounds.errors += 1;
+                            backgrounds.errors.push(index);
                             backgrounds.data[index] = response;
                         }, function notify(message) {
                             log.info('notify', index, message);
@@ -568,14 +582,15 @@ define([
 
                                 backgrounds.size += blob.size;
 
-                                var options = self._getImageAttributes(width, height);
-
-                                defer.resolve({
-                                    image : image,
+                                var attrs = self._getImageAttributes(width, height);
+                                var response = angular.extend({
+                                    generate: false,
+                                    image: image,
                                     blob: blob,
-                                    name: filename, 
-                                    options: options
-                                });
+                                    name: filename
+                                }, attrs);
+
+                                defer.resolve(response);
 
                             }
                         };
@@ -653,28 +668,29 @@ define([
          * @return {Object}
          */
         _getImageAttributes: function(width, height) {
-            var template, handle;
+            var template, act, crop;
 
             if(width == 403 && height == 403) {
                 template = 'default';
-                handle = { type: null };
+                act = crop = null;
             } else if((width >= 403 && height < 550) || (width < 550 && height >= 403)) {
                 template = 'default';
-                handle = { type: 'crop', set: 'center', selection: null };
+                act = 'crop';
+                crop = { type: 'center', selection: null };
             } else {
-                var ratio = width/height;
-                if( ratio > 1 ) {
-                    template = 'landscape';
-                    handle = { type: 'crop', set: 'center', selection: null };
-                } else {
-                    template = 'portrait';
-                    handle = { type: 'crop', set: 'center', selection: null };
-                } 
+                act = 'crop';
+                crop = { type: 'center', selection: null };
+                template = ((width/height) > 1) ? 'landscape' : 'portrait' ;
             }
 
-            var size = this.$.dimensions[template];
-
-            return { template:template, handle:handle, size:size };
+            var resize = this.$.dimensions[template];
+            var attrs = {
+                act: act,
+                crop: crop,
+                resize: resize,
+                template: template
+            };
+            return attrs;
         },
 
         _chainGenerateBackground: function(requests) {
@@ -688,6 +704,8 @@ define([
 
             var promises = requests.reduce(function(promise, request, index) {
                 log.log('request', index, request);
+                // set generate true
+                request.generate = true;
                 return promise.then(function() {
                     var el = angular.element('#background-preview-'+ index);
                     return self._generateBackground(el, request)
@@ -708,7 +726,6 @@ define([
                             var total = self.$.backgrounds.size;
                             var progress = size/total * 100;
                             self.$.backgrounds.progress = progress
-                            log.log('progress', progress);
 
                             // scroll to element
                             if(index % 4 == 0) {
@@ -727,13 +744,11 @@ define([
 
             return promises;
         },
-        _generateBackground: function(element, file) {
+        _generateBackground: function(element, background) {
             var self = this,
                 log = self.$log,
                 timeout = self.$timeout;
-            // define file background
-            var background = file.image,
-                options = file.options;
+
             // define original canvas
             var originalCanvas = self.$.fabric.canvas,
                 canvasScale = self.$.fabric.canvasScale;
@@ -746,16 +761,16 @@ define([
             timeout(function() { defer.notify('Preparing background...'); });
 
             var backgroundImage;
-            if( options.handle.type === 'crop' ) {
-                // do crop background image
+            if( background.act === 'crop' ) {
                 timeout(function() { defer.notify('Cropping background...'); });
-                backgroundImage = this._getImageCrop(background, options);
-            } else if( options.handle.type === 'fit' ) {
-                // do upload 'fit' background image
+                // do crop background image
+                backgroundImage = this._getCropImage(background);
+            } else if( background.act === 'resize' ) {
                 timeout(function() { defer.notify('Resizing background...'); });
+                // do upload 'resize' background image...
             } else {
-                // background is fit!
-                backgroundImage = background.src;
+                // background default is fit!
+                backgroundImage = background.image.src;
             }
 
             //////////////////////
@@ -776,25 +791,30 @@ define([
             // get json objects
             var json = JSON.stringify(canvasProperties);
             // get canvas size by background
-            var canvasSize = options.size;
-            var overlayImage = 'images/conversation/' + self.$.templates[0].template[options.template];
+            var canvasSize = background.resize;
+            // get selected template 
+            var templates = _.find(self.$.templates, { open:true });
+            var overlayImage = 'images/conversation/' +templates.template[background.template];
 
             // create fabric canvas
             var canvasEl = document.createElement('canvas');
             var canvas = new self.FabricWindow.Canvas(canvasEl);
             canvas.loadFromJSON(json, function() {
+                ///////////////////////////////
+                // 2.1. Setting canvas //
+                ///////////////////////////////
                 // set canvas dimension
                 canvas.originalWidth = canvasSize.width;
                 canvas.originalHeight = canvasSize.height;
                 canvas.setWidth(canvasSize.width * canvasScale);
                 canvas.setHeight(canvasSize.height * canvasScale);
 
-                // set lock objects
+                // set position & lock objects
                 var objects = canvas.getObjects();
                 angular.forEach(objects, function(object, key){
-                    if(options.template == 'landscape') {
+                    if(background.template == 'landscape') {
                         object.left = canvas.originalWidth/canvasProperties.originalWidth * object.left;
-                    } else if(options.template == 'portrait') {
+                    } else if(background.template == 'portrait') {
                         object.top = canvas.originalHeight/canvasProperties.originalHeight * object.top;
                     }                   
                     object.lockObject = true;
@@ -837,10 +857,9 @@ define([
             return defer.promise;
         },
 
-        _getImageCrop: function(image, options) {
-            var selection = (options.handle.type == 'custom' && options.handle.selection) ? 
-                                options.handle.selection : 
-                                this._getCropSelection(image, options.size);
+        _getCropImage: function(file) {
+            var image = file.image;
+            var selection = file.crop.selection || this._getCropSelection(file);
 
             var canvas = document.createElement('canvas');
             canvas.width  = image.width;
@@ -857,15 +876,18 @@ define([
             );
             return canvas.toDataURL();
         },
-        _getCropSelection: function(image, options) {
-            var x1 = parseInt((image.width - options.width) / 2),
-                y1 = parseInt((image.height - options.height) / 2);
+        _getCropSelection: function(file) {
+            var image = file.image,
+                resize = file.resize;
+
+            var x1 = parseInt((image.width - resize.width) / 2),
+                y1 = parseInt((image.height - resize.height) / 2);
 
             return {
                 x1: x1,
                 y1: y1,
-                x2 : parseInt(x1 + options.width),
-                y2 : parseInt(y1 + options.height)
+                x2 : parseInt(x1 + resize.width),
+                y2 : parseInt(y1 + resize.height)
             };
         },
 
@@ -935,7 +957,7 @@ define([
         },
         _onCropSelection: function(event, args) {
             this.$log.log('_onCropSelection', event, args);
-            this.$.backgrounds.data[args.index].options.handle.selection = args.selection;
+            this.$.backgrounds.data[args.index].crop.selection = args.selection;
         }
     });
 });
