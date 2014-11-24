@@ -118,10 +118,16 @@ define([
                     $crop.update();
                 });
                 $scope.$watch('background.generate', function(newVal, oldVal) {
+                    console.log('background.generate', newVal, oldVal);
+                    if(!$crop) return;
+
                     if(newVal) {
                         console.log('remove:imgAreaSelect', $element);
                         // remove imgareaselect
-                        $element.imgAreaSelect({ remove:true });
+                        $element.imgAreaSelect({ hide:true });
+                    } else {
+                        $element.imgAreaSelect({ show:true });
+                        $element.parent().find('canvas').remove();
                     }
                 });
             }
@@ -137,6 +143,7 @@ define([
             '$timeout',
             '$q',
             '$compile',
+            '$sce',
 
             'Fabric',
             'FabricConstants',
@@ -145,8 +152,8 @@ define([
         ],
         initScope: {
             fabric: {},
-            fullEditor: false,
-            uploadOptions: {
+            fulleditor: false,
+            uploadoptions: {
                 background: {
                     data: {
                         id    : 'conversation',
@@ -177,17 +184,20 @@ define([
                     width: 550,
                     height: 403
                 }
-            },
-            backgrounds: {
-                progress: -1,
-                size: 0,
-                errors: [],
-                data: []
             }
         },
         init: function() {
             var self = this;
 
+            this.$.backgrounds = {
+                completed: false,
+                reading : false,
+                editing : true,
+                progress: -1,
+                size    : 0,
+                errors  : [],
+                data    : []
+            };
             this.$.templates = [
                 {
                     title: 'Template 1',
@@ -351,6 +361,9 @@ define([
             }
         },
 
+        openFileSelect: function(evt) {
+            angular.element(evt.currentTarget).next().trigger('click');
+        },
         /**
          * Atur input file background (multiple)
          * @param  {Object} $files Input files
@@ -363,10 +376,12 @@ define([
             angular.element('body').animate({
                 scrollTop: angular.element("#preview").offset().top
             }, 1000, function() {
-                log.info('Start chaining...');
+                log.info('Start reading files...');
+                self.$.backgrounds.reading = true;
                 self._chainReadFiles($files).then(function (response) {
                     log.info('End chain...');
                     log.log('completed', response, self.$.backgrounds);
+                    self.$.backgrounds.reading = false;
                 });
             });
         },
@@ -465,13 +480,23 @@ define([
                 log.info('Start generating...');
                 // set progress to 0
                 self.$.backgrounds.progress = 0;
-                // remove imgareaselect
-                angular.element('[class^=imgareaselect]').remove();
-                self._chainGenerateBackground(requests).then(function(response){
-                    log.info('End generate...');
-                    log.log('response', response);
-                    // reset zoom
+                self.$.backgrounds.completed = false;
+                self._chainGenerateBackground(requests).then(function(zip){
+                    log.log('completed', self.$.backgrounds);
+                    log.log('zip', zip);
+
                     self.$.fabric.resetZoom();
+
+                    // generate download link
+                    var DOMURL = window.URL || window.mozURL;
+                    var downloadlink = DOMURL.createObjectURL(zip.generate({type:"blob"}));
+
+                    // get anchor
+                    var link = angular.element('#download')[0];
+                    link.download = Date.now() + '.zip';
+                    link.href = downloadlink;
+
+                    self.$.backgrounds.completed = true;
                 });
             });
         },
@@ -484,18 +509,39 @@ define([
             };
         },
 
+        toggleSettings: function() {
+            var backgrounds = this.$.backgrounds;
+
+            backgrounds.editing = !backgrounds.editing;
+
+            if(backgrounds.progress != 100) return;
+
+            _.forEach(backgrounds.data, function(background) {
+                background.generate = false;
+            });
+            backgrounds.progress = -1;
+        },
+
+        renderHtml: function (htmlCode) {
+            return this.$sce.trustAsHtml(htmlCode);
+        },
+
         /** @private **/
  
         _chainReadFiles: function(files){
             var self = this,
                 log = this.$log;
 
-            var backgrounds = self.$.backgrounds;
-            var until = files.length - 1;
+            var backgrounds = self.$.backgrounds,
+                size = backgrounds.data.length;
+            var until = size + files.length - 1;
+
+            log.info('until', until);
 
             var defer = self.$q.defer();
 
             var promises = files.reduce(function (promise, file, index) {
+                var index = size + index;
                 return promise.then(function() {
                     return self._readFile(file)
                         .then(function resolve(response) {
@@ -700,17 +746,20 @@ define([
             var until = requests.length - 1,
                 size = 0;
 
+            var zip = new JSZip();
+
             var defer = this.$q.defer();
 
             var promises = requests.reduce(function(promise, request, index) {
                 log.log('request', index, request);
-                // set generate true
-                request.generate = true;
                 return promise.then(function() {
                     var el = angular.element('#background-preview-'+ index);
                     return self._generateBackground(el, request)
-                        .then(function resolve(response) {
-                            log.log('resolve', index, response);
+                        .then(function resolve(img) {
+                            log.log('resolve', index, img);
+                            var name = (index+1) +'.png';
+                            var data = img.replace('data:image/png;base64,', '');
+                            zip.file(name , data, { base64:true });
                         }, function reject(response) {
                             log.log('reject', index, response);
                         }, function notify(response) {
@@ -735,7 +784,9 @@ define([
                             }
 
                             // completed
-                            if(index == until) return 'completed';
+                            if(index == until) { 
+                                return zip;
+                            }
                         });
                 });
             }, defer.promise);
@@ -759,6 +810,8 @@ define([
             // 1. Prepare background image //
             ///////////////////////////////////
             timeout(function() { defer.notify('Preparing background...'); });
+            // set generate true
+            background.generate = true;
 
             var backgroundImage;
             if( background.act === 'crop' ) {
@@ -773,9 +826,9 @@ define([
                 backgroundImage = background.image.src;
             }
 
-            //////////////////////
-            // 2. Create canvas //
-            //////////////////////
+            //////////////////////////////
+            // 2. Create canvas preview //
+            //////////////////////////////
             timeout(function() { defer.notify('Creating canvas...'); });
 
             // get objects original canvas
@@ -786,23 +839,71 @@ define([
                 'originalHeight',
                 'originalWidth',
                 'height',
-                'width',
+                'width'
             ]);
+            // get json objects
+            var json = JSON.stringify(canvasProperties);
+            log.log('canvasProperties', canvasProperties);
+            // objects length + background + overlay
+            var renderingUntil = canvasProperties.objects.length + 2;
+
+            // get selected template 
+            var templates = _.find(self.$.templates, { open:true });
+            var overlayImage = 'images/conversation/' +templates.template[background.template];
+            var images = {
+                background: backgroundImage,
+                overlay:overlayImage
+            };
+
+            // set rendering
+            var rendering = 0;
+            var canvasPreview = self._createCanvas(canvasProperties, background, images, canvasScale, null);
+            canvasPreview.on('after:render', function() {
+                rendering++;
+                log.log('preview:after:render', rendering);
+
+                if(rendering == renderingUntil) {
+                    log.log('render completed', canvasPreview);
+
+                    var canvasEl = canvasPreview.getElement();
+                    // set relative position
+                    canvasEl.style.position = 'relative';
+                    // add fabric canvas element
+                    element.find('.image').parent().find('canvas').remove();
+                    element.find('.image').append(canvasEl);
+
+                    /////////////////////////////////
+                    // 3. Create original canvas //
+                    /////////////////////////////////
+                    timeout(function() {
+                        defer.notify('Generating...');
+
+                        var rendering = 0;
+                        var canvasOri = self._createCanvas(canvasProperties, background, images, 1, canvasScale);
+                        canvasOri.on('after:render', function() {
+                            rendering++;
+                            log.log('original:after:render', rendering);
+                            if(rendering == renderingUntil) {
+                                var canvasOriEl = canvasOri.getElement();
+                                defer.resolve(canvasOriEl.toDataURL());
+                            }
+                        });
+                    });
+                }
+            });
+
+            return defer.promise;
+        },
+
+        _createCanvas: function(canvasProperties, background, images, canvasScale, oldScale) {
             // get json objects
             var json = JSON.stringify(canvasProperties);
             // get canvas size by background
             var canvasSize = background.resize;
-            // get selected template 
-            var templates = _.find(self.$.templates, { open:true });
-            var overlayImage = 'images/conversation/' +templates.template[background.template];
 
-            // create fabric canvas
             var canvasEl = document.createElement('canvas');
-            var canvas = new self.FabricWindow.Canvas(canvasEl);
+            var canvas = new this.FabricWindow.Canvas(canvasEl);
             canvas.loadFromJSON(json, function() {
-                ///////////////////////////////
-                // 2.1. Setting canvas //
-                ///////////////////////////////
                 // set canvas dimension
                 canvas.originalWidth = canvasSize.width;
                 canvas.originalHeight = canvasSize.height;
@@ -812,6 +913,12 @@ define([
                 // set position & lock objects
                 var objects = canvas.getObjects();
                 angular.forEach(objects, function(object, key){
+                    if( oldScale ) {
+                        object.scaleX = canvasScale;
+                        object.scaleY = canvasScale;
+                        object.left = object.left / oldScale;
+                        object.top  = object.top / oldScale;
+                    }
                     if(background.template == 'landscape') {
                         object.left = canvas.originalWidth/canvasProperties.originalWidth * object.left;
                     } else if(background.template == 'portrait') {
@@ -823,38 +930,21 @@ define([
                 });
 
                 // set backgound image
-                canvas.setBackgroundImage(backgroundImage, canvas.renderAll.bind(canvas), {
+                canvas.setBackgroundImage(images.background, canvas.renderAll.bind(canvas), {
                     top : 0,
                     left: 0,
                     scaleX: canvasScale,
                     scaleY: canvasScale
                 });
                 // set overlay image
-                canvas.setOverlayImage(overlayImage, canvas.renderAll.bind(canvas), {
+                canvas.setOverlayImage(images.overlay, canvas.renderAll.bind(canvas), {
                     top : 0,
                     left: 0,
                     scaleX: canvasScale,
                     scaleY: canvasScale
                 });
             });
-            // set relative position
-            canvasEl.style.position = 'relative';
-
-            // replace background image to fabric canvas element
-            element.find('.image').html(canvasEl);
-
-            ////////////////////////
-            // 3. Generate canvas //
-            ////////////////////////
-
-            timeout(function() {
-                defer.notify('Generating...');
-                timeout(function() {
-                    defer.resolve('completed');
-                }, Math.floor(Math.random() * 1000));
-            });
-
-            return defer.promise;
+            return canvas;
         },
 
         _getCropImage: function(file) {

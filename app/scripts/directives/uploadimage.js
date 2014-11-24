@@ -71,7 +71,7 @@ define([
                                     overlayCSS:{
                                         cursor : 'default',
                                         opacity: 1,
-                                        backgroundColor: '#000'
+                                        backgroundColor: '#2c3e50'
                                     },
                                     css: {
                                         cursor : 'default',

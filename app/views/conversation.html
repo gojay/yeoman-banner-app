@@ -93,11 +93,9 @@
 	}
 
 	#drop-backgrounds .drop-loading {
-		display: none;
 		position: absolute;
-		top: 49px;
-		left: 185px;
-		color: #3685C6;
+		top: 48%;
+		left: 48%;
 	}
 
 	#drop-backgrounds > .drop .drop-instructions {
@@ -127,9 +125,6 @@
 
 	#drop-backgrounds > .drop.loading {
 		opacity: 0.4
-	}
-	#drop-backgrounds > .drop.loading ~ .drop-loading {
-		display: block;
 	}
 </style>
 <div class="page-header">
@@ -187,28 +182,32 @@
 			</div>
 
 			<div id="drop-backgrounds" class="col-md-12">
-				<div class="drop">
+				<div class="drop" ng-class="{'loading': backgrounds.reading}" ng-file-drop="onFileSelect($files);" ng-file-drag-over-class="over">
 					<div class="input-button">
-						<input type="file" ng-file-select="onFileSelect($files)" multiple="true" onclick="this.value=null" />
+						<button class="btn btn-sm btn-primary" ng-click="openFileSelect($event)">Select images</button>
+						<input type="file" ng-file-select="onFileSelect($files)" class="hide" multiple="true" onclick="this.value=null" />
 						<br><br>
 						<span class="drop-instructions">or Drag and Drop file here</span>
 						<span class="drop-over">Drop files here!</span>
 					</div>
 				</div>
-				<div class="drop-loading"><i class="icon-spinner icon-spin icon-4x"></i></div>
+				<div class="drop-loading" ng-show="backgrounds.reading"><i class="fa fa-spinner fa-spin fa-lg"></i></div>
 			</div>
 		</section>
 	</div>
 	<!-- background images preview -->
-	<div id="preview" class="row margin-top">
-		<h4>Backgrounds <span ng-show="backgrounds.data.length > 0"><span class="badge">{{ backgrounds.data.length }}</span></span></h4>
-
-		<div class="progress progress-striped" ng-show="backgrounds.progress > -1" ng-class="{'active':backgrounds.progress > 0 && backgrounds.progress < 100}">
-		  	<div class="progress-bar progress-bar-success" style="width: {{ backgrounds.progress }}%"></div>
+	<div id="preview" class="row margin-top" ng-show="backgrounds.data.length > 0">
+		<div class="col-md-6">
+			<h4>Backgrounds <span><span class="badge">{{ backgrounds.data.length }}</span></span></h4>
 		</div>
-
-		<div class="col-md-12 margin-top" ng-show="backgrounds.errors.length > 0">
-			<span class="label label-danger">Errors : {{ backgrounds.errors.length }}</span>
+		<div class="col-md-6 margin-top" ng-show="backgrounds.errors.length > 0">
+			<span class="label label-danger pull-right">Errors : {{ backgrounds.errors.length }}</span>
+		</div>
+		
+		<div class="col-md-12 margin-top">
+			<div class="progress progress-striped" ng-show="backgrounds.progress > -1" ng-class="{'active':backgrounds.progress > 0 && backgrounds.progress < 100}">
+			  	<div class="progress-bar progress-bar-success" style="width: {{ backgrounds.progress }}%"></div>
+			</div>
 		</div>
 		
 		<div class="col-md-12 margin-top">
@@ -224,13 +223,14 @@
 					<wave-spinner></wave-spinner>
 				</div>
 
-				<div class="image thumbnail text-center" ng-show="!background.loading">
+				<div class="image thumbnail text-center well well-sm" ng-show="!background.loading">
 					<img ng-src="{{background.image.src}}" class="img-responsive" style="max-height:250px" 
 						ng-class="{'img-small': background.error && background.image}"
+						ng-hide="background.generate"
 						img-show-crop="background" 
 						img-show-crop-parent="background-preview-{{ $index }}">
-			      	<div class="caption">
-				        <h4>{{background.template}} : {{background.name}}</h4>
+			      	<div class="caption" ng-hide="background.generate">
+				        <h5 ng-if="!background.error">{{background.template}} : {{background.name}}</h5>
 						<div ng-show="background.error" class="text-danger text-center">
 							<div class="alert alert-dismissable alert-warning">
 								<p>{{ background.error }}</p>
@@ -276,8 +276,17 @@
 		</div>
 
 		<div class="col-md-12 margin-top" ng-show="backgrounds.data.length > 0">
-			<button type="button" class="pull-right btn btn-sm btn-danger" ng-click="doEmptyFiles()">Empty</button>
-			<button type="button" class="pull-right btn btn-sm btn-success" ng-disabled="backgrounds.errors.length > 0" ng-click="doGenerate()">Generate</button>
+			<div class="btn-group pull-right">
+				<button type="button" class="btn btn-sm" ng-disabled="backgrounds.errors.length > 0" ng-class="{'btn-primary': backgrounds.editing}" ng-click="toggleSettings()">
+					<i class="fa" ng-class="{'fa-check': backgrounds.editing, 'fa-edit': !backgrounds.editing}"></i> {{ backgrounds.editing ? 'Done' : 'Settings' }}
+				</button>
+				<button type="button" class="btn btn-sm btn-info" ng-disabled="backgrounds.editing || backgrounds.errors.length > 0" ng-click="doGenerate()">
+					<i class="fa fa-cog" ng-class="{'fa-spin': backgrounds.progress > 0 && backgrounds.progress < 100}"></i> 
+					{{ backgrounds.progress > 0 && backgrounds.progress < 100 ? 'Generating..' : 'Generate' }}
+				</button>
+				<a href="#" id="download" class="btn btn-sm btn-success" ng-disabled="backgrounds.editing || !backgrounds.completed"><i class="fa fa-download"></i> Download</a>
+				<button type="button" class="btn btn-sm btn-danger" ng-click="doEmptyFiles()"><i class="fa fa-trash-o"></i> Empty</button>
+			</div>
 		</div>
 	</div>
 </div>
