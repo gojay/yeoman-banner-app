@@ -8,7 +8,7 @@ define(['angular', 'controllers/main', 'controllers/bootstrap', 'controllers/ban
             'bannerAppApp.controllers.BannerCtrl',
             'bannerAppApp.controllers.ConversationCtrl',
             'bannerAppApp.controllers.RaphaelCtrl',
-            'bannerAppApp.controllers.FabricCtrl',
+            // 'bannerAppApp.controllers.FabricCtrl',
             'bannerAppApp.controllers.Fabric2Ctrl',
             'bannerAppApp.controllers.UploadCtrl',
             'bannerAppApp.controllers.SplashMobileCtrl',

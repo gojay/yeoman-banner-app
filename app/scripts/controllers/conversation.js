@@ -170,8 +170,13 @@ define([
                         height: 45
                     }
                 }
-            },
-            dimensions: {
+            }
+        },
+        init: function() {
+            var self = this;
+
+            /* dimensions */
+            this.$.dimensions = {
                 'default': {
                     width: 403,
                     height: 403
@@ -184,20 +189,9 @@ define([
                     width: 550,
                     height: 403
                 }
-            }
-        },
-        init: function() {
-            var self = this;
-
-            this.$.backgrounds = {
-                completed: false,
-                reading : false,
-                editing : true,
-                progress: -1,
-                size    : 0,
-                errors  : [],
-                data    : []
             };
+
+            /* templates */
             this.$.templates = [
                 {
                     title: 'Template 1',
@@ -254,9 +248,26 @@ define([
                     }
                 }
             ];
+
+            /* backgrounds */
+            this.$.backgrounds = {
+                completed: false,
+                reading : false,
+                editing : true,
+                progress: -1,
+                size    : 0,
+                errors  : [],
+                data    : []
+            };
+
+            /* conversation */
             this.$.conversation = {
                 images: {
-                    logo: null
+                    logo: null,
+                    elements: {
+                        1: null,
+                        2: null
+                    }
                 },
                 config: {
                     logo: {
@@ -278,12 +289,19 @@ define([
                 }
             };
 
+            /* events */
+            
             this.$.$on('canvas:created', this._onCanvasCreated);
 
             this.$.$on('uploadimage:close:selection', this._onCropSelection);
         },
         watch: {
-            '{object}templates': '_onChangeTemplate'
+            '{object}templates': '_onChangeTemplate',
+            'conversation.images.logo': '_onChangeImageLogo',
+            '{object}conversation.images.elements': '_onChangeImageElements',
+
+            '{object}conversation.config.logo': '_onChangeConfigLogo',
+            '{object}conversation.config.elements': '_onChangeConfigElements'
         },
         _watchAsync: function($scope) {
             var self = this,
@@ -325,11 +343,12 @@ define([
             });
             $scope.$watch('fabric.selectedObject.hasPlaceholder', function(hasPlaceholder) {
                 if (!$scope.fabric.selectedObject || _.isUndefined(hasPlaceholder)) return;
-                $scope.fabric.selectedObject.setPlaceholder(hasPlaceholder);
+                $scope.fabric.selectedObject.hasPlaceholder = hasPlaceholder;
                 $scope.fabric.render();
             });
-            $scope.$watch('fabric.selectedObject.H_PADDING', function(newVal, oldVal) {
+            $scope.$watch('fabric.selectedObject.PADDING', function(newVal, oldVal) {
                 if (!oldVal) return;
+                if(newVal > 10) $scope.fabric.selectedObject.PADDING = 10;
                 $scope.fabric.render();
             });
         },
@@ -520,10 +539,6 @@ define([
                 background.generate = false;
             });
             backgrounds.progress = -1;
-        },
-
-        renderHtml: function (htmlCode) {
-            return this.$sce.trustAsHtml(htmlCode);
         },
 
         /** @private **/
@@ -873,7 +888,7 @@ define([
                     element.find('.image').append(canvasEl);
 
                     /////////////////////////////////
-                    // 3. Create original canvas //
+                    // 3. Generate original canvas //
                     /////////////////////////////////
                     timeout(function() {
                         defer.notify('Generating...');
@@ -1004,7 +1019,7 @@ define([
                     image: 'images/conversation/tpl-1.png'
                 },
                 {
-                    type: 'image',
+                    type: 'polaroid',
                     image: 'images/default/165x45.png',
                     options: {
                         name: 'logo',
@@ -1013,7 +1028,7 @@ define([
                     }
                 },
                 {
-                    type: 'image',
+                    type: 'polaroid',
                     image: 'images/default/70x70.png',
                     options: {
                         name: 'element-1',
@@ -1022,7 +1037,7 @@ define([
                     }
                 },
                 {
-                    type: 'image',
+                    type: 'polaroid',
                     image: 'images/default/70x70.png',
                     options: {
                         name: 'element-2',
@@ -1038,6 +1053,11 @@ define([
 
             self.$.$evalAsync(self._watchAsync);
         },
+        _onCropSelection: function(event, args) {
+            this.$log.log('_onCropSelection', event, args);
+            this.$.backgrounds.data[args.index].crop.selection = args.selection;
+        },
+
         _onChangeTemplate: function(newVal, oldVal) {
             var selected = _.find(newVal, { open:true });
             this.$log.log('_onChangeTemplate', selected);
@@ -1045,9 +1065,19 @@ define([
             var imgURL = 'images/conversation/' + selected.template.default;
             this.$.fabric.setOverlayImage(imgURL);
         },
-        _onCropSelection: function(event, args) {
-            this.$log.log('_onCropSelection', event, args);
-            this.$.backgrounds.data[args.index].crop.selection = args.selection;
+
+        _onChangeImageLogo: function(newVal, oldVal) {
+            this.$log.log('_onChangeImageLogo', newVal, oldVal);
+        },
+        _onChangeImageElements: function(newVal, oldVal) {
+            this.$log.log('_onChangeImageElements', newVal, oldVal);
+        },
+
+        _onChangeConfigLogo: function(newVal, oldVal) {
+            this.$log.log('_onChangeConfigLogo', newVal, oldVal);
+        },
+        _onChangeConfigElements: function(newVal, oldVal) {
+            this.$log.log('_onChangeConfigElements', newVal, oldVal);
         }
     });
 });

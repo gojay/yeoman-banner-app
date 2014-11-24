@@ -381,14 +381,16 @@ angular.module('common.fabric', [
                                 
                                 fabric.Image.fromURL(data.image, function(object) {
                                     canvas.add(object);
-                                    if( data.sendBack) {
-                                        canvas.sendToBack(object);
-                                    }
                                 }, options);
                                 break;
                             case 'polaroid':
-                                var polaroid = new fabric.PolaroidPhoto(data.image, data.options);
-                                canvas.add(polaroid);
+                                var options = angular.extend({
+                                    crossOrigin: 'anonymous'
+                                }, data.options);
+                                
+                                fabric.PolaroidPhoto.fromURL(data.image, function(object) {
+                                    canvas.add(object);
+                                }, options);
                                 break;
                             case 'group':
                                 var objects = [];

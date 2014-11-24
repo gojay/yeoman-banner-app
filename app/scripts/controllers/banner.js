@@ -251,13 +251,13 @@ define([
             $scope.$watch('fabric.selectedObject.hasPlaceholder', function(hasPlaceholder) {
                 if (!$scope.fabric.selectedObject || _.isUndefined(hasPlaceholder)) return;
             	self._applyCanvas('logo', function(object){
-            		object.setPlaceholder(hasPlaceholder);
+                    object.hasPlaceholder = hasPlaceholder;
             	});
             });
-            $scope.$watch('fabric.selectedObject.H_PADDING', function(newVal, oldVal) {
+            $scope.$watch('fabric.selectedObject.PADDING', function(newVal, oldVal) {
                 if (!oldVal) return;
 
-                self._applyCanvas('logo', function(object){});
+                self._applyCanvas('logo');
             });
 
             $scope.$watch('banner.config.prize.type', this._onChangePrizeType);
@@ -734,7 +734,7 @@ define([
             if(!newVal) return;
 
             this._applyCanvas('logo', function(obj) {
-                obj.setImage(newVal);
+                obj.getElement().setAttribute('src', newVal); 
             });
 
             this.$rootScope.$broadcast('uploadimage:completed');
@@ -778,7 +778,7 @@ define([
                         if(fabric.canvasOriginal.prizeTemplate == prizeTemplate) {
                             var obj = fabric.getObjectByName(objName);
                             if(obj) {
-                                obj.setImage(value);
+                                obj.getElement().setAttribute('src', value); 
                                 // fabric.setActiveObject(obj);
                             }
                             fabric.render();
