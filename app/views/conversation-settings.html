@@ -35,10 +35,10 @@
 	<span class="help-block" ng-show="conversation.config.elements[1].enable">Upload Image (use PNG for tansparent background)</span>
 	<div class="row" ng-show="conversation.config.elements[1].enable">
 		<div class="col-md-4">
-			<upload-image ng-model="conversation.images.logo"
+			<upload-image ng-model="conversation.images.elements[1]"
             	upload-image-enable-crop="true" 
             	upload-image-class="btn-primary btn-block" 
-            	upload-image-options="uploadOptions.logo"></upload-image>
+            	upload-image-options="uploadOptions.elements[1]"></upload-image>
     	</div>
 		<div class="col-md-4">
 			<div class="checkbox">
@@ -68,10 +68,10 @@
 	<span class="help-block" ng-show="conversation.config.elements[2].enable">Upload Image (use PNG for tansparent background)</span>
 	<div class="row" ng-show="conversation.config.elements[2].enable">
 		<div class="col-md-4">
-			<upload-image ng-model="conversation.images.logo"
+			<upload-image ng-model="conversation.images.elements[2]"
             	upload-image-enable-crop="true" 
             	upload-image-class="btn-primary btn-block" 
-            	upload-image-options="uploadOptions.logo"></upload-image>
+            	upload-image-options="uploadOptions.elements[2]"></upload-image>
     	</div>
 		<div class="col-md-4">
 			<div class="checkbox">

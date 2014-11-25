@@ -391,6 +391,11 @@ angular.module('common.fabric', [
                                 fabric.PolaroidPhoto.fromURL(data.image, function(object) {
                                     canvas.add(object);
                                 }, options);
+
+                                // fabric.util.loadImage(data.image, function(img) {
+                                //     var object = new fabric.PolaroidPhoto(img, data.options);
+                                //     canvas.add(object);
+                                // }, null, {crossOrigin: 'Anonymous'});
                                 break;
                             case 'group':
                                 var objects = [];

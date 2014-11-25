@@ -31,6 +31,12 @@ define([
         'common.fabric.window'
     ]);
 
+    /**
+     * Directive imgShowCrop
+     *
+     * @description show crop selection on image with imgAreaSelect
+     * @example <img img-show-crop="{model}" img-show-crop-parent="{parentid}" />
+     */
     app.directive('imgShowCrop', function() {
         return {
             scope: {
@@ -39,10 +45,13 @@ define([
             restrict: 'A',
             link: function($scope, $element, $attrs) {
                 var self = this;
-                var parentId = '#' + $attrs.imgShowCropParent;
-                var isShouldbeCrop = $scope.background.error || $scope.background.act != 'crop';
+                var parentId = $attrs.imgShowCropParentId;
 
-                var $crop;
+                var needToCropped = !$scope.background.error && (angular.isDefined($scope.background.act) && $scope.background.act == 'crop');
+
+                console.log('$scope', needToCropped, $scope.background)
+
+                var $cropInstance;
 
                 var getCenterCropSelection = function() {
                     var image = $scope.background.image,
@@ -78,16 +87,16 @@ define([
                 };
 
                 var showCropSelection = function() {
-                    if( isShouldbeCrop ) {
+                    if( !needToCropped ) {
                         return;
                     }
                     console.log('showCropSelection:selection', $scope.background.crop.selection);
-                    // get crop selection
-                    var selection = getCropSelection();
                     // remove imgareaselect
                     $element.imgAreaSelect({remove:true});
+                    // get crop selection
+                    var selection = getCropSelection();
                     // instance imgareaselect
-                    $crop = $element.imgAreaSelect({
+                    $cropInstance = $element.imgAreaSelect({
                         x1: selection.x1, 
                         y1: selection.y1, 
                         x2: selection.x2, 
@@ -108,22 +117,19 @@ define([
                     showCropSelection();
                 });
                 $scope.$watch('background.act', function(newVal, oldVal) {
-                    if(newVal == oldVal || !$crop) return;
+                    if(newVal == oldVal || !$cropInstance) return;
 
                     if(newVal == 'crop') {
-                        $crop.setOptions({ show: true });
+                        $cropInstance.setOptions({ show: true });
                     } else {
-                        $crop.setOptions({ hide: true });
+                        $cropInstance.setOptions({ hide: true });
                     }
-                    $crop.update();
+                    $cropInstance.update();
                 });
                 $scope.$watch('background.generate', function(newVal, oldVal) {
-                    console.log('background.generate', newVal, oldVal);
-                    if(!$crop) return;
+                    if( !needToCropped && !$cropInstance) return;
 
                     if(newVal) {
-                        console.log('remove:imgAreaSelect', $element);
-                        // remove imgareaselect
                         $element.imgAreaSelect({ hide:true });
                     } else {
                         $element.imgAreaSelect({ show:true });
@@ -153,21 +159,31 @@ define([
         initScope: {
             fabric: {},
             fulleditor: false,
-            uploadoptions: {
-                background: {
-                    data: {
-                        id    : 'conversation',
-                        name  : 'background',
-                        width : 403,
-                        height: 403
-                    }
-                },
+            uploadOptions: {
                 logo: {
                     data: {
                         id    : 'conversation',
                         name  : 'logo',
                         width : 165,
                         height: 45
+                    }
+                },
+                elements: {
+                    1: {
+                        data: {
+                            id    : 'conversation',
+                            name  : 'element-1',
+                            width : 70,
+                            height: 70
+                        }
+                    },
+                    2: {
+                        data: {
+                            id    : 'conversation',
+                            name  : 'element-2',
+                            width : 70,
+                            height: 70
+                        }
                     }
                 }
             }
@@ -308,6 +324,7 @@ define([
                 log  = this.$log;
 
             log.log("$evalAsync", $scope);
+            log.log("objects", $scope.fabric.getObjects());
 
             $scope.$watch('fabric.controls.angle', function(angle) {
                 if(!angle) return;
@@ -341,16 +358,21 @@ define([
                 $scope.fabric.selectedObject.set({ shadow:shadow });
                 $scope.fabric.render();
             });
-            $scope.$watch('fabric.selectedObject.hasPlaceholder', function(hasPlaceholder) {
-                if (!$scope.fabric.selectedObject || _.isUndefined(hasPlaceholder)) return;
-                $scope.fabric.selectedObject.hasPlaceholder = hasPlaceholder;
+            $scope.$watch('fabric.selectedObject.placeholder', function(placeholder) {
+                if (!$scope.fabric.selectedObject || _.isUndefined(placeholder)) return;
+                $scope.fabric.selectedObject.placeholder = placeholder;
                 $scope.fabric.render();
             });
-            $scope.$watch('fabric.selectedObject.PADDING', function(newVal, oldVal) {
+            $scope.$watch('fabric.selectedObject.padding', function(newVal, oldVal) {
                 if (!oldVal) return;
-                if(newVal > 10) $scope.fabric.selectedObject.PADDING = 10;
+                if(newVal > 10) $scope.fabric.selectedObject.padding = 10;
                 $scope.fabric.render();
             });
+
+            // $scope.$watch('conversation.images.logo', self._onChangeImageLogo);
+            // $scope.$watchCollection('conversation.images.elements', self._onChangeImageElements);
+            // $scope.$watchCollection('conversation.config.logo', self._onChangeConfigLogo);
+            // $scope.$watchCollection('conversation.config.elements', self._onChangeConfigElements);
         },
 
         getObjectTitle: function(type) {
@@ -472,6 +494,10 @@ define([
             var log = this.$log;
             var requests = this.$.backgrounds.data;
 
+            // set zoom original canvas
+            self.$.fabric.setZoom(0.6);
+
+            // set waiting block
             angular.forEach(requests, function(value, key){
                 self.$timeout(function() {
                     var el = angular.element('#background-preview-'+ key);
@@ -491,8 +517,7 @@ define([
                 });
             });
 
-            self.$.fabric.setZoom(0.6);
-
+            // start chaining generate background
             angular.element('body').animate({
                 scrollTop: angular.element("#preview").offset().top - 60
             }, 1000, function() {
@@ -1001,7 +1026,7 @@ define([
 
             this.$log.log('initialize canvas:created', args);
 
-            var canvasFabric   = args.canvasId;
+            var canvasFabric = args.canvasId;
 
             var fabric = self.$.fabric = new self.Fabric(canvasFabric, {
                 canvasBackgroundColor: 'rgba(0,0,0,0.7)',
@@ -1023,6 +1048,7 @@ define([
                     image: 'images/default/165x45.png',
                     options: {
                         name: 'logo',
+                        fill: '#fff',
                         top : 80,
                         left: 40
                     }
@@ -1032,6 +1058,7 @@ define([
                     image: 'images/default/70x70.png',
                     options: {
                         name: 'element-1',
+                        fill: '#fff',
                         top : 265,
                         left: 40
                     }
@@ -1041,6 +1068,7 @@ define([
                     image: 'images/default/70x70.png',
                     options: {
                         name: 'element-2',
+                        fill: '#fff',
                         top : 265,
                         left: 283
                     }
@@ -1049,7 +1077,7 @@ define([
 
             fabric.buildObjects(objects);
 
-            self.$log.debug('objects', fabric.getObjects());
+            self.$log.debug('fabric', fabric);
 
             self.$.$evalAsync(self._watchAsync);
         },
@@ -1067,17 +1095,78 @@ define([
         },
 
         _onChangeImageLogo: function(newVal, oldVal) {
+            var fabric = this.$.fabric;
             this.$log.log('_onChangeImageLogo', newVal, oldVal);
+            if(!newVal) return;
+
+            var logo = fabric.getObjectByName('logo');
+            logo.getElement().setAttribute('src', newVal);
+            fabric.render();
+
+            this.$rootScope.$broadcast('uploadimage:completed');
         },
         _onChangeImageElements: function(newVal, oldVal) {
+            var fabric = this.$.fabric;
             this.$log.log('_onChangeImageElements', newVal, oldVal);
+
+            if(_.isEqual(newVal, oldVal)) return;
+
+            angular.forEach(newVal, function(image, index){
+                if( image && image != oldVal[index] ) {
+                    console.log('element', index);
+                    var name = 'element-' + index;
+                    var obj = fabric.getObjectByName(name);
+                    obj.getElement().setAttribute('src', image);
+                }
+            });
+            fabric.render();
+
+            this.$rootScope.$broadcast('uploadimage:completed');
         },
 
         _onChangeConfigLogo: function(newVal, oldVal) {
-            this.$log.log('_onChangeConfigLogo', newVal, oldVal);
+            var log = this.$log,
+                fabric = this.$.fabric;
+
+            log.log('_onChangeConfigLogo', newVal, oldVal);
+
+            if(_.isEqual(newVal, oldVal)) return;
+
+            var logo = fabric.getObjectByName('logo');
+            logo.visible = newVal.enable;
+            logo.placeholder = newVal.placeholder;
+            fabric.render();
         },
         _onChangeConfigElements: function(newVal, oldVal) {
-            this.$log.log('_onChangeConfigElements', newVal, oldVal);
+            var log = this.$log,
+                fabric = this.$.fabric;
+
+            log.log('_onChangeConfigElements', newVal, oldVal);
+            
+            if(_.isEqual(newVal, oldVal)) return;
+
+            angular.forEach(newVal, function(element, index){
+                var name = 'element-' + index;
+                var obj = fabric.getObjectByName(name);
+                obj.visible = element.enable;
+                obj.placeholder = element.placeholder;
+                // image circle
+                var clip = null
+                if( !element.default ) {
+                    clip = function(ctx) {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.width / 2 , 0, 2*Math.PI, true);
+                        ctx.lineWidth = this.padding;
+                        ctx.strokeStyle = this.fill;
+                        ctx.stroke();
+                        ctx.closePath();   
+                    }
+                }
+
+                obj.clipTo = clip;
+            });
+
+            fabric.render();
         }
     });
 });

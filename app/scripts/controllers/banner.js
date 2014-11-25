@@ -248,13 +248,13 @@ define([
                 }
             	self._applyCanvas('logo', { shadow:shadow });
             });
-            $scope.$watch('fabric.selectedObject.hasPlaceholder', function(hasPlaceholder) {
-                if (!$scope.fabric.selectedObject || _.isUndefined(hasPlaceholder)) return;
+            $scope.$watch('fabric.selectedObject.placeholder', function(placeholder) {
+                if (!$scope.fabric.selectedObject || _.isUndefined(placeholder)) return;
             	self._applyCanvas('logo', function(object){
-                    object.hasPlaceholder = hasPlaceholder;
+                    object.placeholder = placeholder;
             	});
             });
-            $scope.$watch('fabric.selectedObject.PADDING', function(newVal, oldVal) {
+            $scope.$watch('fabric.selectedObject.padding', function(newVal, oldVal) {
                 if (!oldVal) return;
 
                 self._applyCanvas('logo');

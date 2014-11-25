@@ -150,14 +150,18 @@
 				<accordion-group ng-repeat="template in templates" is-open="template.open" class="panel-primary">
 					<accordion-heading ng-click="template.open = !template.open">
 			           <span ng-class="{'text-muted':!template.open}">{{template.title}}</span>
-			       </accordion-heading>
+			       	</accordion-heading>
+					<!-- conversation settings -->
 					<div ng-include="'views/conversation-settings.html'"></div>
+					<!-- /conversation settings -->
 				</accordion-group>
 			</accordion>
 		</aside>
 		<section id="editor" ng-class="{'col-xs-6 col-sm-6 col-md-6 col-lg-6':!fullEditor, 'col-xs-12 col-sm-12 col-md-12 col-lg-12':fullEditor}">
 			<!-- fabric settings -->
 			<div ng-include="'views/fabric-editor-settings.html'"></div>
+			<!-- /fabric settings -->
+
 			<!-- zoom -->
 			<div class="col-md-12 margin-top-bottom">
 			    <div class='col-xs-1 text-center'>
@@ -170,14 +174,18 @@
 			        <i class='fa fa-search-plus'></i>
 				</div>
 			</div>
+			<!-- /zoom -->
 
+			<!-- fabric canvas -->
 			<div class="col-md-12 margin-top-bottom image-builder">
 				<h3 class="text-center" style="margin-top:5px; margin-bottom: 0">{{ template }}</h3>
 			    <div id="canvas-conversation" class="fabric-container">
 			        <canvas fabric="fabric"></canvas>
 			    </div>
 			</div>
+			<!-- /fabric canvas -->
 
+			<!-- input backgrounds -->
 			<div id="drop-backgrounds" class="col-md-12">
 				<div class="drop" ng-class="{'loading': backgrounds.reading}" ng-file-drop="onFileSelect($files);" ng-file-drag-over-class="over">
 					<div class="input-button">
@@ -190,9 +198,11 @@
 				</div>
 				<div class="drop-loading" ng-show="backgrounds.reading"><i class="fa fa-spinner fa-spin fa-lg"></i></div>
 			</div>
+			<!-- /input backgrounds -->
 		</section>
 	</div>
-	<!-- background images preview -->
+
+	<!-- backgrounds preview -->
 	<div id="preview" class="row margin-top" ng-show="backgrounds.data.length > 0">
 		<div class="col-md-6">
 			<h4>Backgrounds <span><span class="badge">{{ backgrounds.data.length }}</span></span></h4>
@@ -225,7 +235,7 @@
 						ng-class="{'img-small': background.error && background.image}"
 						ng-hide="background.generate"
 						img-show-crop="background" 
-						img-show-crop-parent="background-preview-{{ $index }}">
+						img-show-crop-parent-id="#background-preview-{{ $index }}">
 			      	<div class="caption" ng-hide="background.generate">
 				        <h5 ng-if="!background.error">{{background.template}} : {{background.name}}</h5>
 						<div ng-show="background.error" class="text-danger text-center">

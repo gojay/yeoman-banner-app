@@ -6,26 +6,29 @@ angular.module('common.fabric.window', [])
     // ================================================================
 	fabric.PolaroidPhoto = fabric.util.createClass(fabric.Image, fabric.Observable, {
 		type: 'polaroidPhoto',
-	    PADDING: 10,
-	    hasPlaceholder: true,
 	    hasShadow: false,
 	    initialize: function(element, options) {
 	        options || (options = {});
 	        this.callSuper('initialize', element, options);
 	        this.set('fill', options.fill || '#fff');
-	        if(this.hasPlaceholder) {
-	        	this.left += this.PADDING;
-	        	this.top += this.PADDING;
+	        this.set('placeholder', options.placeholder || true);
+	        this.set('padding', options.padding || 10);
+	        if(this.placeholder) {
+	        	this.left += this.padding;
+	        	this.top += this.padding;
 	        }
 	    },
 	  	toObject: function() {
 	    	return fabric.util.object.extend(this.callSuper('toObject'), { 
 	    		fill: this.fill,
-	    		hasPlaceholder: this.hasPlaceholder
+	    		placeholder: this.placeholder,
+	    		crossOrigin: 'anonymous'
 	    	});
 	  	},
-	    _render: function(ctx) {
-            if (this.hasPlaceholder) {
+		_render: function(ctx) {
+			ctx.webkitImageSmoothingEnabled = true;
+
+            if (this.placeholder) {
                 ctx.fillStyle = this.fill;
             	ctx.strokeStyle = "rgba(0,0,0,0.3)";
             } else {
@@ -34,29 +37,30 @@ angular.module('common.fabric.window', [])
             }
             
 	        ctx.fillRect(
-            	-(this.width / 2) - this.PADDING, 
-            	-(this.height / 2) - this.PADDING,
-                this.width + this.PADDING * 2,
-                this.height + this.PADDING * 2
+            	-(this.width / 2) - this.padding, 
+            	-(this.height / 2) - this.padding,
+                this.width + this.padding * 2,
+                this.height + this.padding * 2
             );
             ctx.strokeRect(
-            	-(this.width / 2) - this.PADDING, 
-            	-(this.height / 2) - this.PADDING,
-                this.width + this.PADDING * 2,
-                this.height + this.PADDING * 2
+            	-(this.width / 2) - this.padding, 
+            	-(this.height / 2) - this.padding,
+                this.width + this.padding * 2,
+                this.height + this.padding * 2
             );
+      
             this.callSuper('_render', ctx); // Draw image
 	    }
 	});
 	fabric.PolaroidPhoto.fromURL = function(url, callback, imgOptions) {
 	    fabric.util.loadImage(url, function(img) {
 	      callback(new fabric.PolaroidPhoto(img, imgOptions));
-	    }, null, imgOptions && imgOptions.crossOrigin);
+	    }, null, { crossOrigin: 'Anonymous' });
 	};
 	fabric.PolaroidPhoto.fromObject = function(object, callback) {
-	  fabric.util.loadImage(object.src, function(img) {
-	    callback && callback(new fabric.PolaroidPhoto(img, object));
-	  });
+	  	fabric.util.loadImage(object.src, function(img) {
+	    	callback && callback(new fabric.PolaroidPhoto(img, object));
+	  	}, null, { crossOrigin: 'Anonymous' });
 	};
 	fabric.PolaroidPhoto.async = true;
 

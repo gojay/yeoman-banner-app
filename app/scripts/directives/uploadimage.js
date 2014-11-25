@@ -34,8 +34,10 @@ define([
                             selection: null,
                             openSelection : false,
                             selectionIndex: null,
-                            init     : function(file) {
+                            init : function(file) {
                                 var _this = this;
+
+                                $log.log('crop', $scope.uploadOptions);
 
                                 var fileReader = new FileReader();
                                 fileReader.readAsDataURL(file);
@@ -65,7 +67,9 @@ define([
                                 
                                 _this.imageEl = angular.element(image);
 
+                                var top  = image.height < $window.innerHeight / 2 ? (($window.innerHeight - image.height) / 2) : 0 ; 
                                 var left = ($window.innerWidth - image.width) / 2;
+                                var position = image.height > $window.innerHeight && !this.openSelection ? 'absolute' : 'fixed';
                                 $.blockUI({
                                     message   : _this.imageEl,
                                     overlayCSS:{
@@ -74,9 +78,10 @@ define([
                                         backgroundColor: '#2c3e50'
                                     },
                                     css: {
+                                        position: position,
                                         cursor : 'default',
                                         border : 'none',
-                                        top    : '0px',
+                                        top    : top + 'px',
                                         left   : left + 'px',
                                         width  : image.width + 'px'
                                     },
@@ -91,7 +96,10 @@ define([
                                         //         e.stopPropagation();
                                         //     });
 
-                                        var cropSelection = _this.selection || _this._position(image);
+                                        var cropSelection = _this._position(image) || _this.selection;
+
+                                        $log.log('cropSelection', cropSelection);
+
                                         _this.imageEl.imgAreaSelect({
                                             x1 : cropSelection.x1,
                                             y1 : cropSelection.y1,
@@ -213,7 +221,7 @@ define([
                                 var options = $scope.uploadOptions.data;
 
                                 var x1 = parseInt((blockEl.width() - options.width) / 2),
-                                    y1 = parseInt((blockEl.height() - options.height) / 2) - 0;
+                                    y1 = parseInt((blockEl.height() - options.height) / 2);
 
                                 return {
                                     x1: x1,
