@@ -35,7 +35,7 @@ define([
      * Directive imgShowCrop
      *
      * @description show crop selection on image with imgAreaSelect
-     * @example <img img-show-crop="{model}" img-show-crop-parent="{parentid}" />
+     * @example <img img-show-crop="{model}" img-show-crop-parent-id="{parentid}" />
      */
     app.directive('imgShowCrop', function() {
         return {
@@ -148,8 +148,9 @@ define([
             '$log',
             '$timeout',
             '$q',
-            '$compile',
-            '$sce',
+            '$upload',
+
+            'API',
 
             'Fabric',
             'FabricConstants',
@@ -311,6 +312,9 @@ define([
 
             this.$.$on('uploadimage:close:selection', this._onCropSelection);
         },
+        /**
+         * Angular scope $watch
+         */
         watch: {
             '{object}templates': '_onChangeTemplate',
             'conversation.images.logo': '_onChangeImageLogo',
@@ -319,12 +323,16 @@ define([
             '{object}conversation.config.logo': '_onChangeConfigLogo',
             '{object}conversation.config.elements': '_onChangeConfigElements'
         },
+        /**
+         * Watch Scope Asyncronus
+         * @param  {object} $scope The angular $scope
+         * @return {void}        
+         */
         _watchAsync: function($scope) {
             var self = this,
                 log  = this.$log;
 
             log.log("$evalAsync", $scope);
-            log.log("objects", $scope.fabric.getObjects());
 
             $scope.$watch('fabric.controls.angle', function(angle) {
                 if(!angle) return;
@@ -368,18 +376,25 @@ define([
                 if(newVal > 10) $scope.fabric.selectedObject.padding = 10;
                 $scope.fabric.render();
             });
-
-            // $scope.$watch('conversation.images.logo', self._onChangeImageLogo);
-            // $scope.$watchCollection('conversation.images.elements', self._onChangeImageElements);
-            // $scope.$watchCollection('conversation.config.logo', self._onChangeConfigLogo);
-            // $scope.$watchCollection('conversation.config.elements', self._onChangeConfigElements);
         },
 
+        /**
+         * Get title fabric selected object
+         * @param  {string} type The object name
+         * @return {string}      
+         */
         getObjectTitle: function(type) {
             if(!this.$.fabric.selectedObject) return null;
             return _.titleize(this.$.fabric.selectedObject[type]);
         },
 
+        /**
+         * Set action the background
+         * - resize
+         * - crop
+         * @param {integer} index The index background 
+         * @param {string} act   The action
+         */
         setHandle: function(index, act) {
             this.$log.log(index, act);
             var backgound = this.$.backgrounds.data[index];
@@ -402,12 +417,18 @@ define([
             }
         },
 
+        /**
+         * Event button "select backgrounds"
+         * Trigger click input file in the next
+         * @param  {event} evt The button events
+         * @return {void}
+         */
         openFileSelect: function(evt) {
             angular.element(evt.currentTarget).next().trigger('click');
         },
         /**
-         * Atur input file background (multiple)
-         * @param  {Object} $files Input files
+         * Event background input files (multiple)
+         * @param  {Object} $files the input files
          * @return {void}          _chainReadFiles
          */
         onFileSelect: function($files) {
@@ -420,13 +441,18 @@ define([
                 log.info('Start reading files...');
                 self.$.backgrounds.reading = true;
                 self._chainReadFiles($files).then(function (response) {
-                    log.info('End chain...');
+                    log.info('End read files...');
                     log.log('completed', response, self.$.backgrounds);
                     self.$.backgrounds.reading = false;
                 });
             });
         },
-
+        /**
+         * Event background input file (single)
+         * @param  {File} $files The input files
+         * @param  {integer} index  The background index
+         * @return {void} 
+         */
         onFileChange: function($files, index) {
             var self = this, 
                 log = this.$log,
@@ -478,9 +504,20 @@ define([
             // read as data uri
             fileReader.readAsDataURL(file);
         },
-        doChangeImg: function($event) {
-            angular.element($event.currentTarget).next().trigger('click');
+        /**
+         * Event button "change"
+         * Trigger click input file in the next, to change the background
+         * @param  {Event} evt The button events
+         * @return {void}     
+         */
+        doChangeImg: function(evt) {
+            angular.element(evt.currentTarget).next().trigger('click');
         },
+        /**
+         * Remove background selected
+         * @param  {integer} index The background index
+         * @return {void}       
+         */
         doDeleteImg: function(index) {
             var backgrounds = this.$.backgrounds;
             // remove backgrounds errors
@@ -488,7 +525,23 @@ define([
             // remove backgrounds data by index
             backgrounds.data.splice(index, 1);
         },
+        /**
+         * Empty backgrounds
+         * @return {void} 
+         */
+        doEmptyFiles: function() {
+            this.$.backgrounds = {
+                progress: -1,
+                size: 0,
+                errors: [],
+                data: []
+            };
+        },
 
+        /**
+         * Do generate conversation
+         * @return {void} 
+         */
         doGenerate: function() {
             var self = this;
             var log = this.$log;
@@ -544,15 +597,11 @@ define([
                 });
             });
         },
-        doEmptyFiles: function() {
-            this.$.backgrounds = {
-                progress: -1,
-                size: 0,
-                errors: [],
-                data: []
-            };
-        },
 
+        /**
+         * Toggle edit/settings background
+         * @return {void}
+         */
         toggleSettings: function() {
             var backgrounds = this.$.backgrounds;
 
@@ -690,10 +739,11 @@ define([
             return defer.promise;
         },
         /**
-         * file validation
-         * @param  {Object} file       File input
-         * @param  {Boolean} showAlert Tampikan "alert"
-         * @return {Void|Object}       Respons validasi
+         * File validation image
+         * @private
+         * @param  {object} file       The file input
+         * @param  {boolean} showAlert is showing alert if get error ?
+         * @return {void|object}       The response validation
          */
         _validation: function(file, showAlert){
             var response = { status: true };
@@ -748,9 +798,14 @@ define([
             return response;
         },
         /**
-         * Attribut gambar : direction, handle, size
-         * @param  {Integer} width  Lebar gambar
-         * @param  {Integer} height Tinggi gambar
+         * Get image attributes
+         * - act  : The action for image manipulation, such as: crop or resize
+         * - crop : The crop configuration for image manipulation, including the type of crop (center, custom) and crop selection
+         * - resize : The resize dimension for image manipulation
+         * - template : The types of templates, such as : default (square), landscape, portrait
+         * @private
+         * @param  {Integer} width  The image width
+         * @param  {Integer} height The image height
          * @return {Object}
          */
         _getImageAttributes: function(width, height) {
@@ -794,7 +849,7 @@ define([
                 log.log('request', index, request);
                 return promise.then(function() {
                     var el = angular.element('#background-preview-'+ index);
-                    return self._generateBackground(el, request)
+                    return self._generateBackground(el, index, request)
                         .then(function resolve(img) {
                             log.log('resolve', index, img);
                             var name = (index+1) +'.png';
@@ -835,41 +890,84 @@ define([
 
             return promises;
         },
-        _generateBackground: function(element, background) {
+        _generateBackground: function(element, index, backgroundData) {
             var self = this,
                 log = self.$log,
                 timeout = self.$timeout;
+
+            var imageEl = element.find('.image');
+
+            // get overlay images of the selected template 
+            var templates = _.find(self.$.templates, { open:true });
+            var overlayImage = 'images/conversation/' + templates.template[backgroundData.template];
+            // canvas images
+            var images = { overlay:overlayImage, background: backgroundData.image.src };
+
+            var defer = this.$q.defer();
+
+            timeout(function() { defer.notify('Preparing background...'); });
+            // set generate true
+            backgroundData.generate = true;
+
+            // get background image
+            if( backgroundData.act === 'crop' ) {
+                timeout(function() { defer.notify('Cropping background...'); });
+                // do crop background image
+                images.background = this._getCropImage(backgroundData);
+            } else if( backgroundData.act === 'resize' ) {
+                timeout(function() { defer.notify('Resizing background...'); });
+                // do upload 'resize' background image...
+                var uploadURL = self.API.URL + '/upload';
+                var data = angular.extend(backgroundData.resize, { id:'conversation', name: 'background-'+ (index + 1) });
+                self.$upload.upload({
+                    url: uploadURL,
+                    method: 'POST',
+                    data: data,
+                    file: backgroundData.blob,
+                    fileFormDataName: 'image'
+                }).then(function success(response) {
+                    log.info('[upload]', response);
+
+                    images.background = response.data.url;
+                    self._generateImage(imageEl, backgroundData, images, function resolve(response) {
+                        defer.resolve(response);
+                    }, function notify(message) {
+                        timeout(function() { defer.notify(message); });
+                    }, function reject(error) {
+                        defer.reject(error);
+                    });
+
+                }, function error(errors) {
+                    log.error('[upload]', errors);
+                }, function notify(evt) {
+                    var progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                    log.info('[upload]', progress);
+                });
+            } 
+
+            log.info('generate image', backgroundData.act, images);
+            self._generateImage(imageEl, backgroundData, images, function resolve(response) {
+                defer.resolve(response);
+            }, function notify(message) {
+                timeout(function() { defer.notify(message); });
+            }, function reject(error) {
+                defer.reject(error);
+            });
+
+            return defer.promise;
+        },
+        _generateImage: function(imageEl, background, images, resolve, notify, reject) {
+            var self = this,
+                 log = self.$log;
 
             // define original canvas
             var originalCanvas = self.$.fabric.canvas,
                 canvasScale = self.$.fabric.canvasScale;
 
-            var defer = this.$q.defer();
-
-            ///////////////////////////////////
-            // 1. Prepare background image //
-            ///////////////////////////////////
-            timeout(function() { defer.notify('Preparing background...'); });
-            // set generate true
-            background.generate = true;
-
-            var backgroundImage;
-            if( background.act === 'crop' ) {
-                timeout(function() { defer.notify('Cropping background...'); });
-                // do crop background image
-                backgroundImage = this._getCropImage(background);
-            } else if( background.act === 'resize' ) {
-                timeout(function() { defer.notify('Resizing background...'); });
-                // do upload 'resize' background image...
-            } else {
-                // background default is fit!
-                backgroundImage = background.image.src;
-            }
-
             //////////////////////////////
-            // 2. Create canvas preview //
+            // 1. Create canvas preview //
             //////////////////////////////
-            timeout(function() { defer.notify('Creating canvas...'); });
+            notify('Creating canvas...');
 
             // get objects original canvas
             var canvasProperties = originalCanvas.toJSON([
@@ -887,21 +985,15 @@ define([
             // objects length + background + overlay
             var renderingUntil = canvasProperties.objects.length + 2;
 
-            // get selected template 
-            var templates = _.find(self.$.templates, { open:true });
-            var overlayImage = 'images/conversation/' +templates.template[background.template];
-            var images = {
-                background: backgroundImage,
-                overlay:overlayImage
-            };
-
             // set rendering
             var rendering = 0;
+            // create canvas preview
             var canvasPreview = self._createCanvas(canvasProperties, background, images, canvasScale, null);
+            // canvas preview event "after render"
             canvasPreview.on('after:render', function() {
-                rendering++;
+                rendering += 1;
                 log.log('preview:after:render', rendering);
-
+                // render is completed
                 if(rendering == renderingUntil) {
                     log.log('render completed', canvasPreview);
 
@@ -909,32 +1001,32 @@ define([
                     // set relative position
                     canvasEl.style.position = 'relative';
                     // add fabric canvas element
-                    element.find('.image').parent().find('canvas').remove();
-                    element.find('.image').append(canvasEl);
+                    imageEl.parent().find('canvas').remove();
+                    imageEl.append(canvasEl);
 
                     /////////////////////////////////
-                    // 3. Generate original canvas //
+                    // 2. Generate original canvas //
                     /////////////////////////////////
-                    timeout(function() {
-                        defer.notify('Generating...');
+                    notify('Generating...');
 
-                        var rendering = 0;
-                        var canvasOri = self._createCanvas(canvasProperties, background, images, 1, canvasScale);
-                        canvasOri.on('after:render', function() {
-                            rendering++;
-                            log.log('original:after:render', rendering);
-                            if(rendering == renderingUntil) {
-                                var canvasOriEl = canvasOri.getElement();
-                                defer.resolve(canvasOriEl.toDataURL());
-                            }
-                        });
+                    rendering = 0;
+                    // create canvas original
+                    var canvasOri = self._createCanvas(canvasProperties, background, images, 1, canvasScale);
+                    // canvas original event "after render"
+                    canvasOri.on('after:render', function() {
+                        rendering += 1;
+                        log.log('original:after:render', rendering);
+                        if(rendering == renderingUntil) {
+                            // resolve image
+                            var canvasOriEl = canvasOri.getElement();
+                            var image = canvasOri.toDataURL();
+                            // call resolve
+                            resolve(image);
+                        }
                     });
                 }
             });
-
-            return defer.promise;
         },
-
         _createCanvas: function(canvasProperties, background, images, canvasScale, oldScale) {
             // get json objects
             var json = JSON.stringify(canvasProperties);
@@ -974,14 +1066,16 @@ define([
                     top : 0,
                     left: 0,
                     scaleX: canvasScale,
-                    scaleY: canvasScale
+                    scaleY: canvasScale,
+                    crossOrigin: 'Anonymous'
                 });
                 // set overlay image
                 canvas.setOverlayImage(images.overlay, canvas.renderAll.bind(canvas), {
                     top : 0,
                     left: 0,
                     scaleX: canvasScale,
-                    scaleY: canvasScale
+                    scaleY: canvasScale,
+                    crossOrigin: 'Anonymous'
                 });
             });
             return canvas;
@@ -1077,8 +1171,6 @@ define([
 
             fabric.buildObjects(objects);
 
-            self.$log.debug('fabric', fabric);
-
             self.$.$evalAsync(self._watchAsync);
         },
         _onCropSelection: function(event, args) {
@@ -1150,9 +1242,10 @@ define([
                 var obj = fabric.getObjectByName(name);
                 obj.visible = element.enable;
                 obj.placeholder = element.placeholder;
-                // image circle
+
                 var clip = null
                 if( !element.default ) {
+                    // clip image circle
                     clip = function(ctx) {
                         ctx.beginPath();
                         ctx.arc(0, 0, this.width / 2 , 0, 2*Math.PI, true);
