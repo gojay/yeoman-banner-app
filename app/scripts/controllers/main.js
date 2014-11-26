@@ -19,33 +19,38 @@ define(['angular'], function(angular) {
                     modal: true
                 }],
 
-                'Poster': [{
-                    title: 'Mobile',
-                    link: 'splash/mobile'
-                }, { 
-                    title: 'Facebook',
-                    link: 'splash/facebook'
-                }, {
-                    title: 'Custom',
-                    link: 'splash/custom'
-                }],
+                'Poster': [
+                    {
+                        title: 'Mobile',
+                        link: 'splash/mobile'
+                    }, 
+                    // { 
+                    //     title: 'Facebook',
+                    //     link: 'splash/facebook'
+                    // }, {
+                    //     title: 'Custom',
+                    //     link: 'splash/custom'
+                    // }
+                ],
 
-                'SVG & Modules': [{
-                    title: 'RaphaelJS',
-                    link: 'svg/raphael'
-                }, {
-                    title: 'FabricJS',
-                    link: 'svg/fabric'
-                }, {
-                    title: 'FabricJS 2',
-                    link: 'svg/fabric2'
-                }, {
-                    title: 'ng-file-upload',
-                    link: 'module/ng-file-upload'
-                }, {
-                    title: 'PUSHER',
-                    link: 'pusher'
-                }]
+                'SVG & Modules': [
+                    {
+                        title: 'RaphaelJS',
+                        link: 'svg/raphael'
+                    }, {
+                        title: 'FabricJS Kitchen',
+                        link: 'svg/fabric'
+                    }, {
+                        title: 'FabricJS Kitchen 2',
+                        link: 'svg/fabric2'
+                    }, {
+                        title: 'PUSHER',
+                        link: 'pusher'
+                    }, {
+                        title: 'ng-file-upload',
+                        link: 'module/ng-file-upload'
+                    }
+                ]
             };
 
             var icons = [

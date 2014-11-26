@@ -140,6 +140,12 @@ define([
         }
     });
 
+    var IMAGE = {
+        extension: '.png',
+        directory: 'images/conversation/',
+        default  : 'images/default/file.png'
+    };
+
     app.classy.controller({
         name: 'ConversationCtrl',
         inject: [
@@ -159,7 +165,8 @@ define([
         ],
         initScope: {
             fabric: {},
-            fulleditor: false,
+            fullEditor: false,
+            selected: 0,
             uploadOptions: {
                 logo: {
                     data: {
@@ -187,7 +194,7 @@ define([
                         }
                     }
                 }
-            }
+            },
         },
         init: function() {
             var self = this;
@@ -208,60 +215,136 @@ define([
                 }
             };
 
+            /* colors */
+            this.$.colors = [ 
+                {
+                    name : '',
+                    title: 'Light Orange',
+                    color: 'orange',
+                    selected: true
+                }, 
+                {
+                    name : 'blue',
+                    title: 'Blue',
+                    color: 'blue',
+                    selected: false
+                },
+                {
+                    name : 'dblue',
+                    title: 'Dark Blue',
+                    color: 'darkblue',
+                    selected: false
+                },
+                {
+                    name : 'dorange',
+                    title: 'Dark Orange',
+                    color: 'darkorange',
+                    selected: false
+                },
+                {
+                    name : 'lgreen',
+                    title: 'Light Green',
+                    color: 'lightgreen',
+                    selected: false
+                }, 
+                {
+                    name : 'green',
+                    title: 'Green',
+                    color: 'green',
+                    selected: false
+                },
+                {
+                    name : 'yellow',
+                    title: 'Yellow',
+                    color: 'yellow',
+                    selected: false
+                }, 
+                {
+                    name : 'dyellow',
+                    title: 'Dark Yellow',
+                    color: '#CCCC00',
+                    selected: false
+                },
+                {
+                    name : 'purple',
+                    title: 'Purple',
+                    color: 'purple',
+                    selected: false
+                }, 
+                {
+                    name : 'pink',
+                    title: 'Pink',
+                    color: 'pink',
+                    selected: false
+                },
+                {
+                    name : 'red',
+                    title: 'Red',
+                    color: 'red',
+                    selected: false
+                }
+            ];
+
             /* templates */
             this.$.templates = [
                 {
                     title: 'Template 1',
                     open: true,
+                    colors: false,
                     template: {
-                        default  : 'tpl-1.png',
-                        landscape: 'tpl-1-landscape.png',
-                        portrait  : 'tpl-1-portrait.png'
+                        default  : 'tpl-1-default',
+                        landscape: 'tpl-1-landscape',
+                        portrait : 'tpl-1-portrait'
                     }
                 },
                 {
                     title: 'Template 2',
                     open : false,
+                    colors: false,
                     template: {
-                        default  : 'tpl-2.png',
-                        landscape: 'tpl-2-landscape.png',
-                        portrait  : 'tpl-2-portrait.png'
+                        default  : 'tpl-2-default',
+                        landscape: 'tpl-2-landscape',
+                        portrait : 'tpl-2-portrait'
                     }
                 },
                 {
                     title: 'Template 3',
                     open: false,
+                    colors: false,
                     template: {
-                        default  : 'tpl-3.png',
-                        landscape: 'tpl-3-landscape.png',
-                        portrait  : 'tpl-3-portrait.png'
+                        default  : 'tpl-3-default',
+                        landscape: 'tpl-3-landscape',
+                        portrait : 'tpl-3-portrait'
                     }
                 },
                 {
                     title: 'Template 4',
                     open: false,
+                    colors: true,
                     template: {
-                        default  : 'tpl-4.png',
-                        landscape: 'tpl-4-landscape.png',
-                        portrait  : 'tpl-4-portrait.png'
+                        default  : 'tpl-4-default',
+                        landscape: 'tpl-4-landscape',
+                        portrait : 'tpl-4-portrait'
                     }
                 },
                 {
                     title: 'Template 5',
                     open: false,
+                    colors: true,
                     template: {
-                        default  : 'tpl-5.png',
-                        landscape: 'tpl-5-landscape.png',
-                        portrait  : 'tpl-5-portrait.png'
+                        default  : 'tpl-5-default',
+                        landscape: 'tpl-5-landscape',
+                        portrait : 'tpl-5-portrait'
                     }
                 },
                 {
                     title: 'Template 6',
                     open: false,
+                    colors: true,
                     template: {
-                        default  : 'tpl-6.png',
-                        landscape: 'tpl-6-landscape.png',
-                        portrait  : 'tpl-6-portrait.png'
+                        default  : 'tpl-6-default',
+                        landscape: 'tpl-6-landscape',
+                        portrait : 'tpl-6-portrait'
                     }
                 }
             ];
@@ -386,6 +469,23 @@ define([
         getObjectTitle: function(type) {
             if(!this.$.fabric.selectedObject) return null;
             return _.titleize(this.$.fabric.selectedObject[type]);
+        },
+
+        /**
+         * Select template color
+         * @param  {integer} index The color index
+         * @return {void}       
+         */
+        doSelectColor: function(index) {
+            angular.forEach(this.$.colors, function(color) {
+                color.selected = false;
+            });
+
+            this.$.colors[index].selected = true;
+
+            var imgURL = this._getTemplateImageURL('default', index);
+            console.log('imgURL', imgURL);
+            this.$.fabric.setOverlayImage(imgURL);
         },
 
         /**
@@ -681,7 +781,7 @@ define([
                 log.warn(valid.message);
 
                 defer.reject({ 
-                    image: { src: 'images/default/file.png' },
+                    image: { src: IMAGE.default },
                     error: valid.message 
                 });
 
@@ -898,8 +998,7 @@ define([
             var imageEl = element.find('.image');
 
             // get overlay images of the selected template 
-            var templates = _.find(self.$.templates, { open:true });
-            var overlayImage = 'images/conversation/' + templates.template[backgroundData.template];
+            var overlayImage = self._getTemplateImageURL(backgroundData.template);
             // canvas images
             var images = { overlay:overlayImage, background: backgroundData.image.src };
 
@@ -1135,7 +1234,7 @@ define([
             var objects = [
                 {
                     type: 'overlay',
-                    image: 'images/conversation/tpl-1.png'
+                    image: ''
                 },
                 {
                     type: 'polaroid',
@@ -1143,8 +1242,8 @@ define([
                     options: {
                         name: 'logo',
                         fill: '#fff',
-                        top : 80,
-                        left: 40
+                        top : 90,
+                        left: 50
                     }
                 },
                 {
@@ -1153,8 +1252,8 @@ define([
                     options: {
                         name: 'element-1',
                         fill: '#fff',
-                        top : 265,
-                        left: 40
+                        top : 275,
+                        left: 50
                     }
                 },
                 {
@@ -1163,8 +1262,8 @@ define([
                     options: {
                         name: 'element-2',
                         fill: '#fff',
-                        top : 265,
-                        left: 283
+                        top : 275,
+                        left: 293
                     }
                 }
             ];
@@ -1179,17 +1278,17 @@ define([
         },
 
         _onChangeTemplate: function(newVal, oldVal) {
-            var selected = _.find(newVal, { open:true });
-            this.$log.log('_onChangeTemplate', selected);
+            this.$.selected = _.findKey(newVal, { open:true });
+            this.$log.log('_onChangeTemplate', this.$.selected);
 
-            var imgURL = 'images/conversation/' + selected.template.default;
+            var imgURL = this._getTemplateImageURL('default');
             this.$.fabric.setOverlayImage(imgURL);
         },
 
         _onChangeImageLogo: function(newVal, oldVal) {
             var fabric = this.$.fabric;
             this.$log.log('_onChangeImageLogo', newVal, oldVal);
-            if(!newVal) return;
+            if(!newVal || !fabric) return;
 
             var logo = fabric.getObjectByName('logo');
             logo.getElement().setAttribute('src', newVal);
@@ -1201,7 +1300,7 @@ define([
             var fabric = this.$.fabric;
             this.$log.log('_onChangeImageElements', newVal, oldVal);
 
-            if(_.isEqual(newVal, oldVal)) return;
+            if(_.isEqual(newVal, oldVal) || !fabric) return;
 
             angular.forEach(newVal, function(image, index){
                 if( image && image != oldVal[index] ) {
@@ -1222,7 +1321,7 @@ define([
 
             log.log('_onChangeConfigLogo', newVal, oldVal);
 
-            if(_.isEqual(newVal, oldVal)) return;
+            if(_.isEqual(newVal, oldVal) || !fabric) return;
 
             var logo = fabric.getObjectByName('logo');
             logo.visible = newVal.enable;
@@ -1235,7 +1334,7 @@ define([
 
             log.log('_onChangeConfigElements', newVal, oldVal);
             
-            if(_.isEqual(newVal, oldVal)) return;
+            if(_.isEqual(newVal, oldVal) || !fabric) return;
 
             angular.forEach(newVal, function(element, index){
                 var name = 'element-' + index;
@@ -1260,6 +1359,22 @@ define([
             });
 
             fabric.render();
+        },
+
+        _getTemplateImageURL: function(type, indexColor) {
+            var selected = this.$.templates[this.$.selected];
+
+            var imgName = selected.template[type];
+            if( selected.colors ) {
+                if( angular.isDefined(indexColor) && indexColor > 0 ) {
+                    var color = this.$.colors[indexColor];
+                    imgName += '-' + color.name;
+                } else {
+                    var color = _.find(this.$.colors, { selected:true });
+                    if( color.name ) imgName += '-' + color.name;
+                }
+            }
+            return IMAGE.directory + imgName + IMAGE.extension;
         }
     });
 });

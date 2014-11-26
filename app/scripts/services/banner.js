@@ -94,8 +94,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/122x80.png',
                             options: {
                                 name: 'logo',
-                                top: 10,
-                                left: 10
+                                top: 20,
+                                left: 20
                             }
                         },
                         {
@@ -103,8 +103,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/340x163.png',
                             options: {
                                 name: 'prize-image-1',
-                                top : 185,
-                                left: 440
+                                top : 195,
+                                left: 450
                             }
                         },
                         {
@@ -295,8 +295,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/122x80.png',
                             options: {
                                 name: 'logo',
-                                top: 10,
-                                left: 10
+                                top: 20,
+                                left: 20
                             }
                         },
                         {
@@ -304,8 +304,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/193x120.png',
                             options: {
                                 name: 'prize-image-1',
-                                top : 190,
-                                left: 365
+                                top : 200,
+                                left: 375
                             }
                         },
                         {
@@ -313,8 +313,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/193x120.png',
                             options: {
                                 name: 'prize-image-2',
-                                top : 190,
-                                left: 588
+                                top : 200,
+                                left: 598
                             }
                         },
                         {
@@ -541,8 +541,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/122x80.png',
                             options: {
                                 name: 'logo',
-                                top : 30,
-                                left: 30
+                                top : 40,
+                                left: 40
                             }
                         },
                         {
@@ -559,8 +559,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/230x230.png',
                             options: {
                                 name: 'prize-image-1',
-                                top : 435,
-                                left: 20
+                                top : 445,
+                                left: 30
                             }
                         },
                         {
@@ -568,8 +568,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/230x230.png',
                             options: {
                                 name: 'prize-image-2',
-                                top : 435,
-                                left: 280
+                                top : 445,
+                                left: 290
                             }
                         },
                         {
@@ -577,8 +577,8 @@ define(['angular'], function(angular) {
                             image: 'images/default/230x230.png',
                             options: {
                                 name: 'prize-image-3',
-                                top : 435,
-                                left: 540
+                                top : 445,
+                                left: 550
                             }
                         },
                         /* contest */

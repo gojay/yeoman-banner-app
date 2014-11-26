@@ -34,6 +34,7 @@ define([
             '$scope',
             '$log',
             '$timeout',
+            '$q',
 
             'Fabric',
             'FabricConstants',
@@ -103,7 +104,8 @@ define([
             loadRandomImage: false
         },
         init: function() {
-            var self = this;
+            var self = this, 
+                 log = self.$log;
 
             $('a[data-toggle="tab"]')
                 .click(function(e) {
@@ -121,14 +123,21 @@ define([
             this.$.banner = new this.Banner();
             angular.extend(this.$.banner, this.BannerData.model);
 
+            /**
+             * Async
+             */
             var q = async.queue(function (task, callback) {
-                self.$log.log('[queue] ', task);
-                self._onCanvasCreated(task, callback);
-            });
-
+                log.info('[queue] ', task);
+                return self._onCanvasCreated(task).then(function sucess() {
+                    callback();
+                }, function reject(error) {
+                    callback(error);
+                });
+            }, 1);
             // assign a callback
             q.drain = function() {
-                self.$log.log('[drain] all canvases have been created');
+                log.info('[drain] all canvases have been created');
+                log.info("\n-----------");
 
                 self.$.$evalAsync(self._watchAsync);
 
@@ -137,38 +146,40 @@ define([
                         if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
                             self.$.fabric.controls.top -= 1;
                             self.$.$apply();
-                            self.$log.debug('up', self.$.fabric.controls.top);
+                            log.debug('up', self.$.fabric.controls.top);
                         }
                     },
                     down: function() {
                         if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
                             self.$.fabric.controls.top += 1;
                             self.$.$apply();
-                            self.$log.debug('down', self.$.fabric.controls.top);
+                            log.debug('down', self.$.fabric.controls.top);
                         }
                     },
                     left: function() {
                         if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
                             self.$.fabric.controls.left -= 1;
                             self.$.$apply();
-                            self.$log.debug('left', self.$.fabric.controls.left);
+                            log.debug('left', self.$.fabric.controls.left);
                         }
                     },
                     right: function() {
                         if (self.$.fabric.selectedObject && !self.$.fabric.selectedObject.isEditing) {
                             self.$.fabric.controls.left += 1;
                             self.$.$apply();
-                            self.$log.debug('right', self.$.fabric.controls.left);
+                            log.debug('right', self.$.fabric.controls.left);
                         }
                     }
                 });
             };
-
             this.$.$on('canvas:created', function(event, args) {
 
                 // add to the queue
                 q.push(args, function (err) {
-                    self.$log.log('[finished] processing ' + args.canvasId);
+                    if(err) {
+                        log.error(args.canvasId, err);
+                    }
+                    log.info('[finished] processing ' + args.canvasId);
                 });
 
             });
@@ -315,7 +326,8 @@ define([
         },
 
         /**
-         * Mengatur background canvas dengan gambar acak. Gambar dari http://lorempixel.com, dengan ukuran canvas/background
+         * Mengatur background canvas dengan gambar acak. 
+         * Gambar dari http://placekitten.com, dengan ukuran canvas/background
          */
         setRandomBackground: function() {
             var self = this;
@@ -338,18 +350,6 @@ define([
 
             var img = new Image();
             img.onload = function() {
-
-                // var canvas = document.createElement('canvas'),
-                //     ctx = canvas.getContext('2d');
-
-                // canvas.height = img.height;
-                // canvas.width = img.width;
-                // ctx.drawImage(img, 0, 0);
-
-                // var dataURL = canvas.toDataURL('image/png');
-                // console.log(dataURL);
-
-                // self.$.banner.images.background = dataURL;
                 self.$.banner.images.background = this.src;
                 self.$.loadRandomImage = false;
                 self.$.$digest();
@@ -512,10 +512,13 @@ define([
          * @param  {Object} event canvas event
          * @param  {Object} args  nilai attribut dari canvas
          */
-        _onCanvasCreated: function(args, callback) {
-            var self = this;
+        _onCanvasCreated: function(args) {
+            var self = this,
+                 log = self.$log;
 
-            this.$log.log('initialize canvas:created', args);
+            var defer = self.$q.defer();
+
+            log.log('initialize canvas:created', args);
 
             var canvasFabric   = args.canvasId;
             var canvasTemplate = args.canvasTemplate;
@@ -563,10 +566,19 @@ define([
 
                 fabric.buildObjects(objects);
 
-                self.$log.debug('objects', fabric.getObjects());
+                var render = 0;
+                fabric.canvas.on('after:render', function(e) {
+                    render++;
+                    if(render == objects.length) {
+                        log.log('objects', canvasFabric, fabric.getObjects());
+                        defer.resolve();
+                    }
+                });
+            } else {
+                defer.reject('Object is empty!');
             }
 
-            callback();
+            return defer.promise;
         },
 
         _onFullEditor: function(newVal, oldVal) {

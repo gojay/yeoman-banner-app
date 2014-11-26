@@ -351,3 +351,15 @@ input[type="range"]::-webkit-slider-thumb {
 .toggle-switch .switch-left { 
   background: #18bc9c; 
 }
+
+/* button colors */
+
+.btn-color-picker > .btn {
+  height:20px;
+  border-color: transparent;
+}
+.btn-color-picker > .btn.active {
+  -webkit-box-shadow: 0 6px 6px -6px black;
+       -moz-box-shadow: 0 6px 6px -6px black;
+            box-shadow: 0 6px 6px -6px black;
+}

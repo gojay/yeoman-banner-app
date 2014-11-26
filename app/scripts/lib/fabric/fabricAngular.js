@@ -150,6 +150,10 @@ angular.module('common.fabric', [
                     canvas.selection = self.canvasDefaults.selection;
                 };
 
+                self.getCanvas = function() {
+                    return canvas;
+                };
+
                 self.setTextDefaults = function(textDefaults) {
                     self.textDefaults = textDefaults;
                 };

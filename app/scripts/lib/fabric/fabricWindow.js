@@ -13,10 +13,6 @@ angular.module('common.fabric.window', [])
 	        this.set('fill', options.fill || '#fff');
 	        this.set('placeholder', options.placeholder || true);
 	        this.set('padding', options.padding || 10);
-	        if(this.placeholder) {
-	        	this.left += this.padding;
-	        	this.top += this.padding;
-	        }
 	    },
 	  	toObject: function() {
 	    	return fabric.util.object.extend(this.callSuper('toObject'), { 

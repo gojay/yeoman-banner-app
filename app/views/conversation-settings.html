@@ -1,3 +1,14 @@
+<div class="form-group col-md-12 prefix" ng-if="templates[selected].colors">
+	<div class="btn-group btn-color-picker">
+		<button type="button" class="btn btn-sm"
+			tooltip="{{c.title}}"
+			ng-repeat="c in colors"
+			ng-style="{'background': c.color}" 
+  			ng-class="{'active': c.selected}"
+  			ng-click="doSelectColor($index)">
+		</button>
+	</div>
+</div>
 <div class="form-group col-md-12 prefix">
 	<label>Logo</label>
 	<span class="pull-right">
